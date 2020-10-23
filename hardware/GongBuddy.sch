@@ -786,18 +786,6 @@ Connection ~ 7000 2450
 Wire Wire Line
 	7000 2450 7000 2800
 Wire Wire Line
-	8250 1650 8950 1650
-Wire Wire Line
-	8250 1750 8950 1750
-Wire Wire Line
-	8250 1850 8950 1850
-Wire Wire Line
-	8250 1950 8950 1950
-Wire Wire Line
-	8250 2050 8950 2050
-Wire Wire Line
-	8250 2150 8950 2150
-Wire Wire Line
 	8250 2250 8950 2250
 Wire Wire Line
 	8250 2350 8950 2350
@@ -1336,30 +1324,30 @@ DIO5
 Text Label 8800 2250 2    50   ~ 0
 PG
 Wire Wire Line
-	10800 2250 10450 2250
+	10750 2850 10400 2850
 Wire Wire Line
-	10800 2350 10450 2350
+	10750 2950 10400 2950
 Wire Wire Line
-	10800 2550 10450 2550
+	10750 3150 10400 3150
 Wire Wire Line
-	10800 2650 10450 2650
-Text Label 10450 2250 0    50   ~ 0
+	10750 3250 10400 3250
+Text Label 10400 2850 0    50   ~ 0
 VDD_OUT
-Text Label 10450 2350 0    50   ~ 0
+Text Label 10400 2950 0    50   ~ 0
 SWD_CLK
-Text Label 10450 2550 0    50   ~ 0
+Text Label 10400 3150 0    50   ~ 0
 SWD_IO
-Text Label 10450 2650 0    50   ~ 0
+Text Label 10400 3250 0    50   ~ 0
 NRST
 $Comp
 L power:GND #PWR013
 U 1 1 5FA14628
-P 9850 2500
-F 0 "#PWR013" H 9850 2250 50  0001 C CNN
-F 1 "GND" H 9855 2327 50  0000 C CNN
-F 2 "" H 9850 2500 50  0001 C CNN
-F 3 "" H 9850 2500 50  0001 C CNN
-	1    9850 2500
+P 9800 3050
+F 0 "#PWR013" H 9800 2800 50  0001 C CNN
+F 1 "GND" H 9805 2877 50  0000 C CNN
+F 2 "" H 9800 3050 50  0001 C CNN
+F 3 "" H 9800 3050 50  0001 C CNN
+	1    9800 3050
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -1456,17 +1444,6 @@ F 3 "~" H 2500 5850 50  0001 C CNN
 	1    2500 5850
 	1    0    0    -1  
 $EndComp
-$Comp
-L Connector_Generic:Conn_01x15 J8
-U 1 1 5FAC72F6
-P 9150 2350
-F 0 "J8" H 9230 2392 50  0000 L CNN
-F 1 "Conn_01x15" H 9230 2301 50  0000 L CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x15_P2.54mm_Vertical" H 9150 2350 50  0001 C CNN
-F 3 "~" H 9150 2350 50  0001 C CNN
-	1    9150 2350
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	8950 2550 8450 2550
 Wire Wire Line
@@ -1480,48 +1457,22 @@ I2C_SDA
 Text Label 8450 2450 0    50   ~ 0
 LORA_CS
 $Comp
-L Connector_Generic:Conn_01x15 J4
-U 1 1 5FB3FCCE
-P 11000 2350
-F 0 "J4" H 11080 2392 50  0000 L CNN
-F 1 "Conn_01x15" H 11080 2301 50  0000 L CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_1x15_P2.54mm_Vertical" H 11000 2350 50  0001 C CNN
-F 3 "~" H 11000 2350 50  0001 C CNN
-	1    11000 2350
-	1    0    0    -1  
-$EndComp
-$Comp
 L power:VBUS #PWR017
 U 1 1 5FB416C0
-P 10050 2750
-F 0 "#PWR017" H 10050 2600 50  0001 C CNN
-F 1 "VBUS" H 10065 2923 50  0000 C CNN
-F 2 "" H 10050 2750 50  0001 C CNN
-F 3 "" H 10050 2750 50  0001 C CNN
-	1    10050 2750
+P 10050 2400
+F 0 "#PWR017" H 10050 2250 50  0001 C CNN
+F 1 "VBUS" H 10065 2573 50  0000 C CNN
+F 2 "" H 10050 2400 50  0001 C CNN
+F 3 "" H 10050 2400 50  0001 C CNN
+	1    10050 2400
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	10800 2950 10050 2950
+	10800 2600 10050 2600
 Wire Wire Line
-	10050 2950 10050 2750
-Text Label 10450 2850 0    50   ~ 0
+	10050 2600 10050 2400
+Text Label 10450 2500 0    50   ~ 0
 VBAT
-$Comp
-L power:GND #PWR021
-U 1 1 5FB7CFA1
-P 10700 3150
-F 0 "#PWR021" H 10700 2900 50  0001 C CNN
-F 1 "GND" H 10705 2977 50  0000 C CNN
-F 2 "" H 10700 3150 50  0001 C CNN
-F 3 "" H 10700 3150 50  0001 C CNN
-	1    10700 3150
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	10800 3050 10700 3050
-Wire Wire Line
-	10700 3050 10700 3150
 Text Label 8450 2950 0    50   ~ 0
 SPI_MISO
 Text Label 8450 2750 0    50   ~ 0
@@ -1547,47 +1498,14 @@ Wire Wire Line
 Wire Wire Line
 	10800 1650 10500 1650
 $Comp
-L power:GND #PWR0104
-U 1 1 5FC33EC8
-P 8900 3150
-F 0 "#PWR0104" H 8900 2900 50  0001 C CNN
-F 1 "GND" H 8905 2977 50  0000 C CNN
-F 2 "" H 8900 3150 50  0001 C CNN
-F 3 "" H 8900 3150 50  0001 C CNN
-	1    8900 3150
-	1    0    0    -1  
-$EndComp
-$Comp
 L Mechanical:MountingHole H1
 U 1 1 5FC8A6F8
 P 9800 750
 F 0 "H1" H 9900 796 50  0000 L CNN
 F 1 "MountingHole" H 9900 705 50  0000 L CNN
-F 2 "MountingHole:MountingHole_2.7mm_M2.5" H 9800 750 50  0001 C CNN
+F 2 "MountingHole:MountingHole_4mm" H 9800 750 50  0001 C CNN
 F 3 "~" H 9800 750 50  0001 C CNN
 	1    9800 750 
-	1    0    0    -1  
-$EndComp
-$Comp
-L Mechanical:MountingHole H3
-U 1 1 5FC8AD07
-P 10350 750
-F 0 "H3" H 10450 796 50  0000 L CNN
-F 1 "MountingHole" H 10450 705 50  0000 L CNN
-F 2 "MountingHole:MountingHole_2.7mm_M2.5" H 10350 750 50  0001 C CNN
-F 3 "~" H 10350 750 50  0001 C CNN
-	1    10350 750 
-	1    0    0    -1  
-$EndComp
-$Comp
-L Mechanical:MountingHole H4
-U 1 1 5FC8B0C0
-P 10350 1000
-F 0 "H4" H 10450 1046 50  0000 L CNN
-F 1 "MountingHole" H 10450 955 50  0000 L CNN
-F 2 "MountingHole:MountingHole_2.7mm_M2.5" H 10350 1000 50  0001 C CNN
-F 3 "~" H 10350 1000 50  0001 C CNN
-	1    10350 1000
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -1596,36 +1514,30 @@ U 1 1 5FC8B37A
 P 9800 1000
 F 0 "H2" H 9900 1046 50  0000 L CNN
 F 1 "MountingHole" H 9900 955 50  0000 L CNN
-F 2 "MountingHole:MountingHole_2.7mm_M2.5" H 9800 1000 50  0001 C CNN
+F 2 "MountingHole:MountingHole_4mm" H 9800 1000 50  0001 C CNN
 F 3 "~" H 9800 1000 50  0001 C CNN
 	1    9800 1000
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	10800 2850 10450 2850
+	10800 2500 10450 2500
 $Comp
 L power:VCC #PWR020
 U 1 1 5FB411A1
-P 10200 2700
-F 0 "#PWR020" H 10200 2550 50  0001 C CNN
-F 1 "VCC" H 10215 2873 50  0000 C CNN
-F 2 "" H 10200 2700 50  0001 C CNN
-F 3 "" H 10200 2700 50  0001 C CNN
-	1    10200 2700
+P 10200 2350
+F 0 "#PWR020" H 10200 2200 50  0001 C CNN
+F 1 "VCC" H 10215 2523 50  0000 C CNN
+F 2 "" H 10200 2350 50  0001 C CNN
+F 3 "" H 10200 2350 50  0001 C CNN
+	1    10200 2350
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	10200 2750 10200 2700
+	10200 2400 10200 2350
 Wire Wire Line
-	10200 2750 10800 2750
+	10200 2400 10800 2400
 Wire Wire Line
-	10800 2450 9850 2450
-Wire Wire Line
-	9850 2450 9850 2500
-Wire Wire Line
-	8950 3050 8900 3050
-Wire Wire Line
-	8900 3050 8900 3150
+	10750 3050 9800 3050
 Wire Wire Line
 	850  1800 850  1900
 Wire Wire Line
@@ -1659,4 +1571,203 @@ Wire Wire Line
 Connection ~ 1600 6850
 Wire Wire Line
 	1600 6850 1600 6900
+$Comp
+L Connector:TestPoint TP1
+U 1 1 5F92D286
+P 10800 1650
+F 0 "TP1" V 10754 1838 50  0000 L CNN
+F 1 "TestPoint" V 10845 1838 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 11000 1650 50  0001 C CNN
+F 3 "~" H 11000 1650 50  0001 C CNN
+	1    10800 1650
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP2
+U 1 1 5F93CDA4
+P 10800 1750
+F 0 "TP2" V 10754 1938 50  0000 L CNN
+F 1 "TestPoint" V 10845 1938 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 11000 1750 50  0001 C CNN
+F 3 "~" H 11000 1750 50  0001 C CNN
+	1    10800 1750
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP3
+U 1 1 5F93CEF8
+P 10800 1850
+F 0 "TP3" V 10754 2038 50  0000 L CNN
+F 1 "TestPoint" V 10845 2038 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 11000 1850 50  0001 C CNN
+F 3 "~" H 11000 1850 50  0001 C CNN
+	1    10800 1850
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP4
+U 1 1 5F93D048
+P 10800 1950
+F 0 "TP4" V 10754 2138 50  0000 L CNN
+F 1 "TestPoint" V 10845 2138 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 11000 1950 50  0001 C CNN
+F 3 "~" H 11000 1950 50  0001 C CNN
+	1    10800 1950
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP5
+U 1 1 5F93D1D0
+P 10800 2050
+F 0 "TP5" V 10754 2238 50  0000 L CNN
+F 1 "TestPoint" V 10845 2238 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 11000 2050 50  0001 C CNN
+F 3 "~" H 11000 2050 50  0001 C CNN
+	1    10800 2050
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP6
+U 1 1 5F93D31B
+P 10800 2150
+F 0 "TP6" V 10754 2338 50  0000 L CNN
+F 1 "TestPoint" V 10845 2338 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 11000 2150 50  0001 C CNN
+F 3 "~" H 11000 2150 50  0001 C CNN
+	1    10800 2150
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP9
+U 1 1 5F93D5CD
+P 10800 2600
+F 0 "TP9" V 10754 2788 50  0000 L CNN
+F 1 "TestPoint" V 10845 2788 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 11000 2600 50  0001 C CNN
+F 3 "~" H 11000 2600 50  0001 C CNN
+	1    10800 2600
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP8
+U 1 1 5F93DCCE
+P 10800 2500
+F 0 "TP8" V 10754 2688 50  0000 L CNN
+F 1 "TestPoint" V 10845 2688 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 11000 2500 50  0001 C CNN
+F 3 "~" H 11000 2500 50  0001 C CNN
+	1    10800 2500
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP7
+U 1 1 5F93DDF2
+P 10800 2400
+F 0 "TP7" V 10754 2588 50  0000 L CNN
+F 1 "TestPoint" V 10845 2588 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 11000 2400 50  0001 C CNN
+F 3 "~" H 11000 2400 50  0001 C CNN
+	1    10800 2400
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x05 J2
+U 1 1 5F969BDD
+P 10950 3050
+F 0 "J2" H 11030 3092 50  0000 L CNN
+F 1 "Conn_01x05" H 11030 3001 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x05_P2.54mm_Vertical" H 10950 3050 50  0001 C CNN
+F 3 "~" H 10950 3050 50  0001 C CNN
+	1    10950 3050
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector_Generic:Conn_01x08 J4
+U 1 1 5F962A93
+P 9150 2550
+F 0 "J4" H 9230 2542 50  0000 L CNN
+F 1 "Conn_01x08" H 9230 2451 50  0000 L CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical" H 9150 2550 50  0001 C CNN
+F 3 "~" H 9150 2550 50  0001 C CNN
+	1    9150 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Connector:TestPoint TP10
+U 1 1 5F972E0D
+P 9250 1650
+F 0 "TP10" V 9204 1838 50  0000 L CNN
+F 1 "TestPoint" V 9295 1838 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 9450 1650 50  0001 C CNN
+F 3 "~" H 9450 1650 50  0001 C CNN
+	1    9250 1650
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP11
+U 1 1 5F973676
+P 9250 1750
+F 0 "TP11" V 9204 1938 50  0000 L CNN
+F 1 "TestPoint" V 9295 1938 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 9450 1750 50  0001 C CNN
+F 3 "~" H 9450 1750 50  0001 C CNN
+	1    9250 1750
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP12
+U 1 1 5F973836
+P 9250 1850
+F 0 "TP12" V 9204 2038 50  0000 L CNN
+F 1 "TestPoint" V 9295 2038 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 9450 1850 50  0001 C CNN
+F 3 "~" H 9450 1850 50  0001 C CNN
+	1    9250 1850
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP13
+U 1 1 5F9739DE
+P 9250 1950
+F 0 "TP13" V 9204 2138 50  0000 L CNN
+F 1 "TestPoint" V 9295 2138 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 9450 1950 50  0001 C CNN
+F 3 "~" H 9450 1950 50  0001 C CNN
+	1    9250 1950
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP14
+U 1 1 5F973BA6
+P 9250 2050
+F 0 "TP14" V 9204 2238 50  0000 L CNN
+F 1 "TestPoint" V 9295 2238 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 9450 2050 50  0001 C CNN
+F 3 "~" H 9450 2050 50  0001 C CNN
+	1    9250 2050
+	0    1    1    0   
+$EndComp
+$Comp
+L Connector:TestPoint TP15
+U 1 1 5F973D22
+P 9250 2150
+F 0 "TP15" V 9204 2338 50  0000 L CNN
+F 1 "TestPoint" V 9295 2338 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.5mm" H 9450 2150 50  0001 C CNN
+F 3 "~" H 9450 2150 50  0001 C CNN
+	1    9250 2150
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	8250 2150 9250 2150
+Wire Wire Line
+	8250 1650 9250 1650
+Wire Wire Line
+	8250 1750 9250 1750
+Wire Wire Line
+	8250 1850 9250 1850
+Wire Wire Line
+	8250 1950 9250 1950
+Wire Wire Line
+	8250 2050 9250 2050
 $EndSCHEMATC
