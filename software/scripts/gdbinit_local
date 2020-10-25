@@ -1,0 +1,8 @@
+target remote 127.0.0.1:2331
+monitor reset
+monitor flash device STM32L476RG
+monitor flash breakpoints = 1
+load
+b main
+monitor reset
+c

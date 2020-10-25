@@ -47,23 +47,25 @@ extern "C" {
 #include "stm32l4xx_hal.h"
 #include "SensorTile_bus.h"
 #include "SensorTile_errno.h"
-  
+
 #define AUDIO_CHANNELS 				        1
 #define AUDIO_SAMPLING_FREQUENCY 		        48000
-#define BSP_AUDIO_IN_INSTANCE 1U   /* Define the audio peripheral used: 1U = DFSDM */  
-#define BSP_AUDIO_OUT_INSTANCE 0U   /* Define the audio peripheral used: 0U = SAI */  
+#define BSP_AUDIO_IN_INSTANCE 1U   /* Define the audio peripheral used: 1U = DFSDM */
+#define BSP_AUDIO_OUT_INSTANCE 0U   /* Define the audio peripheral used: 0U = SAI */
+#define BSP_AUDIO_IN_IT_PRIORITY        6U
+#define BSP_AUDIO_OUT_IT_PRIORITY       7U
 
 #define USE_MOTION_SENSOR_LSM6DSM_0        1U
 #define USE_MOTION_SENSOR_LSM303AGR_ACC_0  0U
 #define USE_MOTION_SENSOR_LSM303AGR_MAG_0  1U
 #define USE_ENV_SENSOR_HTS221_0            1U
 #define USE_ENV_SENSOR_LPS22HB_0           1U
-  
+
 #define BSP_LSM6DSM_INT2_GPIO_PORT           GPIOA
 #define BSP_LSM6DSM_INT2_GPIO_CLK_ENABLE()   __GPIOA_CLK_ENABLE()
 #define BSP_LSM6DSM_INT2_GPIO_CLK_DISABLE()  __GPIOA_CLK_DISABLE()
 #define BSP_LSM6DSM_INT2                 GPIO_PIN_2
-#define BSP_LSM6DSM_INT2_EXTI_IRQn           EXTI2_IRQn  
+#define BSP_LSM6DSM_INT2_EXTI_IRQn           EXTI2_IRQn
 
 #define BSP_LSM6DSM_CS_PORT GPIOB
 #define BSP_LSM6DSM_CS_PIN GPIO_PIN_12
@@ -72,7 +74,7 @@ extern "C" {
 #define BSP_LSM303AGR_M_CS_PORT GPIOB
 #define BSP_LSM303AGR_M_CS_PIN GPIO_PIN_1
 #define BSP_LSM303AGR_M_CS_GPIO_CLK_ENABLE()  __GPIOB_CLK_ENABLE()
-                                                
+
 #define BSP_LSM303AGR_X_CS_PORT GPIOC
 #define BSP_LSM303AGR_X_CS_PIN GPIO_PIN_4
 #define BSP_LSM303AGR_X_CS_GPIO_CLK_ENABLE()  __GPIOC_CLK_ENABLE()
