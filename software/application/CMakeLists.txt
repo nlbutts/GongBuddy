@@ -59,8 +59,6 @@ foreach(item ${SRC_FILES})
     endif()
 endforeach()
 
-message(STATUS ${SRC_FILES})
-
 # --------------------------------------------------------- DEFINE BUILD TARGET
 set(THIS_LINK_LIBS )
 add_executable(${THIS_RELEASE} ${SRC_FILES})

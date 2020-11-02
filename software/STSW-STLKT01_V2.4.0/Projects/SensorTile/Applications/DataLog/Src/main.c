@@ -60,6 +60,8 @@ uint32_t  exec;
 
 static int32_t LSM6DSM_Sensor_IO_ITConfig( void );
 
+volatile uint32_t * dfu_key = (volatile uint32_t*)0x10000000;
+
 /* Private functions ---------------------------------------------------------*/
 uint8_t detectImpact(T_SensorsData *sensorData)
 {
@@ -67,13 +69,24 @@ uint8_t detectImpact(T_SensorsData *sensorData)
                 (sensorData->acc.y * sensorData->acc.y) +
                 (sensorData->acc.z * sensorData->acc.z);
 
-    if (mag > (2000*2000))
+    if (mag > (1300*1300))
     {
         return 1;
     }
   return 0;
 }
 
+void rebootInDFUMode()
+{
+    void (*SysMemBootJump)(void);
+    __DSB();
+    __HAL_SYSCFG_REMAPMEMORY_SYSTEMFLASH();
+    __DSB();
+    __ISB();
+    SysMemBootJump = (void (*)(void)) (*((uint32_t *) 0x1fff0004)); // Point the PC to the System Memory reset vector (+4)
+    __set_MSP(*(__IO uint32_t*) 0x1FFF0000);
+    SysMemBootJump();
+}
 
 /**
   * @brief  Main program
@@ -82,6 +95,15 @@ uint8_t detectImpact(T_SensorsData *sensorData)
   */
 int main(void)
 {
+    if ((dfu_key[0] == 0xdeadbeef) && (dfu_key[1] == 0x87654321) && (RCC->CSR & (1 << 28)))
+    {
+        dfu_key[0] = 0;
+        dfu_key[1] = 0;
+        rebootInDFUMode();
+    }
+    dfu_key[0] = 0;
+    dfu_key[1] = 0;
+    SET_BIT(RCC->CSR, 1 << 23);
     HAL_Init();
 
     /* Configure the System clock to 80 MHz */
@@ -95,7 +117,7 @@ int main(void)
     HAL_PWREx_EnableVddUSB();
     HAL_PWREx_EnableVddIO2();
 
-    if(LoggingInterface == USB_Datalog) /* Configure the USB */
+    //if(LoggingInterface == USB_Datalog) /* Configure the USB */
     {
         /*** USB CDC Configuration ***/
         /* Init Device Library */
@@ -107,7 +129,7 @@ int main(void)
         /* Start Device Process */
         USBD_Start(&USBD_Device);
     }
-    else /* Configure the SDCard */
+    //else /* Configure the SDCard */
     {
         DATALOG_SD_Init();
     }
@@ -125,7 +147,6 @@ int main(void)
 
     /* We should never get here as control is now taken by the scheduler */
     for (;;);
-
 }
 
 /**
@@ -196,65 +217,84 @@ static void WriteData_Thread(void const *argument)
     uint32_t impactTimer = 0;
     uint8_t SD_Log_Enabled = 0;
     uint8_t impactDetected = 0;
+    volatile uint32_t * otg_dsts = (volatile uint32_t*)(0x50000808); // Can't find a #define
+
 
     for (;;)
     {
         evt = osMessageGet(dataQueue_id, osWaitForever);  // wait for message
         rptr = evt.value.p;
 
-		// Check to see if we had large change in acceleration
-		if (SD_Log_Enabled == 0)
-		{
-			// Start recording
-			while(SD_Log_Enabled != 1)
-			{
-				if(DATALOG_SD_Log_Enable())
-				{
-					SD_Log_Enabled=1;
-					osDelay(100);
-					//dataTimerStart();
-				}
-				else
-				{
-					//DATALOG_SD_Log_Disable();
-					DATALOG_SD_DeInit();
-					DATALOG_SD_Init();
-					osDelay(100);
-				}
-			}
-		}
+        // Check to see if we had large change in acceleration
+        if (SD_Log_Enabled == 0)
+        {
+            // Start recording
+            while(SD_Log_Enabled != 1)
+            {
+                if(DATALOG_SD_Log_Enable())
+                {
+                    SD_Log_Enabled=1;
+                    osDelay(100);
+                    //dataTimerStart();
+                }
+                else
+                {
+                    //DATALOG_SD_Log_Disable();
+                    DATALOG_SD_DeInit();
+                    DATALOG_SD_Init();
+                    osDelay(100);
+                }
+            }
+        }
 
         if (detectImpact(rptr))
-		{
-			// Set a timer to roll the SD card recording
-			impactTimer = HAL_GetTick();
-			impactDetected = 1;
-			osSignalSet(ledThreadId, 0x10000);
-		}
-		else if (SD_Log_Enabled && impactDetected && ((HAL_GetTick() - impactTimer) > 5000)) // 5 seconds
-		{
-			DATALOG_SD_Log_Disable();
-			SD_Log_Enabled = 0;
-			impactDetected = 0;
-		}
+        {
+            uint32_t frameSOF = (*otg_dsts >> 8) & 0x3FFF;
+            if ((impactDetected == 1) && (frameSOF > 0))
+            {
+                strcpy(data_s, "Impact 2\n");
+                CDC_Fill_Buffer(( uint8_t * )data_s, size);
+                osDelay(100);
+                dfu_key[0] = 0xdeadbeef;
+                dfu_key[1] = 0x87654321;
+                HAL_NVIC_SystemReset();
+            }
+            else
+            {
+                strcpy(data_s, "Impact 1");
+                CDC_Fill_Buffer(( uint8_t * )data_s, size);
+            }
 
-        size = sprintf(data_s, "%ld, %d, %d, %d, %d, %d, %d, %d, %d, %d, %5.2f, %5.2f, %4.1f\r\n",
-                    rptr->ms_counter,
-                    (int)rptr->acc.x, (int)rptr->acc.y, (int)rptr->acc.z,
-                    (int)rptr->gyro.x, (int)rptr->gyro.y, (int)rptr->gyro.z,
-                    (int)rptr->mag.x, (int)rptr->mag.y, (int)rptr->mag.z,
-                    rptr->pressure, rptr->temperature, rptr->humidity);
-		osStatus status = osPoolFree(sensorPool_id, rptr);      // free memory allocated for message
+            // Set a timer to roll the SD card recording
+            impactTimer = HAL_GetTick();
+            impactDetected = 1;
+            osSignalSet(ledThreadId, 0x10000);
+
+        }
+        else if (SD_Log_Enabled && impactDetected && ((HAL_GetTick() - impactTimer) > 5000)) // 5 seconds
+        {
+            DATALOG_SD_Log_Disable();
+            SD_Log_Enabled = 0;
+            impactDetected = 0;
+        }
+
+        // size = sprintf(data_s, "%ld, %d, %d, %d, %d, %d, %d, %d, %d, %d, %5.2f, %5.2f, %4.1f\r\n",
+        //             rptr->ms_counter,
+        //             (int)rptr->acc.x, (int)rptr->acc.y, (int)rptr->acc.z,
+        //             (int)rptr->gyro.x, (int)rptr->gyro.y, (int)rptr->gyro.z,
+        //             (int)rptr->mag.x, (int)rptr->mag.y, (int)rptr->mag.z,
+        //             rptr->pressure, rptr->temperature, rptr->humidity);
+        osStatus status = osPoolFree(sensorPool_id, rptr);      // free memory allocated for message
         if (status < 0)
         {
             Error_Handler();
         }
 
-		//CDC_Fill_Buffer(( uint8_t * )data_s, size);
-		if (SD_Log_Enabled == 1)
-		{
-			DATALOG_SD_writeBuf(data_s, size);
-		}
+        CDC_Fill_Buffer(( uint8_t * )data_s, size);
+        if (SD_Log_Enabled == 1)
+        {
+            DATALOG_SD_writeBuf(data_s, size);
+        }
     }
 }
 

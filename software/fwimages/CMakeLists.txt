@@ -14,16 +14,16 @@ set(APPLICATION_ELF application.elf)
 set(APPLICATION_DEBUG_ELF application_debug.elf)
 
 # Built locally
-set(APPLICATION_HEX application.hex)
+set(APPLICATION_BIN application.bin)
 set(APPLICATION_DEBUG_HEX application_debug.hex)
 set(APPLICATION_CRC_HEX application_crc.hex)
 set(APPLICATION_CRC_BIN application_crc.bin)
 
 add_custom_command(
-    OUTPUT ${APPLICATION_HEX}
-    COMMAND ${OC} -O ihex $<TARGET_FILE:${APPLICATION_ELF}> ${APPLICATION_HEX}
+    OUTPUT ${APPLICATION_BIN}
+    COMMAND ${OC} -O binary $<TARGET_FILE:${APPLICATION_ELF}> ${APPLICATION_BIN}
     DEPENDS ${APPLICATION_ELF}
-    COMMENT "Building ${APPLICATION_HEX}"
+    COMMENT "Building ${APPLICATION_BIN}"
 )
 
 add_custom_command(
@@ -98,12 +98,16 @@ add_custom_command(
 
 
 # # ------------------------------------------------- SET TARGETS TO BUILD ON ALL
-# add_custom_target(fwimages ALL
-#     DEPENDS ${ASSEMBLY_HEX} ${APPLICATION_CRC_BIN} ${APPLICATION_DEBUG_HEX} ${BOOTBLOCK_BIN}
-# )
-
+add_custom_target(fwimages ALL
+    DEPENDS ${APPLICATION_BIN}
+)
 
 # ------------------------------------------------------------- INSTALL TARGETS
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${APPLICATION_BIN}
+        RENAME application-${ASSEMBLY_PN}-${BUILD_VERSION}.bin
+        DESTINATION ./
+)
+
 # install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${ASSEMBLY_HEX}
 #         RENAME assembly-${ASSEMBLY_PN}-${BUILD_VERSION}.hex
 #         DESTINATION ./

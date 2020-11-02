@@ -24,7 +24,6 @@ endif()
 
 get_filename_component(THIS_TOOLCHAIN_PATH ${THIS_TOOLCHAIN_FILE} DIRECTORY)
 
-
 message(STATUS "Toolchain path: $ENV{TOOLCHAIN_PATH}")
 
 

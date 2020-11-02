@@ -120,8 +120,6 @@ endif()
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal)
     # --------------------------------------------------STRATUS DEBUG LOG LEVEL
     # build for arm only
-    # TODO: Do not pass this definition globally, make it part of the libAppareo build
-    add_definitions(-DSYS_LOG_LEVEL=LOG_DEBUG -DDEBUG_LOGGING -DSTM32L476xx -DUSE_HAL_DRIVER -DUSE_STM32L4XX_NUCLEO)
 
     # Libraries
     #add_subdirectory(drivers)
