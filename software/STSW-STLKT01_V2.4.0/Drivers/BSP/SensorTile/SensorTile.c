@@ -33,22 +33,23 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 ******************************************************************************
-*/ 
+*/
 
 /* Includes ------------------------------------------------------------------*/
 #include "SensorTile.h"
+#include "mcp23008_i2c_expander.h"
 
 
 /** @addtogroup BSP
 * @{
-*/ 
+*/
 
 /** @addtogroup SENSORTILE
 * @{
 */
 
   /** @addtogroup SENSORTILE_LOW_LEVEL
-  * @brief This file provides a set of low level firmware functions 
+  * @brief This file provides a set of low level firmware functions
   * @{
   */
 
@@ -82,7 +83,7 @@
 * @}
 */
 
-/** @defgroup SENSORTILE_LOW_LEVEL_Private_Variables SENSORTILE_LOW_LEVEL Private Variables 
+/** @defgroup SENSORTILE_LOW_LEVEL_Private_Variables SENSORTILE_LOW_LEVEL Private Variables
 * @{
 */
 
@@ -101,7 +102,7 @@ uint32_t SpixTimeout = SENSORTILE_SD_SPI_TIMEOUT_MAX;        /*<! Value of Timeo
 
 /** @defgroup SENSORTILE_LOW_LEVEL_Private_Functions SENSORTILE_LOW_LEVEL Private Functions
 * @{
-*/ 
+*/
 
 static void               SD_IO_SPI_Init(void);/*high speed*/
 
@@ -148,7 +149,7 @@ uint32_t BSP_GetVersion(void)
 
 /**
 * @brief  Configures LEDs.
-* @param  Led: LED to be configured. 
+* @param  Led: LED to be configured.
 *          This parameter can be one of the following values:
 *            @arg  LED1
 * @retval None
@@ -156,43 +157,43 @@ uint32_t BSP_GetVersion(void)
 void BSP_LED_Init(Led_TypeDef Led)
 {
   GPIO_InitTypeDef  GPIO_InitStruct;
-  
+
   /* Enable VddIO2 for GPIOG  */
   __HAL_RCC_PWR_CLK_ENABLE();
   HAL_PWREx_EnableVddIO2();
 
   /* Enable the GPIO_LED clock */
   LEDx_GPIO_CLK_ENABLE(Led);
-  
+
   /* Configure the GPIO_LED pin */
   GPIO_InitStruct.Pin = GPIO_PIN[Led];
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-  
+
   HAL_GPIO_Init(GPIO_PORT[Led], &GPIO_InitStruct);
 }
 
 
 /**
 * @brief  DeInit LEDs.
-* @param  Led: LED to be configured. 
+* @param  Led: LED to be configured.
 *          This parameter can be one of the following values:
 *            @arg  LED1
 *            @arg  LED2
 *            @arg  LED3
 *            @arg  LED4
-* @note Led DeInit does not disable the GPIO clock nor disable the Mfx 
+* @note Led DeInit does not disable the GPIO clock nor disable the Mfx
 * @retval None
 */
 void BSP_LED_DeInit(Led_TypeDef Led)
 {
-  
+
 }
 
 /**
 * @brief  Turns selected LED On.
-* @param  Led: LED to be set on 
+* @param  Led: LED to be set on
 *          This parameter can be one of the following values:
 *            @arg  LED1
 *            @arg  LED2
@@ -217,7 +218,7 @@ void BSP_LED_On(Led_TypeDef Led)
 }
 
 /**
-* @brief  Turns selected LED Off. 
+* @brief  Turns selected LED Off.
 * @param  Led: LED to be set off
 *          This parameter can be one of the following values:
 *            @arg  LED1
@@ -266,24 +267,24 @@ void BSP_LED_Toggle(Led_TypeDef Led)
   */
 static void SD_IO_SPI_MspInit(SPI_HandleTypeDef *hspi)
 {
-  GPIO_InitTypeDef  GPIO_InitStructure;  
-  
+  GPIO_InitTypeDef  GPIO_InitStructure;
+
   /* Enable VddIO2 for GPIOG  */
   __HAL_RCC_PWR_CLK_ENABLE();
   HAL_PWREx_EnableVddIO2();
-  
+
     /* Enable SPI clock */
   SENSORTILE_SD_SPI_CLK_ENABLE();
-  
+
   /* Enable DMA clock */
   __HAL_RCC_DMA2_CLK_ENABLE();
-  
-  
-  /*** Configure the GPIOs ***/  
+
+
+  /*** Configure the GPIOs ***/
   /* Enable GPIO clock */
   SENSORTILE_SD_SPI_SCK_GPIO_CLK_ENABLE();
   SENSORTILE_SD_SPI_MISO_MOSI_GPIO_CLK_ENABLE();
-  
+
   /* configure SPI SCK */
   GPIO_InitStructure.Pin = SENSORTILE_SD_SPI_SCK_PIN;
   GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
@@ -299,7 +300,7 @@ static void SD_IO_SPI_MspInit(SPI_HandleTypeDef *hspi)
   GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
   GPIO_InitStructure.Alternate = SENSORTILE_SD_SPI_MISO_MOSI_AF;
   HAL_GPIO_Init(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, &GPIO_InitStructure);
-  
+
   GPIO_InitStructure.Pin = (SENSORTILE_SD_SPI_MISO_PIN );
   GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStructure.Pull  = GPIO_PULLUP;
@@ -307,7 +308,7 @@ static void SD_IO_SPI_MspInit(SPI_HandleTypeDef *hspi)
   GPIO_InitStructure.Alternate = SENSORTILE_SD_SPI_MISO_MOSI_AF;
   HAL_GPIO_Init(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, &GPIO_InitStructure);
 
-  /*** Configure the SPI peripheral ***/ 
+  /*** Configure the SPI peripheral ***/
 
   /*##-3- Configure the DMA ##################################################*/
   /* Configure the DMA handler for Transmission process */
@@ -320,17 +321,17 @@ static void SD_IO_SPI_MspInit(SPI_HandleTypeDef *hspi)
   hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
   hdma_tx.Init.Mode                = DMA_NORMAL;
   hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
-  
+
   HAL_DMA_Init(&hdma_tx);
-  
+
   /* Associate the initialized DMA handle to the the SPI handle */
   __HAL_LINKDMA(hspi, hdmatx, hdma_tx);
-  
-  /*##-4- Configure the NVIC for DMA #########################################*/ 
+
+  /*##-4- Configure the NVIC for DMA #########################################*/
   /* NVIC configuration for DMA transfer complete interrupt (SPI1_TX) */
   HAL_NVIC_SetPriority(DMA2_Channel2_IRQn, 2, 1);
   HAL_NVIC_EnableIRQ(DMA2_Channel2_IRQn);
-    
+
 }
 
 /**
@@ -354,7 +355,7 @@ static void SD_IO_SPI_Init_LS(void)
     SPI_SD_Handle.Init.NSS = SPI_NSS_SOFT;
     SPI_SD_Handle.Init.TIMode = SPI_TIMODE_DISABLED;
     SPI_SD_Handle.Init.Mode = SPI_MODE_MASTER;
-    
+
     SD_IO_SPI_MspInit(&SPI_SD_Handle);
     HAL_SPI_Init(&SPI_SD_Handle);
   }
@@ -366,11 +367,11 @@ static void SD_IO_SPI_Init_LS(void)
 */
 static void SD_IO_SPI_Init(void)
 {
-  
+
   HAL_SPI_DeInit(&SPI_SD_Handle);
-  
+
   HAL_Delay(1);
-  
+
   if(HAL_SPI_GetState(&SPI_SD_Handle) == HAL_SPI_STATE_RESET)
   {
     SPI_SD_Handle.Instance = SENSORTILE_SD_SPI;
@@ -385,7 +386,7 @@ static void SD_IO_SPI_Init(void)
     SPI_SD_Handle.Init.NSS = SPI_NSS_SOFT;
     SPI_SD_Handle.Init.TIMode = SPI_TIMODE_DISABLED;
     SPI_SD_Handle.Init.Mode = SPI_MODE_MASTER;
-    
+
     SD_IO_SPI_MspInit(&SPI_SD_Handle);
     HAL_SPI_Init(&SPI_SD_Handle);
   }
@@ -401,9 +402,9 @@ static uint32_t SD_IO_SPI_Read(void)
   HAL_StatusTypeDef status = HAL_OK;
   uint32_t readvalue = 0;
   uint32_t writevalue = 0xFFFFFFFF;
-  
+
   status = HAL_SPI_TransmitReceive(&SPI_SD_Handle, (uint8_t*) &writevalue, (uint8_t*) &readvalue, 1, SpixTimeout);
-  
+
   /* Check the communication status */
   if(status != HAL_OK)
   {
@@ -422,7 +423,7 @@ static uint32_t SD_IO_SPI_Read(void)
 static void SD_IO_SPI_Write(uint8_t Value)
 {
   HAL_StatusTypeDef status = HAL_OK;
-  
+
   status = HAL_SPI_Transmit(&SPI_SD_Handle, (uint8_t*) &Value, 1, SpixTimeout);
 
   /* Check the communication status */
@@ -442,7 +443,7 @@ static void SD_IO_SPI_Error (void)
 {
   /* De-initialize the SPI communication BUS */
   HAL_SPI_DeInit(&SPI_SD_Handle);
-  
+
   /* Re- Initiaize the SPI communication BUS */
   SD_IO_SPI_Init();
 }
@@ -450,7 +451,7 @@ static void SD_IO_SPI_Error (void)
 /******************************** LINK SD Card ********************************/
 
 /**
-  * @brief  Initializes the SD Card and put it into StandBy State (Ready for 
+  * @brief  Initializes the SD Card and put it into StandBy State (Ready for
   *         data transfer).
   * @param  None
   * @retval None
@@ -461,12 +462,13 @@ void SD_IO_Init(void)
 
   /* SD SPI Config */
   SD_IO_CS_Init();
-  
+
   /* SD SPI Config */
   SD_IO_SPI_Init();
-  
-  SENSORTILE_SD_CS_HIGH();
-  
+
+  //SENSORTILE_SD_CS_HIGH();
+  i2c_sd_cs(1);
+
   /* Send dummy byte 0xFF, 10 times with CS high */
   /* Rise CS and MOSI for 80 clocks cycles */
   for (counter = 0; counter <= 9; counter++)
@@ -477,23 +479,24 @@ void SD_IO_Init(void)
 }
 
 /**
-  * @brief  Initializes the SD Card and put it into StandBy State (Ready for 
+  * @brief  Initializes the SD Card and put it into StandBy State (Ready for
   *         data transfer). Low baundrate
   * @param  None
   * @retval None
   */
 void SD_IO_Init_LS()
-{ 
+{
   uint8_t counter;
 
   /* SD SPI Config */
   SD_IO_CS_Init();
-  
+
   /* SD SPI Config */
   SD_IO_SPI_Init_LS();
-  
-  SENSORTILE_SD_CS_HIGH();
-  
+
+  //SENSORTILE_SD_CS_HIGH();
+  i2c_sd_cs(1);
+
   /* Send dummy byte 0xFF, 10 times with CS high */
   /* Rise CS and MOSI for 80 clocks cycles */
   for (counter = 0; counter <= 9; counter++)
@@ -505,29 +508,31 @@ void SD_IO_Init_LS()
 
 void SD_IO_CS_Init(void)
 {
-  GPIO_InitTypeDef  GPIO_InitStructure;
-  
-  /* SD_CS_GPIO and SD_DETECT_GPIO Periph clock enable */
-  SENSORTILE_SD_CS_GPIO_CLK_ENABLE();
+  // GPIO_InitTypeDef  GPIO_InitStructure;
 
-  /* Configure SD_CS_PIN pin: SD Card CS pin */
-  GPIO_InitStructure.Pin = SENSORTILE_SD_CS_PIN;
-  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStructure.Pull = GPIO_PULLUP;
-  GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
-  HAL_GPIO_Init(SENSORTILE_SD_CS_GPIO_PORT, &GPIO_InitStructure);
+  // /* SD_CS_GPIO and SD_DETECT_GPIO Periph clock enable */
+  // SENSORTILE_SD_CS_GPIO_CLK_ENABLE();
+
+  // /* Configure SD_CS_PIN pin: SD Card CS pin */
+  // GPIO_InitStructure.Pin = SENSORTILE_SD_CS_PIN;
+  // GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+  // GPIO_InitStructure.Pull = GPIO_PULLUP;
+  // GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
+  // HAL_GPIO_Init(SENSORTILE_SD_CS_GPIO_PORT, &GPIO_InitStructure);
+  i2c_sd_cs(1);
 }
 
 void SD_IO_CS_DeInit(void)
 {
-  GPIO_InitTypeDef  GPIO_InitStructure;
-  
-  /* Configure SD_CS_PIN pin: SD Card CS pin */
-  GPIO_InitStructure.Pin = SENSORTILE_SD_CS_PIN;
-  GPIO_InitStructure.Mode = GPIO_MODE_ANALOG;
-  GPIO_InitStructure.Pull = GPIO_NOPULL;
-  GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
-  HAL_GPIO_Init(SENSORTILE_SD_CS_GPIO_PORT, &GPIO_InitStructure);
+  // GPIO_InitTypeDef  GPIO_InitStructure;
+
+  // /* Configure SD_CS_PIN pin: SD Card CS pin */
+  // GPIO_InitStructure.Pin = SENSORTILE_SD_CS_PIN;
+  // GPIO_InitStructure.Mode = GPIO_MODE_ANALOG;
+  // GPIO_InitStructure.Pull = GPIO_NOPULL;
+  // GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
+  // HAL_GPIO_Init(SENSORTILE_SD_CS_GPIO_PORT, &GPIO_InitStructure);
+  i2c_sd_cs(1);
 }
 
 
@@ -540,7 +545,7 @@ void SD_IO_WriteByte(uint8_t Data)
 {
   /* Send the byte */
   SD_IO_SPI_Write(Data);
-  
+
 }
 
 
@@ -551,13 +556,13 @@ void SD_IO_WriteByte(uint8_t Data)
   */
 void SD_IO_WriteDMA(uint8_t *pData, uint16_t Size)
 {
-  
+
   if(HAL_SPI_Transmit_DMA(&SPI_SD_Handle, (uint8_t*)pData, Size) != HAL_OK)
   {
     /* Transfer error in transmission process */
     while(1);
   }
-  
+
 }
 
 /**
@@ -568,7 +573,7 @@ void SD_IO_WriteDMA(uint8_t *pData, uint16_t Size)
 uint8_t SD_IO_ReadByte(void)
 {
   uint8_t data = 0;
-  
+
   /* Get the received data */
   data = SD_IO_SPI_Read();
 
@@ -597,10 +602,11 @@ uint8_t SD_IO_WriteCmd_wResp(uint8_t Cmd, uint32_t Arg, uint8_t Crc)
   frame[3] = (uint8_t)(Arg >> 8); /* Construct byte 4 */
   frame[4] = (uint8_t)(Arg); /* Construct byte 5 */
   frame[5] = (Crc); /* Construct CRC: byte 6 */
-  
+
   /* SD chip select low */
-  SENSORTILE_SD_CS_LOW();
-    
+  //SENSORTILE_SD_CS_LOW();
+  i2c_sd_cs(0);
+
   /* Send Frame */
   for (n = 0; n < 6; n++)
   {
@@ -611,7 +617,7 @@ uint8_t SD_IO_WriteCmd_wResp(uint8_t Cmd, uint32_t Arg, uint8_t Crc)
   do {
     resp = SD_IO_ReadByte();
   } while ((resp & 0x80) && --n);
-  
+
   return resp;	/* Return received response */
 }
 
@@ -636,10 +642,12 @@ HAL_StatusTypeDef SD_IO_WriteCmd(uint8_t Cmd, uint32_t Arg, uint8_t Crc, uint8_t
   frame[3] = (uint8_t)(Arg >> 8); /* Construct byte 4 */
   frame[4] = (uint8_t)(Arg); /* Construct byte 5 */
   frame[5] = (Crc); /* Construct CRC: byte 6 */
-  
+
   /* SD chip select low */
-  SENSORTILE_SD_CS_LOW();
-    
+  //SENSORTILE_SD_CS_LOW();
+  i2c_sd_cs(0);
+
+
   /* Send Frame */
   for (counter = 0; counter < 6; counter++)
   {
@@ -650,7 +658,7 @@ HAL_StatusTypeDef SD_IO_WriteCmd(uint8_t Cmd, uint32_t Arg, uint8_t Crc, uint8_t
   {
     return SD_IO_WaitResponse(Response);
   }
-  
+
   return HAL_OK;
 }
 
@@ -689,8 +697,9 @@ HAL_StatusTypeDef SD_IO_WaitResponse(uint8_t Response)
 void SD_IO_WriteDummy(void)
 {
     /* SD chip select high */
-    SENSORTILE_SD_CS_HIGH();
-    
+    //SENSORTILE_SD_CS_HIGH();
+    i2c_sd_cs(1);
+
     /* Send Dummy byte 0xFF */
     SD_IO_WriteByte(SENSORTILE_SD_DUMMY_BYTE);
 }
@@ -739,6 +748,53 @@ uint8_t Sensor_IO_SPI_CS_Init_All(void)
   return HAL_OK;
 }
 
+void LORA_init()
+{
+  GPIO_InitTypeDef  GPIO_InitStruct;
+
+  /* Configure the GPIO_LED pin */
+  GPIO_InitStruct.Pin = LORA_CS_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+
+  HAL_GPIO_Init(LORA_CS_PORT, &GPIO_InitStruct);
+
+  // CS High
+  HAL_GPIO_WritePin(LORA_CS_PORT, LORA_CS_PIN, GPIO_PIN_SET);
+
+  i2c_lora_reset(0);
+  HAL_Delay(1);
+  i2c_lora_reset(1);
+}
+
+int LORA_ReadReg(uint8_t reg)
+{
+  HAL_StatusTypeDef status = HAL_OK;
+  uint8_t txData[2] = {0};
+  uint8_t rxData[2] = {0};
+  int rv;
+
+  // CS Low
+  HAL_GPIO_WritePin(LORA_CS_PORT, LORA_CS_PIN, GPIO_PIN_RESET);
+  txData[0] = reg;
+  status = HAL_SPI_TransmitReceive(&SPI_SD_Handle, &txData, &rxData, 2, 1000);
+
+  HAL_GPIO_WritePin(LORA_CS_PORT, LORA_CS_PIN, GPIO_PIN_SET);
+
+  /* Check the communication status */
+  if(status != HAL_OK)
+  {
+    /* Execute user timeout callback */
+    rv = -1;
+  }
+  else
+  {
+    rv = rxData[1];
+  }
+  return rv;
+}
+
 
 /**
 * @}
@@ -746,7 +802,7 @@ uint8_t Sensor_IO_SPI_CS_Init_All(void)
 
 /**
 * @}
-*/ 
+*/
 
 /**
 * @}
@@ -754,6 +810,6 @@ uint8_t Sensor_IO_SPI_CS_Init_All(void)
 
 /**
 * @}
-*/    
+*/
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

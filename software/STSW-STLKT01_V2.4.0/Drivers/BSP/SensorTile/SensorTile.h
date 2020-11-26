@@ -33,11 +33,11 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 ******************************************************************************
-*/ 
+*/
 
 /* IMPORTANT: in order to compile with RevA following flag shall be defined  */
 /* in the preprocessor options:  USE_SENSORTILE_REVA !!!!!!!!!! */
-  
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SENSORTILE_H
 #define __SENSORTILE_H
@@ -49,7 +49,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l4xx_hal.h"
 #include "SensorTile_conf.h"
-   
+
 
 #define LSM303AGR_ACC_WHO_AM_I         0x33
 #define LSM303AGR_MAG_WHO_AM_I         0x40
@@ -62,7 +62,7 @@
 /** @addtogroup SENSORTILE
   * @{
   */
-      
+
   /** @addtogroup SENSORTILE_LOW_LEVEL
   * @{
   */
@@ -70,7 +70,7 @@
 /** @defgroup SENSORTILE_LOW_LEVEL_Exported_Types SENSORTILE_LOW_LEVEL Exported Types
   * @{
   */
-typedef enum 
+typedef enum
 {
   LED1 = 0,
   LEDSWD = 1,
@@ -89,23 +89,23 @@ typedef enum
 
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup SENSORTILE_LOW_LEVEL_Exported_Constants SENSORTILE_LOW_LEVEL Exported Constants
   * @{
-  */ 
+  */
 
 #define LEDn                             3
 
 #define LED1_PIN                         GPIO_PIN_12
 #define LED1_GPIO_PORT                   GPIOG
-#define LED1_GPIO_CLK_ENABLE()           __GPIOG_CLK_ENABLE()  
-#define LED1_GPIO_CLK_DISABLE()          __GPIOG_CLK_DISABLE()  
+#define LED1_GPIO_CLK_ENABLE()           __GPIOG_CLK_ENABLE()
+#define LED1_GPIO_CLK_DISABLE()          __GPIOG_CLK_DISABLE()
 
 #define LEDSWD_PIN                       GPIO_PIN_14
 #define LEDSWD_GPIO_PORT                 GPIOA
-#define LEDSWD_GPIO_CLK_ENABLE()         __GPIOA_CLK_ENABLE()  
-#define LEDSWD_GPIO_CLK_DISABLE()        __GPIOA_CLK_DISABLE()  
+#define LEDSWD_GPIO_CLK_ENABLE()         __GPIOA_CLK_ENABLE()
+#define LEDSWD_GPIO_CLK_DISABLE()        __GPIOA_CLK_DISABLE()
 
 #define LEDFLASH_PIN                     GPIO_PIN_14
 #define LEDFLASH_GPIO_PORT               GPIOA
@@ -115,12 +115,12 @@ typedef enum
 #define LEDx_GPIO_CLK_ENABLE(__INDEX__)  do{if((__INDEX__) == 0) LED1_GPIO_CLK_ENABLE(); \
                                             if((__INDEX__) == 1) LEDSWD_GPIO_CLK_ENABLE(); \
                                             }while(0)
-												
+
 #define LEDx_GPIO_CLK_DISABLE(__INDEX__) do{if((__INDEX__) == 0) LED1_GPIO_CLK_DISABLE(); \
                                             if((__INDEX__) == 1) LEDSWD_GPIO_CLK_DISABLE(); \
                                             }while(0)
-                                              
-                                              
+
+
 /*##################### SD ###################################*/
 /* Chip Select macro definition */
 #define SENSORTILE_SD_CS_LOW()       HAL_GPIO_WritePin(SENSORTILE_SD_CS_GPIO_PORT, SENSORTILE_SD_CS_PIN, GPIO_PIN_RESET)
@@ -133,11 +133,11 @@ typedef enum
 #define SENSORTILE_SD_CS_GPIO_PORT                         GPIOG
 #define SENSORTILE_SD_CS_GPIO_CLK_ENABLE()                 __GPIOG_CLK_ENABLE()
 #define SENSORTILE_SD_CS_GPIO_CLK_DISABLE()                __GPIOG_CLK_DISABLE()
-      
+
 #define SENSORTILE_SD_DUMMY_BYTE   0xFF
 #define SENSORTILE_SD_NO_RESPONSE_EXPECTED 0x80
-    
-                                                
+
+
 /*##################### SPI3 SensorTile ###################################*/
 #define SENSORTILE_SD_SPI                               SPI3
 #define SENSORTILE_SD_SPI_CLK_ENABLE()                  __SPI3_CLK_ENABLE()
@@ -158,35 +158,37 @@ typedef enum
    on accurate values, they just guarantee that the application will not remain
    stuck if the SPI communication is corrupted.
    You may modify these timeout values depending on CPU frequency and application
-   conditions (interrupts routines ...). */   
+   conditions (interrupts routines ...). */
 #define SENSORTILE_SD_SPI_TIMEOUT_MAX                   1000
 
 /**
   * @}
-  */ 
+  */
 
 
 /** @defgroup SENSORTILE_LOW_LEVEL_Exported_Macros SENSORTILE_LOW_LEVEL Exported Macros
   * @{
-  */  
+  */
 /**
   * @}
-  */ 
+  */
 /** @defgroup SENSORTILE_LOW_LEVEL_Exported_Functions SENSORTILE_LOW_LEVEL Exported Functions
   * @{
   */
-uint32_t         BSP_GetVersion(void);  
+uint32_t         BSP_GetVersion(void);
 void             BSP_LED_Init(Led_TypeDef Led);
 void             BSP_LED_DeInit(Led_TypeDef Led);
 void             BSP_LED_On(Led_TypeDef Led);
 void             BSP_LED_Off(Led_TypeDef Led);
 void             BSP_LED_Toggle(Led_TypeDef Led);
 
-
 void SD_IO_CS_Init(void);
 void SD_IO_CS_DeInit(void);
 
 uint8_t Sensor_IO_SPI_CS_Init_All(void);
+
+void LORA_init();
+int LORA_ReadReg(uint8_t reg);
 
 /**
   * @}
@@ -194,11 +196,11 @@ uint8_t Sensor_IO_SPI_CS_Init_All(void);
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}

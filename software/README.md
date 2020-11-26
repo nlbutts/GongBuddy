@@ -18,6 +18,12 @@ in the toolchain directory.
 
 
 # Building
+Set the path to the toolchain in the environment
+
+```
+export TOOLCHAIN_PATH=~/gcc-arm-none-eabi-9-2020-q2-update/
+```
+
 ```
 mkdir build
 cd build

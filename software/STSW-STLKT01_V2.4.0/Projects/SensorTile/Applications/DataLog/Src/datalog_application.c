@@ -206,31 +206,31 @@ int32_t getSensorsData( T_SensorsData *mptr)
     ret = BSP_ERROR_COMPONENT_FAILURE;
   }
 
-  if(!no_T_HTS221)
-  {
-    if ( BSP_ENV_SENSOR_GetValue(HTS221_0, ENV_TEMPERATURE, &mptr->temperature ) == BSP_ERROR_COMPONENT_FAILURE )
-    {
-      mptr->temperature = 0.0f;
-      ret = BSP_ERROR_COMPONENT_FAILURE;
-    }
-  }
-  else
-  {
+  // if(!no_T_HTS221)
+  // {
+  //   if ( BSP_ENV_SENSOR_GetValue(HTS221_0, ENV_TEMPERATURE, &mptr->temperature ) == BSP_ERROR_COMPONENT_FAILURE )
+  //   {
+  //     mptr->temperature = 0.0f;
+  //     ret = BSP_ERROR_COMPONENT_FAILURE;
+  //   }
+  // }
+  // else
+  // {
     if ( BSP_ENV_SENSOR_GetValue(LPS22HB_0, ENV_TEMPERATURE, &mptr->temperature ) == BSP_ERROR_COMPONENT_FAILURE )
     {
       mptr->temperature = 0.0f;
       ret = BSP_ERROR_COMPONENT_FAILURE;
     }
-  }
+  // }
 
-  if(!no_H_HTS221)
-  {
-    if ( BSP_ENV_SENSOR_GetValue(HTS221_0, ENV_HUMIDITY, &mptr->humidity ) == BSP_ERROR_COMPONENT_FAILURE )
-    {
-      mptr->humidity = 0.0f;
-      ret = BSP_ERROR_COMPONENT_FAILURE;
-    }
-  }
+  // if(!no_H_HTS221)
+  // {
+  //   if ( BSP_ENV_SENSOR_GetValue(HTS221_0, ENV_HUMIDITY, &mptr->humidity ) == BSP_ERROR_COMPONENT_FAILURE )
+  //   {
+  //     mptr->humidity = 0.0f;
+  //     ret = BSP_ERROR_COMPONENT_FAILURE;
+  //   }
+  // }
   return ret;
 }
 
@@ -290,16 +290,16 @@ void MX_DataLogTerminal_Init(void)
   BSP_MOTION_SENSOR_SetOutputDataRate(LSM6DSM_0, MOTION_GYRO, LSM6DSM_GYRO_ODR);
   BSP_MOTION_SENSOR_SetFullScale(LSM6DSM_0, MOTION_GYRO, LSM6DSM_GYRO_FS);
 
-  if (BSP_ENV_SENSOR_Init(HTS221_0, ENV_TEMPERATURE | ENV_HUMIDITY) == BSP_ERROR_NONE)
-  {
-    BSP_ENV_SENSOR_SetOutputDataRate(HTS221_0, ENV_TEMPERATURE, HTS221_ODR);
-    BSP_ENV_SENSOR_SetOutputDataRate(HTS221_0, ENV_HUMIDITY, HTS221_ODR);
-  }
-  else
-  {
-    no_H_HTS221 = 1;
-    no_T_HTS221 = 1;
-  }
+  // if (BSP_ENV_SENSOR_Init(HTS221_0, ENV_TEMPERATURE | ENV_HUMIDITY) == BSP_ERROR_NONE)
+  // {
+  //   BSP_ENV_SENSOR_SetOutputDataRate(HTS221_0, ENV_TEMPERATURE, HTS221_ODR);
+  //   BSP_ENV_SENSOR_SetOutputDataRate(HTS221_0, ENV_HUMIDITY, HTS221_ODR);
+  // }
+  // else
+  // {
+  //   no_H_HTS221 = 1;
+  //   no_T_HTS221 = 1;
+  // }
 
   BSP_ENV_SENSOR_Init(LPS22HB_0, ENV_TEMPERATURE | ENV_PRESSURE);
   BSP_ENV_SENSOR_SetOutputDataRate(LPS22HB_0, ENV_TEMPERATURE, LPS22HB_ODR);

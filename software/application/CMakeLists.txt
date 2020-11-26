@@ -38,6 +38,8 @@ file(GLOB_RECURSE SRC_FILES
     ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c
     ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
     ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
+    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
+    ${CMAKE_CURRENT_LIST_DIR}/../FreeRTOS-Plus-CLI/FreeRTOS_CLI.c
 )
 
 foreach(item ${SRC_FILES})
@@ -88,6 +90,7 @@ set (INC_DIRS
     ${DRIVER_DIR}/BSP/Components/pcm1774
     ${DRIVER_DIR}/BSP/Components/stc3115
     ${DRIVER_DIR}/BSP/SensorTile
+    ${CMAKE_CURRENT_LIST_DIR}/../FreeRTOS-Plus-CLI
 )
 
 target_include_directories(${THIS_RELEASE}

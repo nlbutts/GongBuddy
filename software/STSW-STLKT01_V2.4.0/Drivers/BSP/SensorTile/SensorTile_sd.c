@@ -34,24 +34,26 @@
 * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 ******************************************************************************
-*/ 
+*/
 
 /* File Info : -----------------------------------------------------------------
                                  User NOTES
-This file implements a high level communication layer for read and write 
+This file implements a high level communication layer for read and write
 from/to this memory.
- 
+
 1. How To use this driver:
 --------------------------
-   - This driver is used to drive the micro SD external card mounted on SensorTile Cradle 
+   - This driver is used to drive the micro SD external card mounted on SensorTile Cradle
      evaluation board.
    - This driver does not need a specific component driver for the micro SD device
      to be included with.
- 
-------------------------------------------------------------------------------*/ 
+
+------------------------------------------------------------------------------*/
 
 /* Includes ------------------------------------------------------------------*/
 #include "SensorTile_sd.h"
+
+#include "mcp23008_i2c_expander.h"
 
 /** @addtogroup BSP
   * @{
@@ -59,23 +61,23 @@ from/to this memory.
 
 /** @addtogroup SENSORTILE
   * @{
-  */ 
-  
+  */
+
 /** @addtogroup SENSORTILE_SD
-* @brief This file provides a set of firmware functions to manage SPI SD card 
+* @brief This file provides a set of firmware functions to manage SPI SD card
 * @{
-*/ 
-  
+*/
+
 /* Private typedef -----------------------------------------------------------*/
 
 /** @defgroup SENSORTILE_SD_Private_Types_Definitions SENSORTILE_SD Private Types Definitions
   * @{
-  */ 
+  */
 
 /**
   * @}
   */
-  
+
 /* Private define ------------------------------------------------------------*/
 
 /** @defgroup SENSORTILE_SD_Private_Defines SENSORTILE_SD Private Defines
@@ -86,29 +88,29 @@ from/to this memory.
 /**
   * @}
   */
-  
+
 /* Private macro -------------------------------------------------------------*/
 
 /** @defgroup SENSORTILE_SD_Private_Macros SENSORTILE_SD Private Macros
   * @{
-  */  
+  */
 
 /**
   * @}
   */
-  
+
 /* Private variables ---------------------------------------------------------*/
 
 /** @defgroup SENSORTILE_SD_Private_Variables SENSORTILE_SD Private Variables
   * @{
-  */   
+  */
 
 enum {
 	TRANSFER_WAIT,
 	TRANSFER_COMPLETE,
 	TRANSFER_ERROR
 };
-    
+
 __IO uint8_t SdStatus = SD_PRESENT;
 __IO uint8_t SD_CardType = STD_CAPACITY_SD_CARD_V1_1;
 
@@ -118,7 +120,7 @@ __IO uint32_t wTransferState = TRANSFER_WAIT;
 
 /**
   * @}
-  */ 
+  */
 
 /* Private function prototypes -----------------------------------------------*/
 static uint8_t SD_GetCIDRegister(SD_CID* Cid);
@@ -130,29 +132,29 @@ static uint8_t SD_SendCmd_wResp(uint8_t Cmd, uint32_t Arg, uint8_t Crc);
 
 /** @defgroup SENSORTILE_SD_Private_Function_Prototypes SENSORTILE_SD Private Function Prototypes
   * @{
-  */ 
+  */
 /**
   * @}
   */
- 
+
 /* Private functions ---------------------------------------------------------*/
-    
+
 /** @defgroup SENSORTILE_SD_Private_Functions SENSORTILE_SD Private Functions
   * @{
-  */ 
-  
+  */
+
 /**
   * @brief  Initialize the SD card.
   * @param  None
-  * @retval The SD Response: 
+  * @retval The SD Response:
   *         - MSD_ERROR : Sequence failed
   *         - MSD_OK    : Sequence succeed
   */
 uint8_t BSP_SD_Init(void)
-{ 
+{
   /* Configure SPI in Low Speed mode for initialization */
   SD_IO_Init_LS();
-  
+
   if(SD_GoIdleState() == MSD_ERROR)
   {
     SdStatus = SD_NOT_PRESENT;
@@ -161,13 +163,13 @@ uint8_t BSP_SD_Init(void)
   else
   {
     SdStatus = SD_PRESENT;
-    
+
     if(SD_CardType != HIGH_CAPACITY_SD_CARD)
     {
       /* SD Card type not supported. Please use SDHC Card */
       return MSD_ERROR;
     }
-    
+
     /* Configure SPI in High Speed mode for normal usage */
     SD_IO_Init();
     return MSD_OK;
@@ -176,7 +178,7 @@ uint8_t BSP_SD_Init(void)
 
 /**
   * @brief  Returns information about specific card.
-  * @param  cardinfo: pointer to a SD_CardInfo structure that contains all SD 
+  * @param  cardinfo: pointer to a SD_CardInfo structure that contains all SD
   *         card information.
   * @retval The SD Response:
   *         - MSD_ERROR : Sequence failed
@@ -200,11 +202,11 @@ uint8_t BSP_SD_GetCardInfo(SD_CardInfo *pCardInfo)
 }
 
 /**
-  * @brief  Reads block(s) from a specified address in an SD card, in polling mode. 
+  * @brief  Reads block(s) from a specified address in an SD card, in polling mode.
   * @param  pData: Pointer to the buffer that will contain the data to transmit
-  * @param  ReadAddr: Address from where data is to be read  
+  * @param  ReadAddr: Address from where data is to be read
   * @param  BlockSize: SD card data block size, that should be 512
-  * @param  NumOfBlocks: Number of SD blocks to read 
+  * @param  NumOfBlocks: Number of SD blocks to read
   * @retval SD status
   */
 uint8_t BSP_SD_ReadBlocks(uint32_t* p32Data, uint64_t Sector, uint32_t NumberOfBlocks, uint32_t timeout)
@@ -212,10 +214,10 @@ uint8_t BSP_SD_ReadBlocks(uint32_t* p32Data, uint64_t Sector, uint32_t NumberOfB
   uint32_t counter = 0, offset = 0;
   uint8_t rvalue = MSD_ERROR;
   uint8_t *pData = (uint8_t *)p32Data;
-  
-  
+
+
   uint16_t BlockSize=BLOCK_SIZE;
-  /* Send CMD16 (SD_CMD_SET_BLOCKLEN) to set the size of the block and 
+  /* Send CMD16 (SD_CMD_SET_BLOCKLEN) to set the size of the block and
      Check if the SD acknowledged the set block length command: R1 response (0x00: no errors) */
   if (SD_IO_WriteCmd(SD_CMD_SET_BLOCKLEN, BlockSize, 0xFF, SD_RESPONSE_NO_ERROR) != HAL_OK)
   {
@@ -226,7 +228,7 @@ uint8_t BSP_SD_ReadBlocks(uint32_t* p32Data, uint64_t Sector, uint32_t NumberOfB
   {
     Sector *= 512;
   }
-  
+
   /* Data transfer */
   while (NumberOfBlocks--)
   {
@@ -251,7 +253,7 @@ uint8_t BSP_SD_ReadBlocks(uint32_t* p32Data, uint64_t Sector, uint32_t NumberOfB
         /* Point to the next location where the byte read will be saved */
         pData++;
       }
-      
+
       /* Set next write address */
       if(SD_CardType != HIGH_CAPACITY_SD_CARD)
       {
@@ -273,7 +275,7 @@ uint8_t BSP_SD_ReadBlocks(uint32_t* p32Data, uint64_t Sector, uint32_t NumberOfB
       rvalue = MSD_ERROR;
     }
   }
-  
+
   /* Send dummy byte: 8 Clock pulses of delay */
   SD_IO_WriteDummy();
   /* Returns the reponse */
@@ -281,9 +283,9 @@ uint8_t BSP_SD_ReadBlocks(uint32_t* p32Data, uint64_t Sector, uint32_t NumberOfB
 }
 
 /**
-  * @brief  Writes block(s) to a specified address in an SD card, in polling mode. 
+  * @brief  Writes block(s) to a specified address in an SD card, in polling mode.
   * @param  pData: Pointer to the buffer that will contain the data to transmit
-  * @param  WriteAddr: Address from where data is to be written  
+  * @param  WriteAddr: Address from where data is to be written
   * @param  BlockSize: SD card data block size, that should be 512
   * @param  NumOfBlocks: Number of SD blocks to write
   * @retval SD status
@@ -293,41 +295,42 @@ uint8_t BSP_SD_WriteBlocks(uint32_t* p32Data, uint64_t Sector, uint32_t NumberOf
   uint32_t offset = 0;
   uint8_t rvalue = MSD_ERROR;
   uint8_t *pData = (uint8_t *)p32Data;
-  
+
   uint16_t BlockSize=BLOCK_SIZE;
-  
-  SENSORTILE_SD_CS_HIGH();
-  
+
+  //SENSORTILE_SD_CS_HIGH();
+  i2c_sd_cs(1);
+
   if(SD_CardType != HIGH_CAPACITY_SD_CARD)
   {
     Sector *= BlockSize;
   }
-  
+
   /* Data transfer */
   while (NumberOfBlocks--)
   {
-    
+
     /* Send CMD24 (SD_CMD_WRITE_SINGLE_BLOCK) to write blocks  and
     Check if the SD acknowledged the write block command: R1 response (0x00: no errors) */
     if (SD_IO_WriteCmd(SD_CMD_WRITE_SINGLE_BLOCK, Sector + offset, 0xFF, SD_RESPONSE_NO_ERROR) != HAL_OK)
     {
       return MSD_ERROR;
     }
-    
+
     /* Send dummy byte */
     SD_IO_WriteByte(SD_DUMMY_BYTE);
-    
+
     /* Send the data token to signify the start of the data */
     SD_IO_WriteByte(SD_START_DATA_SINGLE_BLOCK_WRITE);
-    
-    SD_IO_WriteDMA((uint8_t*)pData, BlockSize);	
+
+    SD_IO_WriteDMA((uint8_t*)pData, BlockSize);
     pData+= BLOCK_SIZE;
-    
+
     while (wTransferState == TRANSFER_WAIT)
     {
-    } 
+    }
     wTransferState = TRANSFER_WAIT;
-    
+
     /* Set next write address */
     if(SD_CardType != HIGH_CAPACITY_SD_CARD)
     {
@@ -337,11 +340,11 @@ uint8_t BSP_SD_WriteBlocks(uint32_t* p32Data, uint64_t Sector, uint32_t NumberOf
     {
       offset += 1;
     }
-    
+
     /* Put CRC bytes (not really needed by us, but required by SD) */
     SD_IO_ReadByte();
     SD_IO_ReadByte();
-    
+
     /* Read data response */
     if (SD_GetDataResponse() == SD_DATA_OK)
     {
@@ -353,12 +356,12 @@ uint8_t BSP_SD_WriteBlocks(uint32_t* p32Data, uint64_t Sector, uint32_t NumberOf
       /* Set response value to failure */
       rvalue = MSD_ERROR;
     }
-    
-  }  
+
+  }
   /* Send dummy byte: 8 Clock pulses of delay */
   SD_IO_WriteDummy();
-  
-  
+
+
   /* Returns the reponse */
   return rvalue;
 }
@@ -367,8 +370,8 @@ uint8_t BSP_SD_WriteBlocks(uint32_t* p32Data, uint64_t Sector, uint32_t NumberOf
 /**
   * @brief  TxRx Transfer completed callback.
   * @param  hspi: SPI handle
-  * @note   This example shows a simple way to report end of DMA TxRx transfer, and 
-  *         you can add your own implementation. 
+  * @note   This example shows a simple way to report end of DMA TxRx transfer, and
+  *         you can add your own implementation.
   * @retval None
   */
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
@@ -379,7 +382,7 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 
 /**
   * @brief  Read the CSD card register.
-  *         Reading the contents of the CSD register in SPI mode is a simple 
+  *         Reading the contents of the CSD register in SPI mode is a simple
   *         read-block transaction.
   * @param  Csd: pointer on an SCD register structure
   * @retval SD status
@@ -445,16 +448,16 @@ uint8_t SD_GetCSDRegister(SD_CSD* Csd)
     if (SD_CardType == STD_CAPACITY_SD_CARD_V1_1)
     {
       Csd->DeviceSize = (CSD_Tab[6] & 0x03) << 10;
-      
+
       /* Byte 7 */
       Csd->DeviceSize |= (CSD_Tab[7]) << 2;
-      
+
       /* Byte 8 */
       Csd->DeviceSize |= (CSD_Tab[8] & 0xC0) >> 6;
-      
+
       Csd->MaxRdCurrentVDDMin = (CSD_Tab[8] & 0x38) >> 3;
       Csd->MaxRdCurrentVDDMax = (CSD_Tab[8] & 0x07);
-      
+
       /* Byte 9 */
       Csd->MaxWrCurrentVDDMin = (CSD_Tab[9] & 0xE0) >> 5;
       Csd->MaxWrCurrentVDDMax = (CSD_Tab[9] & 0x1C) >> 2;
@@ -466,16 +469,16 @@ uint8_t SD_GetCSDRegister(SD_CSD* Csd)
     {
       /* Byte 7 */
       Csd->DeviceSize = (CSD_Tab[7] & 0x3F) << 16;
-      
+
       /* Byte 8 */
       Csd->DeviceSize |= (CSD_Tab[8]) << 8;
-      
+
       /* Byte 9 */
       Csd->DeviceSize |= (CSD_Tab[9]);
-      
+
       Csd->DeviceSizeMul = 8; // 2^(8 + 2) = 1024
     }
-    
+
     Csd->EraseGrSize = (CSD_Tab[10] & 0x40) >> 6;
     Csd->EraseGrMul = (CSD_Tab[10] & 0x3F) << 1;
 
@@ -513,7 +516,7 @@ uint8_t SD_GetCSDRegister(SD_CSD* Csd)
 
 /**
   * @brief  Read the CID card register.
-  *         Reading the contents of the CID register in SPI mode is a simple 
+  *         Reading the contents of the CID register in SPI mode is a simple
   *         read-block transaction.
   * @param  Cid: pointer on an CID register structure
   * @retval SD status
@@ -523,7 +526,7 @@ static uint8_t SD_GetCIDRegister(SD_CID* Cid)
   uint32_t counter = 0;
   uint8_t rvalue = MSD_ERROR;
   uint8_t CID_Tab[16];
-  
+
   /* Send CMD10 (CID register) and Wait for response in the R1 format (0x00 is no errors) */
   if (SD_IO_WriteCmd(SD_CMD_SEND_CID, 0, 0xFF, SD_RESPONSE_NO_ERROR) == HAL_OK)
   {
@@ -627,12 +630,12 @@ static uint8_t SD_SendCmd_wResp(uint8_t Cmd, uint32_t Arg, uint8_t Crc)
 static uint8_t SD_SendCmd(uint8_t Cmd, uint32_t Arg, uint8_t Crc, uint8_t Response)
 {
   uint8_t status = MSD_ERROR;
-  
+
   if(SD_IO_WriteCmd(Cmd, Arg, Crc, Response) == HAL_OK)
   {
     status = MSD_OK;
   }
-  
+
   /* Send Dummy Byte */
   SD_IO_WriteDummy();
 
@@ -651,10 +654,10 @@ static uint8_t SD_SendCmd(uint8_t Cmd, uint32_t Arg, uint8_t Crc, uint8_t Respon
 static SD_Info SD_GetDataResponse(void)
 {
   SD_Info response, rvalue= SD_DATA_OTHER_ERROR;
-  
+
   while (rvalue != SD_DATA_OK)
   {
-    
+
     /* Read response */
     response = (SD_Info)SD_IO_ReadByte();
     /* Mask unused bits */
@@ -682,14 +685,14 @@ static SD_Info SD_GetDataResponse(void)
         break;
       }
     }
-    
+
   }
 
   /* Wait null data */
   while (SD_IO_ReadByte() == 0);
   /* Return response */
   return response;
-  
+
 }
 
 /**
@@ -710,8 +713,8 @@ uint8_t BSP_SD_GetCardState(void)
 static uint8_t SD_GoIdleState(void)
 {
   uint8_t n, resp[4];
-  
-  /* Send CMD0 (SD_CMD_GO_IDLE_STATE) to put SD in SPI mode and 
+
+  /* Send CMD0 (SD_CMD_GO_IDLE_STATE) to put SD in SPI mode and
      Wait for In Idle State Response (R1 Format) equal to 0x01 */
   if (SD_SendCmd(SD_CMD_GO_IDLE_STATE, 0, 0x95, SD_IN_IDLE_STATE) != MSD_OK)
   {
@@ -727,9 +730,9 @@ static uint8_t SD_GoIdleState(void)
       resp[n] = SD_IO_ReadByte();	/* Get 32 bit return value of R7 resp */
     }
     SD_IO_WriteDummy();
-    
+
     if (resp[2] == 0x01 && resp[3] == 0xAA)  /* the card supports vcc of 2.7-3.6V? */
-    {	
+    {
       do /* Wait for end of initialization with ACMD41(HCS) */
       {
         HAL_Delay(100);
@@ -738,9 +741,9 @@ static uint8_t SD_GoIdleState(void)
           return MSD_ERROR;
         }
       } while(SD_SendCmd(SD_CMD_SD_APP_OP_COND, 1UL << 30, 0xFF, SD_RESPONSE_NO_ERROR) != MSD_OK); /* ACMD41 */
-      
+
       HAL_Delay(10);
-      
+
       /* Read OCR register with CMD58 and check CCS flag (bit 30) */
       resp[0] = SD_SendCmd_wResp(SD_CMD_SDMMC_READ_OCR, 0, 0xFF);
       if(resp[0] == 0)
@@ -765,12 +768,12 @@ static uint8_t SD_GoIdleState(void)
   {
     SD_CardType = STD_CAPACITY_SD_CARD_V1_1;
   }
-  
+
   SD_IO_WriteDummy();
   return MSD_OK;
 }
 /**
-  * @brief  Erases the specified memory area of the given SD card. 
+  * @brief  Erases the specified memory area of the given SD card.
   * @param  StartAddr: Start byte address
   * @param  EndAddr: End byte address
   * @retval SD status
@@ -794,24 +797,24 @@ uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr)
       }
     }
   }
-  
+
   /* Return the reponse */
   return rvalue;
 }
 /**
   * @}
-  */  
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

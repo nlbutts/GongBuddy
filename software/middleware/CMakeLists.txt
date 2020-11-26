@@ -14,6 +14,7 @@ set(MIDDLEWARE_DIR  ${SENSOR_TILE_DIR}/Middlewares)
 # ------------------------------------------------------------ Get files
 file(GLOB_RECURSE SRC_FILES
     ${MIDDLEWARE_DIR}/ST/*.c
+    FreeRTOS-Plus-CLI/*.c
 )
 
 # foreach(item ${SRC_FILES})

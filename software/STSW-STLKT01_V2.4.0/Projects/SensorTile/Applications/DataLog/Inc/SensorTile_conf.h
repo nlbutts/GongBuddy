@@ -58,7 +58,7 @@ extern "C" {
 #define USE_MOTION_SENSOR_LSM6DSM_0        1U
 #define USE_MOTION_SENSOR_LSM303AGR_ACC_0  0U
 #define USE_MOTION_SENSOR_LSM303AGR_MAG_0  1U
-#define USE_ENV_SENSOR_HTS221_0            1U
+#define USE_ENV_SENSOR_HTS221_0            0U
 #define USE_ENV_SENSOR_LPS22HB_0           1U
 
 #define BSP_LSM6DSM_INT2_GPIO_PORT           GPIOA
@@ -82,6 +82,10 @@ extern "C" {
 #define BSP_LPS22HB_CS_PORT GPIOA
 #define BSP_LPS22HB_CS_PIN GPIO_PIN_3
 #define BSP_LPS22HB_CS_GPIO_CLK_ENABLE()  __GPIOA_CLK_ENABLE()
+
+#define LORA_CS_PORT GPIOG
+#define LORA_CS_PIN GPIO_PIN_12
+#define LORA_CS_GPIO_CLK_ENABLE()  __GPIOG_CLK_ENABLE()
 
 #ifdef __cplusplus
 }

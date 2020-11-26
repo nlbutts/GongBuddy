@@ -39,12 +39,12 @@ function cleanup {
 trap cleanup EXIT
 
 
-printf "loadfile ${PROJECT_DIR}/build/arm/fwimages/assembly.hex\nr\nq\n" \
+printf "loadfile ${PROJECT_DIR}/build/arm/fwimages/assembly.bin\nr\nq\n" \
     >> ${jflash_file}
 
 
 # ----------------------------------------------------- Start JLink application
 JLinkExe \
-    -device STM32F303VE \
+    -device STM32L476RG \
     -if SWD -speed 4000 \
     -CommanderScript ${jflash_file}
