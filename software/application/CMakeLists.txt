@@ -1,6 +1,10 @@
 # ------------------------------------------------------- MINIMUM CMAKE VERSION
 cmake_minimum_required(VERSION 3.7)
 
+# RANT: ST vomits dependency all over the place. You can't really isolate
+# parts of the code. Thereofre I have one big CMakeList file because ST
+# can't figure out how to isolate their code
+
 
 # ---------------------------------------------------------- ONLY BUILD FOR ARM
 if(NOT ${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal)
@@ -40,6 +44,10 @@ file(GLOB_RECURSE SRC_FILES
     ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
     ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
     ${CMAKE_CURRENT_LIST_DIR}/../FreeRTOS-Plus-CLI/FreeRTOS_CLI.c
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Crypto/*
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Mac/*
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Phy/*
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Utilities/*
 )
 
 foreach(item ${SRC_FILES})
@@ -69,7 +77,6 @@ target_link_libraries(${THIS_RELEASE} ${THIS_LINK_LIBS})
 add_executable(${THIS_DEBUG} ${SRC_FILES})
 target_link_libraries(${THIS_DEBUG} ${THIS_LINK_LIBS})
 
-
 # ------------------------------------------------------------- INCLUDE FOLDERS
 set (INC_DIRS
     ${APPLICATION_DIR}/Inc
@@ -79,6 +86,12 @@ set (INC_DIRS
     ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/include
     ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
     ${MIDDLEWARE_DIR}/Third_Party/FatFs/src
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Conf
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Crypto
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Mac
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Patterns
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Phy
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Utilities
     ${DRIVER_DIR}/CMSIS/Include
     ${DRIVER_DIR}/CMSIS/Device/ST/STM32L4xx/Include
     ${DRIVER_DIR}/STM32L4xx_HAL_Driver/Inc
@@ -89,6 +102,7 @@ set (INC_DIRS
     ${DRIVER_DIR}/BSP/Components/lsm6dsm
     ${DRIVER_DIR}/BSP/Components/pcm1774
     ${DRIVER_DIR}/BSP/Components/stc3115
+    ${DRIVER_DIR}/BSP/Components/sx1276
     ${DRIVER_DIR}/BSP/SensorTile
     ${CMAKE_CURRENT_LIST_DIR}/../FreeRTOS-Plus-CLI
 )

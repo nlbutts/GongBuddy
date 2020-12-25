@@ -4,6 +4,7 @@
 #include "cmsis_os.h"
 #include "datalog_application.h"
 #include "FreeRTOS_CLI.h"
+#include "pingpong.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -16,12 +17,16 @@ typedef enum
 {
   THREAD_1 = 0,
   THREAD_2,
-  THREAD_3
+  THREAD_3,
+  THREAD_4
 } Thread_TypeDef;
 
 /* Private variables ---------------------------------------------------------*/
 
-osThreadId GetDataThreadId, WriteDataThreadId, ledThreadId;
+osThreadId GetDataThreadId;
+osThreadId WriteDataThreadId;
+osThreadId ledThreadId;
+osThreadId pingpongId;
 
 osMessageQId dataQueue_id;
 osMessageQDef(dataqueue, DATAQUEUE_SIZE, int);
@@ -168,10 +173,12 @@ int main(void)
     osThreadDef(THREAD_1, GetData_Thread, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE*4);
     osThreadDef(THREAD_2, WriteData_Thread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE*32);
     osThreadDef(THREAD_3, blinkLedThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
+    osThreadDef(THREAD_4, pingpingThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
 
     GetDataThreadId = osThreadCreate(osThread(THREAD_1), NULL);
     WriteDataThreadId = osThreadCreate(osThread(THREAD_2), NULL);
     ledThreadId = osThreadCreate(osThread(THREAD_3), NULL);
+    pingpongId = osThreadCreate(osThread(THREAD_4), NULL);
 
     /* Register CLI info */
     FreeRTOS_CLIRegisterCommand(&xReprogramCommand);
@@ -279,7 +286,6 @@ static void WriteData_Thread(void const *argument)
                     DATALOG_SD_Init();
                     osDelay(100);
                 }
-                checkLora();
             }
         }
 
@@ -326,7 +332,7 @@ static void WriteData_Thread(void const *argument)
             Error_Handler();
         }
 
-        CDC_Fill_Buffer(( uint8_t * )data_s, size);
+        //CDC_Fill_Buffer(( uint8_t * )data_s, size);
         if (SD_Log_Enabled == 1)
         {
             DATALOG_SD_writeBuf(data_s, size);
@@ -546,23 +552,6 @@ void vApplicationStackOverflowHook(TaskHandle_t task, signed char *pcTaskName)
     {
         volatile TaskHandle_t localTask = task;
     }
-}
-
-void checkLora()
-{
-    LORA_init();
-    volatile int reg  = LORA_ReadReg(0x42);
-    if (reg < 0)
-    {
-        // Bad things happened
-        reg = 0;
-    }
-    else
-    {
-        // Good things happened
-        reg++;
-    }
-
 }
 
 #ifdef  USE_FULL_ASSERT

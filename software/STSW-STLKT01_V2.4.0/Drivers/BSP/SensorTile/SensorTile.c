@@ -768,33 +768,14 @@ void LORA_init()
   i2c_lora_reset(1);
 }
 
-int LORA_ReadReg(uint8_t reg)
+uint16_t HW_SPI_InOut(uint16_t txData)
 {
-  HAL_StatusTypeDef status = HAL_OK;
-  uint8_t txData[2] = {0};
-  uint8_t rxData[2] = {0};
-  int rv;
+  uint16_t rxData ;
 
-  // CS Low
-  HAL_GPIO_WritePin(LORA_CS_PORT, LORA_CS_PIN, GPIO_PIN_RESET);
-  txData[0] = reg;
-  status = HAL_SPI_TransmitReceive(&SPI_SD_Handle, &txData, &rxData, 2, 1000);
+  HAL_SPI_TransmitReceive(&SPI_SD_Handle, (uint8_t *) &txData, (uint8_t *) &rxData, 1, HAL_MAX_DELAY);
 
-  HAL_GPIO_WritePin(LORA_CS_PORT, LORA_CS_PIN, GPIO_PIN_SET);
-
-  /* Check the communication status */
-  if(status != HAL_OK)
-  {
-    /* Execute user timeout callback */
-    rv = -1;
-  }
-  else
-  {
-    rv = rxData[1];
-  }
-  return rv;
+  return rxData;
 }
-
 
 /**
 * @}

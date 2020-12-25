@@ -87,6 +87,9 @@ extern "C" {
 #define LORA_CS_PIN GPIO_PIN_12
 #define LORA_CS_GPIO_CLK_ENABLE()  __GPIOG_CLK_ENABLE()
 
+#define RADIO_NSS_PORT GPIOG
+#define RADIO_NSS_PIN GPIO_PIN_12
+
 #ifdef __cplusplus
 }
 #endif

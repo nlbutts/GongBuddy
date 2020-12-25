@@ -30,3 +30,12 @@ cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=../toolchain/arm_embedded_toolchain.txt ..
 make -j99
 ```
+
+# LoRa Communications
+
+The system uses a LoRa radio, but does not use LoraWan protocol. Instead the
+system uses a protobufs system. The entire data field of the LoRa packet
+is a protobuf. The source and destination address are present in there.
+
+There is already a CRC on the LoRa packet, therefore additional data integrity
+checks are not present.

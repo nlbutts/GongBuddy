@@ -71,7 +71,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CPU_FLAGS}")
 
     add_definitions(-D__FPU_PRESENT -DARM_MATH_CM4 -DUSE_HAL_DRIVER
-                    -DSTM32L476xx -DUSE_STM32L4XX_NUCLEO)
+                    -DSTM32L476xx)
 
     # Don't use exceptions or RTTI on the target
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions")
