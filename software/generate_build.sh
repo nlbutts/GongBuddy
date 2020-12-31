@@ -5,6 +5,7 @@
 # Examples:
 # 1) generates build code using cmake: ./generate_build
 # 2) generates and makes projects:     ./generate_build make
+# 3) generates debug build:            ./generate_build debug
 
 main()
 {
@@ -21,7 +22,7 @@ main()
     rm -rf ${BUILD_ROOT_PATH}/*
 
     # Create builds
-    create_build    arm         .           "${THIS_SCRIPT_PATH}/toolchain/arm_embedded_toolchain.txt" || exit 1
+    create_build    arm         .           "${THIS_SCRIPT_PATH}/toolchain/arm_embedded_toolchain.txt" $1 || exit 1
     #create_build    x86         .                                                           || exit 1
 
     # Build created projects, if option is set
@@ -55,9 +56,15 @@ function create_build()
         #exit 1
     fi
 
-    if [ ! -z "$4" ]; then
-        cmake_args=${4}
+    if [ "$4" == "debug" ]; then
+        printf "DEBUG build\n"
+        cmake_args="-DCMAKE_BUILD_TYPE=Debug"
+        #exit 1
     fi
+
+    # if [ ! -z "$4" ]; then
+    #     cmake_args=${4}
+    # fi
 
     # Clear and create the build path
     printf "Clearing ${build_path}\n"
@@ -67,7 +74,7 @@ function create_build()
     # Optionally select the toolchain file
     if [ ! -z "${3}" ]; then
         toolchain_file=$( realpath "${3}" )
-        cmake_args="-DCMAKE_TOOLCHAIN_FILE:PATH=${toolchain_file}"
+        cmake_args="-DCMAKE_TOOLCHAIN_FILE:PATH=${toolchain_file} ${cmake_args}"
     fi
 
     # Call CMake to generate the build

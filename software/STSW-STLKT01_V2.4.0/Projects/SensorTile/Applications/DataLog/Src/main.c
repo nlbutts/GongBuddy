@@ -69,6 +69,7 @@ static int32_t LSM6DSM_Sensor_IO_ITConfig( void );
 volatile uint32_t * dfu_key = (volatile uint32_t*)0x10000000;
 
 /* Private functions ---------------------------------------------------------*/
+#if 0
 BaseType_t prvTaskReprogramCommand( int8_t *pcWriteBuffer,
                                     size_t xWriteBufferLen,
                                     const int8_t *pcCommandString )
@@ -85,6 +86,7 @@ static const CLI_Command_Definition_t xReprogramCommand =
     prvTaskReprogramCommand,
     0
 };
+#endif
 
 uint8_t detectImpact(T_SensorsData *sensorData)
 {
@@ -142,8 +144,7 @@ int main(void)
     i2c_sd_cs(0);
     i2c_big_led(0);
     i2c_big_led(1);
-
-    volatile uint8_t pg = i2c_get_pg();
+    i2c_big_led(0);
 
     /* Initialize LED */
     BSP_LED_Init(LED1);
@@ -170,18 +171,25 @@ int main(void)
         DATALOG_SD_Init();
     }
 
-    osThreadDef(THREAD_1, GetData_Thread, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE*4);
-    osThreadDef(THREAD_2, WriteData_Thread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE*32);
+    osThreadDef(THREAD_1, GetData_Thread, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE*8);
+    osThreadDef(THREAD_2, WriteData_Thread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE*8);
     osThreadDef(THREAD_3, blinkLedThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
     osThreadDef(THREAD_4, pingpingThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
 
     GetDataThreadId = osThreadCreate(osThread(THREAD_1), NULL);
     WriteDataThreadId = osThreadCreate(osThread(THREAD_2), NULL);
     ledThreadId = osThreadCreate(osThread(THREAD_3), NULL);
-    pingpongId = osThreadCreate(osThread(THREAD_4), NULL);
+    //pingpongId = osThreadCreate(osThread(THREAD_4), NULL);
+
+    // if ((GetDataThreadId == NULL) ||
+    //     (WriteDataThreadId == NULL) ||
+    //     (ledThreadId == NULL))
+    // {
+    //     Error_Handler();
+    // }
 
     /* Register CLI info */
-    FreeRTOS_CLIRegisterCommand(&xReprogramCommand);
+    //FreeRTOS_CLIRegisterCommand(&xReprogramCommand);
 
     /* Start scheduler */
     osKernelStart();
@@ -214,6 +222,18 @@ static void GetData_Thread(void const *argument)
     LSM6DSM_Sensor_IO_ITConfig();
 
     dataTimerStart();
+
+    // GPIO_InitTypeDef GPIO_InitStructure;
+    // GPIO_InitStructure.Pin = (SENSORTILE_SD_SPI_MISO_PIN | SENSORTILE_SD_SPI_MOSI_PIN);
+    // GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+    // GPIO_InitStructure.Pull  = GPIO_PULLUP;
+    // GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
+    // GPIO_InitStructure.Alternate = 0;
+    // HAL_GPIO_Init(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, &GPIO_InitStructure);
+    // HAL_GPIO_TogglePin(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, SENSORTILE_SD_SPI_MISO_PIN);
+    // HAL_GPIO_TogglePin(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, SENSORTILE_SD_SPI_MISO_PIN);
+    // HAL_GPIO_TogglePin(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, SENSORTILE_SD_SPI_MOSI_PIN);
+    // HAL_GPIO_TogglePin(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, SENSORTILE_SD_SPI_MOSI_PIN);
 
     for (;;)
     {
@@ -258,13 +278,12 @@ static void WriteData_Thread(void const *argument)
     uint32_t impactTimer = 0;
     uint8_t SD_Log_Enabled = 0;
     uint8_t impactDetected = 0;
-    volatile uint32_t * otg_dsts = (volatile uint32_t*)(0x50000808); // Can't find a #define
 
     for (;;)
     {
         evt = osMessageGet(dataQueue_id, osWaitForever);  // wait for message
         rptr = evt.value.p;
-
+#if 1
         // Check to see if we had large change in acceleration
         if (SD_Log_Enabled == 0)
         {
@@ -337,6 +356,7 @@ static void WriteData_Thread(void const *argument)
         {
             DATALOG_SD_writeBuf(data_s, size);
         }
+#endif
     }
 }
 
@@ -362,7 +382,7 @@ static void blinkLedThread(void const *argument)
 #define MAX_INPUT_LENGTH    50
 #define MAX_OUTPUT_LENGTH   100
 
-static const int8_t * const pcWelcomeMessage =
+static const char * const pcWelcomeMessage =
   "FreeRTOS command server.rnType Help to view a list of registered commands.rn";
 
 #if 0
