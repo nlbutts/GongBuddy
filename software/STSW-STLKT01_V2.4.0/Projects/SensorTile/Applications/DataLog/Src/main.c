@@ -179,7 +179,7 @@ int main(void)
     GetDataThreadId = osThreadCreate(osThread(THREAD_1), NULL);
     WriteDataThreadId = osThreadCreate(osThread(THREAD_2), NULL);
     ledThreadId = osThreadCreate(osThread(THREAD_3), NULL);
-    //pingpongId = osThreadCreate(osThread(THREAD_4), NULL);
+    pingpongId = osThreadCreate(osThread(THREAD_4), NULL);
 
     // if ((GetDataThreadId == NULL) ||
     //     (WriteDataThreadId == NULL) ||
@@ -222,18 +222,6 @@ static void GetData_Thread(void const *argument)
     LSM6DSM_Sensor_IO_ITConfig();
 
     dataTimerStart();
-
-    // GPIO_InitTypeDef GPIO_InitStructure;
-    // GPIO_InitStructure.Pin = (SENSORTILE_SD_SPI_MISO_PIN | SENSORTILE_SD_SPI_MOSI_PIN);
-    // GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
-    // GPIO_InitStructure.Pull  = GPIO_PULLUP;
-    // GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
-    // GPIO_InitStructure.Alternate = 0;
-    // HAL_GPIO_Init(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, &GPIO_InitStructure);
-    // HAL_GPIO_TogglePin(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, SENSORTILE_SD_SPI_MISO_PIN);
-    // HAL_GPIO_TogglePin(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, SENSORTILE_SD_SPI_MISO_PIN);
-    // HAL_GPIO_TogglePin(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, SENSORTILE_SD_SPI_MOSI_PIN);
-    // HAL_GPIO_TogglePin(SENSORTILE_SD_SPI_MISO_MOSI_GPIO_PORT, SENSORTILE_SD_SPI_MOSI_PIN);
 
     for (;;)
     {
