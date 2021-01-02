@@ -5,6 +5,7 @@
 #include "datalog_application.h"
 #include "FreeRTOS_CLI.h"
 #include "pingpong.h"
+#include "commandline.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -18,7 +19,8 @@ typedef enum
   THREAD_1 = 0,
   THREAD_2,
   THREAD_3,
-  THREAD_4
+  THREAD_4,
+  THREAD_5
 } Thread_TypeDef;
 
 /* Private variables ---------------------------------------------------------*/
@@ -27,6 +29,7 @@ osThreadId GetDataThreadId;
 osThreadId WriteDataThreadId;
 osThreadId ledThreadId;
 osThreadId pingpongId;
+osThreadId commandConsoleId;
 
 osMessageQId dataQueue_id;
 osMessageQDef(dataqueue, DATAQUEUE_SIZE, int);
@@ -69,25 +72,6 @@ static int32_t LSM6DSM_Sensor_IO_ITConfig( void );
 volatile uint32_t * dfu_key = (volatile uint32_t*)0x10000000;
 
 /* Private functions ---------------------------------------------------------*/
-#if 0
-BaseType_t prvTaskReprogramCommand( int8_t *pcWriteBuffer,
-                                    size_t xWriteBufferLen,
-                                    const int8_t *pcCommandString )
-{
-    (void)xWriteBufferLen;
-    vTaskList(pcWriteBuffer + 2);
-    return pdFALSE;
-}
-
-static const CLI_Command_Definition_t xReprogramCommand =
-{
-    "reprogram",
-    "reprogram: Reboots the unit in reprogramming mode",
-    prvTaskReprogramCommand,
-    0
-};
-#endif
-
 uint8_t detectImpact(T_SensorsData *sensorData)
 {
     float mag = (sensorData->acc.x * sensorData->acc.x) +
@@ -134,18 +118,6 @@ int main(void)
     /* Configure the System clock to 80 MHz */
     SystemClock_Config();
 
-    i2c_expander_data i2c_cfg;
-    i2c_cfg.deviceAddress = 0x40; // Includes w/r bit
-    i2c_cfg.inputPorts = 0x40;
-    i2c_expander_init(&i2c_cfg);
-    i2c_lora_reset(1);
-    i2c_lora_reset(0);
-    i2c_sd_cs(1);
-    i2c_sd_cs(0);
-    i2c_big_led(0);
-    i2c_big_led(1);
-    i2c_big_led(0);
-
     /* Initialize LED */
     BSP_LED_Init(LED1);
     BSP_LED_Off(LED1);
@@ -171,15 +143,25 @@ int main(void)
         DATALOG_SD_Init();
     }
 
-    osThreadDef(THREAD_1, GetData_Thread, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE*8);
-    osThreadDef(THREAD_2, WriteData_Thread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE*8);
-    osThreadDef(THREAD_3, blinkLedThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
-    osThreadDef(THREAD_4, pingpingThread, osPriorityNormal, 0, configMINIMAL_STACK_SIZE);
+    i2c_expander_data i2c_cfg;
+    i2c_cfg.deviceAddress = 0x40; // Includes w/r bit
+    i2c_cfg.inputPorts = 0x40;
+    i2c_cfg.baudrate = 400000;
+    i2c_expander_init(&i2c_cfg);
+    i2c_lora_reset(1);
+    i2c_lora_reset(0);
 
-    GetDataThreadId = osThreadCreate(osThread(THREAD_1), NULL);
-    WriteDataThreadId = osThreadCreate(osThread(THREAD_2), NULL);
-    ledThreadId = osThreadCreate(osThread(THREAD_3), NULL);
-    pingpongId = osThreadCreate(osThread(THREAD_4), NULL);
+    osThreadDef(GetData_Thread,         GetData_Thread,       osPriorityAboveNormal,  0, configMINIMAL_STACK_SIZE*8);
+    osThreadDef(WriteData_Thread,       WriteData_Thread,     osPriorityNormal,       0, configMINIMAL_STACK_SIZE*8);
+    osThreadDef(blinkLedThread,         blinkLedThread,       osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
+    osThreadDef(pingpingThread,         pingpingThread,       osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
+    osThreadDef(vCommandConsoleTask,    vCommandConsoleTask,  osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
+
+    GetDataThreadId     = osThreadCreate(osThread(GetData_Thread), NULL);
+    WriteDataThreadId   = osThreadCreate(osThread(WriteData_Thread), NULL);
+    ledThreadId         = osThreadCreate(osThread(blinkLedThread), NULL);
+    pingpongId          = osThreadCreate(osThread(pingpingThread), NULL);
+    commandConsoleId    = osThreadCreate(osThread(vCommandConsoleTask), NULL);
 
     // if ((GetDataThreadId == NULL) ||
     //     (WriteDataThreadId == NULL) ||
@@ -187,9 +169,6 @@ int main(void)
     // {
     //     Error_Handler();
     // }
-
-    /* Register CLI info */
-    //FreeRTOS_CLIRegisterCommand(&xReprogramCommand);
 
     /* Start scheduler */
     osKernelStart();
@@ -226,8 +205,11 @@ static void GetData_Thread(void const *argument)
     for (;;)
     {
         osSemaphoreWait(readDataSem_id, osWaitForever);
+        i2c_debug1(1);
+        i2c_debug1(0);
         /* Try to allocate a memory block and check if is not NULL */
         mptr = osPoolAlloc(sensorPool_id);
+        i2c_debug1(0);
         if(mptr != NULL)
         {
             if(getSensorsData(mptr) == BSP_ERROR_NONE)
@@ -247,6 +229,7 @@ static void GetData_Thread(void const *argument)
         {
             Error_Handler();
         }
+        //i2c_debug1(0);
     }
 }
 
@@ -270,8 +253,8 @@ static void WriteData_Thread(void const *argument)
     for (;;)
     {
         evt = osMessageGet(dataQueue_id, osWaitForever);  // wait for message
+        i2c_debug2(1);
         rptr = evt.value.p;
-#if 1
         // Check to see if we had large change in acceleration
         if (SD_Log_Enabled == 0)
         {
@@ -298,22 +281,6 @@ static void WriteData_Thread(void const *argument)
 
         if (detectImpact(rptr))
         {
-            // uint32_t frameSOF = (*otg_dsts >> 8) & 0x3FFF;
-            // if ((impactDetected == 1) && (frameSOF > 0))
-            // {
-            //     strcpy(data_s, "Impact 2\n");
-            //     CDC_Fill_Buffer(( uint8_t * )data_s, size);
-            //     osDelay(100);
-            //     dfu_key[0] = 0xdeadbeef;
-            //     dfu_key[1] = 0x87654321;
-            //     HAL_NVIC_SystemReset();
-            // }
-            // else
-            // {
-            //     strcpy(data_s, "Impact 1");
-            //     CDC_Fill_Buffer(( uint8_t * )data_s, size);
-            // }
-
             // Set a timer to roll the SD card recording
             impactTimer = HAL_GetTick();
             impactDetected = 1;
@@ -339,12 +306,11 @@ static void WriteData_Thread(void const *argument)
             Error_Handler();
         }
 
-        //CDC_Fill_Buffer(( uint8_t * )data_s, size);
         if (SD_Log_Enabled == 1)
         {
             DATALOG_SD_writeBuf(data_s, size);
         }
-#endif
+        i2c_debug2(0);
     }
 }
 
@@ -366,106 +332,6 @@ static void blinkLedThread(void const *argument)
         }
     }
 }
-
-#define MAX_INPUT_LENGTH    50
-#define MAX_OUTPUT_LENGTH   100
-
-static const char * const pcWelcomeMessage =
-  "FreeRTOS command server.rnType Help to view a list of registered commands.rn";
-
-#if 0
-void vCommandConsoleTask( void *pvParameters )
-{
-Peripheral_Descriptor_t xConsole;
-int8_t cRxedChar, cInputIndex = 0;
-BaseType_t xMoreDataToFollow;
-/* The input and output buffers are declared static to keep them off the stack. */
-static int8_t pcOutputString[ MAX_OUTPUT_LENGTH ], pcInputString[ MAX_INPUT_LENGTH ];
-
-    /* This code assumes the peripheral being used as the console has already
-    been opened and configured, and is passed into the task as the task
-    parameter.  Cast the task parameter to the correct type. */
-    xConsole = ( Peripheral_Descriptor_t ) pvParameters;
-
-    /* Send a welcome message to the user knows they are connected. */
-    FreeRTOS_write( xConsole, pcWelcomeMessage, strlen( pcWelcomeMessage ) );
-
-    for( ;; )
-    {
-        /* This implementation reads a single character at a time.  Wait in the
-        Blocked state until a character is received. */
-        FreeRTOS_read( xConsole, &cRxedChar, sizeof( cRxedChar ) );
-
-        if( cRxedChar == '\n' )
-        {
-            /* A newline character was received, so the input command string is
-            complete and can be processed.  Transmit a line separator, just to
-            make the output easier to read. */
-            FreeRTOS_write( xConsole, "\r\n", strlen( "\r\n" );
-
-            /* The command interpreter is called repeatedly until it returns
-            pdFALSE.  See the "Implementing a command" documentation for an
-            exaplanation of why this is. */
-            do
-            {
-                /* Send the command string to the command interpreter.  Any
-                output generated by the command interpreter will be placed in the
-                pcOutputString buffer. */
-                xMoreDataToFollow = FreeRTOS_CLIProcessCommand
-                              (
-                                  pcInputString,   /* The command string.*/
-                                  pcOutputString,  /* The output buffer. */
-                                  MAX_OUTPUT_LENGTH/* The size of the output buffer. */
-                              );
-
-                /* Write the output generated by the command interpreter to the
-                console. */
-                FreeRTOS_write( xConsole, pcOutputString, strlen( pcOutputString ) );
-
-            } while( xMoreDataToFollow != pdFALSE );
-
-            /* All the strings generated by the input command have been sent.
-            Processing of the command is complete.  Clear the input string ready
-            to receive the next command. */
-            cInputIndex = 0;
-            memset( pcInputString, 0x00, MAX_INPUT_LENGTH );
-        }
-        else
-        {
-            /* The if() clause performs the processing after a newline character
-            is received.  This else clause performs the processing if any other
-            character is received. */
-
-            if( cRxedChar == '\r' )
-            {
-                /* Ignore carriage returns. */
-            }
-            else if( cRxedChar == '\b' )
-            {
-                /* Backspace was pressed.  Erase the last character in the input
-                buffer - if there are any. */
-                if( cInputIndex > 0 )
-                {
-                    cInputIndex--;
-                    pcInputString[ cInputIndex ] = '';
-                }
-            }
-            else
-            {
-                /* A character was entered.  It was not a new line, backspace
-                or carriage return, so it is accepted as part of the input and
-                placed into the input buffer.  When a n is entered the complete
-                string will be passed to the command interpreter. */
-                if( cInputIndex < MAX_INPUT_LENGTH )
-                {
-                    pcInputString[ cInputIndex ] = cRxedChar;
-                    cInputIndex++;
-                }
-            }
-        }
-    }
-}
-#endif
 
 void dataTimer_Callback(void const *arg)
 {

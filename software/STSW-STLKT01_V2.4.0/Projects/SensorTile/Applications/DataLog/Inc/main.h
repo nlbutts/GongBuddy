@@ -65,8 +65,8 @@ extern "C" {
 #include "lps22hb_settings.h"
 #include "usbd_desc.h"
 #include "usbd_cdc.h"
-#include "usbd_cdc_interface.h"
 #include "mcp23008_i2c_expander.h"
+#include "usbd_cdc_interface.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

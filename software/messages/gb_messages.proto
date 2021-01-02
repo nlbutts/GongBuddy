@@ -1,0 +1,33 @@
+syntax = "proto2";
+
+message Sensor {
+    required sint32 x = 1;
+    required sint32 y = 2;
+    required sint32 z = 3;
+}
+
+message IMUSample {
+    required Sensor accel = 1;
+    required Sensor gyro = 2;
+    required sint32 pressure = 3;
+    required sint32 temperature = 4;
+}
+
+message LoraMsg {
+    required uint32 buildnum = 1;
+    optional uint32 status = 2;
+    repeated IMUSample imu = 3;
+    optional uint32 batt_voltage = 4;
+    optional uint32 threshold = 5;
+    optional uint32 configuration = 6;
+}
+
+message Reprogramming {
+    required uint32 address = 1;
+    required bytes data = 2;
+    enum Flags {
+        LAST_PACKET = 0;
+        CONTINUE = 1;
+    }
+    required Flags flags = 3 [default = CONTINUE];
+}

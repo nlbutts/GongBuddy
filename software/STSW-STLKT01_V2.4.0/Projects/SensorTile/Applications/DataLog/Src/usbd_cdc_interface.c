@@ -48,6 +48,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_interface.h"
 #include "main.h"
+#include "cmsis_os.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -278,10 +279,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   * @param  Len: Number of data received (in bytes)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
+extern osMessageQId usbQueue_id;
+
 static int8_t CDC_Itf_Receive(uint8_t* Buf, uint32_t *Len)
 {
-  static volatile int foo = 0;
-  foo++;
+  /* Push the new memory Block in the Data Queue */
+  for (int i = 0; i < *Len; i++)
+  {
+    if(osMessagePut(usbQueue_id, Buf[i], osWaitForever) != osOK)
+    {
+      while (1) {};
+    }
+  }
+
 //  uint16_t numByteToCopy;
 //  if(((USB_RxBufferStart_idx) + (uint16_t)*Len) > USB_RxBufferDim)
 //  {
@@ -303,8 +313,8 @@ static int8_t CDC_Itf_Receive(uint8_t* Buf, uint32_t *Len)
 //      USB_RxBufferStart_idx = 0;
 //  }
 //
-//  /* Initiate next USB packet transfer */
-//  USBD_CDC_ReceivePacket(&USBD_Device);
+  /* Initiate next USB packet transfer */
+  USBD_CDC_ReceivePacket(&USBD_Device);
   return (USBD_OK);
 }
 

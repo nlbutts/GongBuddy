@@ -6,6 +6,7 @@ struct _mcp23008_i2c_expander_data
 {
     uint8_t deviceAddress;
     uint8_t inputPorts; // Bit field, positive values are inputs, otherwise outputs
+    uint32_t baudrate;
 };
 
 typedef struct _mcp23008_i2c_expander_data i2c_expander_data;
@@ -36,6 +37,21 @@ int i2c_expander_read();
  *  @return errno
  */
 int i2c_big_led(uint8_t value);
+
+/*! @brief Sets or clear GPIO
+ *  @param value 0 off 1 on
+ *
+ *  @return errno
+ */
+int i2c_debug1(uint8_t value);
+
+/*! @brief Sets or clear GPIO
+ *  @param value 0 off 1 on
+ *
+ *  @return errno
+ */
+int i2c_debug2(uint8_t value);
+
 
 /*! @brief Sets or clear GPIO
  *  @param value 0 off 1 on
