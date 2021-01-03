@@ -5,6 +5,8 @@
 #include "timeServer.h"
 #include "low_power_manager.h"
 #include "SensorTile.h"
+#include "common_structs.h"
+#include "cmsis_os.h"
 
 #define RF_FREQUENCY                                915000000 // Hz
 #define TX_OUTPUT_POWER                             14        // dBm
@@ -73,6 +75,10 @@ int8_t SnrValue = 0;
 
 /* Led Timers objects*/
 static  TimerEvent_t timerLed;
+// Defined in main.c
+extern osMessageQId loraQueue_id;
+extern osPoolId loraPool_id;
+
 
 /* Private function prototypes -----------------------------------------------*/
 /*!
@@ -172,18 +178,13 @@ void pingpingThread(void const *argument)
 
   while (1)
   {
+    osEvent evt = osMessageGet(loraQueue_id, osWaitForever);  // wait for message
+    LoraData_t * loraData = evt.value.p;
+    memcpy(Buffer, loraData->buf, loraData->bytesWritten);
+    osPoolFree(loraPool_id, loraData);
     // Send the next PING frame
-    Buffer[0] = 'P';
-    Buffer[1] = 'I';
-    Buffer[2] = 'N';
-    Buffer[3] = 'G';
-    for (i = 4; i < BufferSize; i++)
-    {
-      Buffer[i] = i - 4;
-    }
-    DelayMs(1);
     Radio.Send(Buffer, BufferSize);
-    osDelay(1000);
+    //osDelay(1000);
   }
 
   while (1)
@@ -380,4 +381,3 @@ static void OnledEvent(void *context)
 
   TimerStart(&timerLed);
 }
-

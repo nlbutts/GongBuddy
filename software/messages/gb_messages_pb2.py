@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11gb_messages.proto\")\n\x06Sensor\x12\t\n\x01x\x18\x01 \x02(\x11\x12\t\n\x01y\x18\x02 \x02(\x11\x12\t\n\x01z\x18\x03 \x02(\x11\":\n\tIMUSample\x12\x16\n\x05\x61\x63\x63\x65l\x18\x01 \x02(\x0b\x32\x07.Sensor\x12\x15\n\x04gyro\x18\x02 \x02(\x0b\x32\x07.Sensor\"\xab\x01\n\x07LoraMsg\x12\x10\n\x08\x62uildnum\x18\x01 \x02(\r\x12\x0e\n\x06status\x18\x02 \x01(\r\x12\x17\n\x03imu\x18\x03 \x03(\x0b\x32\n.IMUSample\x12\x10\n\x08pressure\x18\x04 \x01(\r\x12\x13\n\x0btemperature\x18\x05 \x01(\x11\x12\x14\n\x0c\x62\x61tt_voltage\x18\x06 \x01(\r\x12\x11\n\tthreshold\x18\x07 \x01(\r\x12\x15\n\rconfiguration\x18\x08 \x01(\r\"\xa0\x01\n\x08LoraMsg2\x12\x10\n\x08\x62uildnum\x18\x01 \x02(\r\x12\x0e\n\x06status\x18\x02 \x01(\r\x12\x0b\n\x03imu\x18\x03 \x01(\x0c\x12\x10\n\x08pressure\x18\x04 \x01(\r\x12\x13\n\x0btemperature\x18\x05 \x01(\x11\x12\x14\n\x0c\x62\x61tt_voltage\x18\x06 \x01(\r\x12\x11\n\tthreshold\x18\x07 \x01(\r\x12\x15\n\rconfiguration\x18\x08 \x01(\r\"\x85\x01\n\rReprogramming\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x02(\r\x12\x0c\n\x04\x64\x61ta\x18\x02 \x02(\x0c\x12-\n\x05\x66lags\x18\x03 \x02(\x0e\x32\x14.Reprogramming.Flags:\x08\x43ONTINUE\"&\n\x05\x46lags\x12\x0f\n\x0bLAST_PACKET\x10\x00\x12\x0c\n\x08\x43ONTINUE\x10\x01'
+  serialized_pb=b'\n\x11gb_messages.proto\"\xa0\x01\n\x08LoraMsg2\x12\x10\n\x08\x62uildnum\x18\x01 \x02(\r\x12\x0e\n\x06status\x18\x02 \x01(\r\x12\x0b\n\x03imu\x18\x03 \x01(\x0c\x12\x10\n\x08pressure\x18\x04 \x01(\r\x12\x13\n\x0btemperature\x18\x05 \x01(\x11\x12\x14\n\x0c\x62\x61tt_voltage\x18\x06 \x01(\r\x12\x11\n\tthreshold\x18\x07 \x01(\r\x12\x15\n\rconfiguration\x18\x08 \x01(\r\"\x85\x01\n\rReprogramming\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x02(\r\x12\x0c\n\x04\x64\x61ta\x18\x02 \x02(\x0c\x12-\n\x05\x66lags\x18\x03 \x02(\x0e\x32\x14.Reprogramming.Flags:\x08\x43ONTINUE\"&\n\x05\x46lags\x12\x0f\n\x0bLAST_PACKET\x10\x00\x12\x0c\n\x08\x43ONTINUE\x10\x01'
 )
 
 
@@ -44,176 +44,10 @@ _REPROGRAMMING_FLAGS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=557,
-  serialized_end=595,
+  serialized_start=280,
+  serialized_end=318,
 )
 _sym_db.RegisterEnumDescriptor(_REPROGRAMMING_FLAGS)
-
-
-_SENSOR = _descriptor.Descriptor(
-  name='Sensor',
-  full_name='Sensor',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='x', full_name='Sensor.x', index=0,
-      number=1, type=17, cpp_type=1, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='y', full_name='Sensor.y', index=1,
-      number=2, type=17, cpp_type=1, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='z', full_name='Sensor.z', index=2,
-      number=3, type=17, cpp_type=1, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto2',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=21,
-  serialized_end=62,
-)
-
-
-_IMUSAMPLE = _descriptor.Descriptor(
-  name='IMUSample',
-  full_name='IMUSample',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='accel', full_name='IMUSample.accel', index=0,
-      number=1, type=11, cpp_type=10, label=2,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='gyro', full_name='IMUSample.gyro', index=1,
-      number=2, type=11, cpp_type=10, label=2,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto2',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=64,
-  serialized_end=122,
-)
-
-
-_LORAMSG = _descriptor.Descriptor(
-  name='LoraMsg',
-  full_name='LoraMsg',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='buildnum', full_name='LoraMsg.buildnum', index=0,
-      number=1, type=13, cpp_type=3, label=2,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='status', full_name='LoraMsg.status', index=1,
-      number=2, type=13, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='imu', full_name='LoraMsg.imu', index=2,
-      number=3, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='pressure', full_name='LoraMsg.pressure', index=3,
-      number=4, type=13, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='temperature', full_name='LoraMsg.temperature', index=4,
-      number=5, type=17, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='batt_voltage', full_name='LoraMsg.batt_voltage', index=5,
-      number=6, type=13, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='threshold', full_name='LoraMsg.threshold', index=6,
-      number=7, type=13, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='configuration', full_name='LoraMsg.configuration', index=7,
-      number=8, type=13, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto2',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=125,
-  serialized_end=296,
-)
 
 
 _LORAMSG2 = _descriptor.Descriptor(
@@ -292,8 +126,8 @@ _LORAMSG2 = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=299,
-  serialized_end=459,
+  serialized_start=22,
+  serialized_end=182,
 )
 
 
@@ -339,42 +173,15 @@ _REPROGRAMMING = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=462,
-  serialized_end=595,
+  serialized_start=185,
+  serialized_end=318,
 )
 
-_IMUSAMPLE.fields_by_name['accel'].message_type = _SENSOR
-_IMUSAMPLE.fields_by_name['gyro'].message_type = _SENSOR
-_LORAMSG.fields_by_name['imu'].message_type = _IMUSAMPLE
 _REPROGRAMMING.fields_by_name['flags'].enum_type = _REPROGRAMMING_FLAGS
 _REPROGRAMMING_FLAGS.containing_type = _REPROGRAMMING
-DESCRIPTOR.message_types_by_name['Sensor'] = _SENSOR
-DESCRIPTOR.message_types_by_name['IMUSample'] = _IMUSAMPLE
-DESCRIPTOR.message_types_by_name['LoraMsg'] = _LORAMSG
 DESCRIPTOR.message_types_by_name['LoraMsg2'] = _LORAMSG2
 DESCRIPTOR.message_types_by_name['Reprogramming'] = _REPROGRAMMING
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
-
-Sensor = _reflection.GeneratedProtocolMessageType('Sensor', (_message.Message,), {
-  'DESCRIPTOR' : _SENSOR,
-  '__module__' : 'gb_messages_pb2'
-  # @@protoc_insertion_point(class_scope:Sensor)
-  })
-_sym_db.RegisterMessage(Sensor)
-
-IMUSample = _reflection.GeneratedProtocolMessageType('IMUSample', (_message.Message,), {
-  'DESCRIPTOR' : _IMUSAMPLE,
-  '__module__' : 'gb_messages_pb2'
-  # @@protoc_insertion_point(class_scope:IMUSample)
-  })
-_sym_db.RegisterMessage(IMUSample)
-
-LoraMsg = _reflection.GeneratedProtocolMessageType('LoraMsg', (_message.Message,), {
-  'DESCRIPTOR' : _LORAMSG,
-  '__module__' : 'gb_messages_pb2'
-  # @@protoc_insertion_point(class_scope:LoraMsg)
-  })
-_sym_db.RegisterMessage(LoraMsg)
 
 LoraMsg2 = _reflection.GeneratedProtocolMessageType('LoraMsg2', (_message.Message,), {
   'DESCRIPTOR' : _LORAMSG2,

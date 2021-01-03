@@ -7,6 +7,8 @@
 #include "pingpong.h"
 #include "commandline.h"
 #include "gb_messages.pb.h"
+#include <pb_encode.h>
+#include "common_structs.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -43,6 +45,12 @@ osSemaphoreDef(readDataSem);
 
 osSemaphoreId ledBlinkSem_id;
 osSemaphoreDef(ledBlinkSem);
+
+osMessageQId loraQueue_id;
+osMessageQDef(loraQueue, 1, int);
+
+osPoolId loraPool_id;
+osPoolDef(loraPool, 1, LoraData_t);
 
 /* LoggingInterface = USB_Datalog  --> Send sensors data via USB */
 /* LoggingInterface = SDCARD_Datalog  --> Save sensors data on SDCard (enable with double tap) */
@@ -269,10 +277,11 @@ static void WriteData_Thread(void const *argument)
     uint8_t SD_Log_Enabled = 0;
     uint8_t impactDetected = 0;
     uint32_t sensorBufferIndex = 0;
-    uint32_t impactSensorBufferIndex = 0;
-    uint8_t impactDetectedForRF = 0;
     uint32_t loraStatus = 0;
-    LoraMsg2 msg = {};
+    uint8_t pb_data[250];
+
+    loraPool_id  = osPoolCreate(osPool(loraPool));
+    loraQueue_id = osMessageCreate(osMessageQ(loraQueue), NULL);
 
     for (;;)
     {
@@ -308,8 +317,6 @@ static void WriteData_Thread(void const *argument)
             // Set a timer to roll the SD card recording
             impactTimer = HAL_GetTick();
             impactDetected = 1;
-            impactDetectedForRF = 1;
-            impactSensorBufferIndex = sensorBufferIndex;
             osSignalSet(ledThreadId, 0x10000);
         }
         else if (SD_Log_Enabled && impactDetected && ((HAL_GetTick() - impactTimer) > 5000)) // 5 seconds
@@ -332,16 +339,34 @@ static void WriteData_Thread(void const *argument)
         }
         else if (sensorBufferIndex == SENSOR_CIR_BUF_SIZE)
         {
+            LoraMsg2 msg = LoraMsg2_init_default;
             sensorBufferIndex++;
             // Generate the protobuf and send it to the Lora Thread
             msg.buildnum = 123;
+            msg.has_status = true;
             msg.status = ++loraStatus;
+            msg.has_pressure = true;
             msg.pressure = (rptr->pressure * 10);
+            msg.has_temperature = true;
             msg.temperature = (rptr->temperature * 10);
 
+            msg.has_imu = true;
             for (int i = 0; i < SENSOR_CIR_BUF_SIZE; i++)
             {
                 packSensorSample(&sensorBuffer[i], &msg.imu.bytes[i*12]);
+            }
+            msg.imu.size = SENSOR_CIR_BUF_SIZE * 12;
+            pb_ostream_t stream = pb_ostream_from_buffer(pb_data, sizeof(pb_data));
+            pb_encode(&stream, LoraMsg2_fields, &msg);
+
+            LoraData_t * loraData = osPoolAlloc(loraPool_id);
+            if (loraData != NULL)
+            {
+                loraData->buf = pb_data;
+                loraData->bytesWritten = stream.bytes_written;
+                // Put the pointer into the message queue, the Lora thread will pull
+                // it out. Don't worry about the return.
+                (void)osMessagePut(loraQueue_id, (int)loraData, osWaitForever);
             }
         }
 

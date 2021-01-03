@@ -6,15 +6,6 @@
 #error Regenerate this file with the current version of nanopb generator.
 #endif
 
-PB_BIND(Sensor, Sensor, AUTO)
-
-
-PB_BIND(IMUSample, IMUSample, AUTO)
-
-
-PB_BIND(LoraMsg, LoraMsg, AUTO)
-
-
 PB_BIND(LoraMsg2, LoraMsg2, 2)
 
 

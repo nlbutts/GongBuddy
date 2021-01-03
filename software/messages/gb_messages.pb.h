@@ -16,23 +16,6 @@ typedef enum _Reprogramming_Flags {
 } Reprogramming_Flags;
 
 /* Struct definitions */
-typedef struct _LoraMsg {
-    uint32_t buildnum;
-    bool has_status;
-    uint32_t status;
-    pb_callback_t imu;
-    bool has_pressure;
-    uint32_t pressure;
-    bool has_temperature;
-    int32_t temperature;
-    bool has_batt_voltage;
-    uint32_t batt_voltage;
-    bool has_threshold;
-    uint32_t threshold;
-    bool has_configuration;
-    uint32_t configuration;
-} LoraMsg;
-
 typedef PB_BYTES_ARRAY_T(200) LoraMsg2_imu_t;
 typedef struct _LoraMsg2 {
     uint32_t buildnum;
@@ -59,17 +42,6 @@ typedef struct _Reprogramming {
     Reprogramming_Flags flags;
 } Reprogramming;
 
-typedef struct _Sensor {
-    int32_t x;
-    int32_t y;
-    int32_t z;
-} Sensor;
-
-typedef struct _IMUSample {
-    Sensor accel;
-    Sensor gyro;
-} IMUSample;
-
 
 /* Helper constants for enums */
 #define _Reprogramming_Flags_MIN Reprogramming_Flags_LAST_PACKET
@@ -82,26 +54,12 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define Sensor_init_default                      {0, 0, 0}
-#define IMUSample_init_default                   {Sensor_init_default, Sensor_init_default}
-#define LoraMsg_init_default                     {0, false, 0, {{NULL}, NULL}, false, 0, false, 0, false, 0, false, 0, false, 0}
 #define LoraMsg2_init_default                    {0, false, 0, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0}
 #define Reprogramming_init_default               {0, {0, {0}}, Reprogramming_Flags_CONTINUE}
-#define Sensor_init_zero                         {0, 0, 0}
-#define IMUSample_init_zero                      {Sensor_init_zero, Sensor_init_zero}
-#define LoraMsg_init_zero                        {0, false, 0, {{NULL}, NULL}, false, 0, false, 0, false, 0, false, 0, false, 0}
 #define LoraMsg2_init_zero                       {0, false, 0, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0}
 #define Reprogramming_init_zero                  {0, {0, {0}}, _Reprogramming_Flags_MIN}
 
 /* Field tags (for use in manual encoding/decoding) */
-#define LoraMsg_buildnum_tag                     1
-#define LoraMsg_status_tag                       2
-#define LoraMsg_imu_tag                          3
-#define LoraMsg_pressure_tag                     4
-#define LoraMsg_temperature_tag                  5
-#define LoraMsg_batt_voltage_tag                 6
-#define LoraMsg_threshold_tag                    7
-#define LoraMsg_configuration_tag                8
 #define LoraMsg2_buildnum_tag                    1
 #define LoraMsg2_status_tag                      2
 #define LoraMsg2_imu_tag                         3
@@ -113,41 +71,8 @@ extern "C" {
 #define Reprogramming_address_tag                1
 #define Reprogramming_data_tag                   2
 #define Reprogramming_flags_tag                  3
-#define Sensor_x_tag                             1
-#define Sensor_y_tag                             2
-#define Sensor_z_tag                             3
-#define IMUSample_accel_tag                      1
-#define IMUSample_gyro_tag                       2
 
 /* Struct field encoding specification for nanopb */
-#define Sensor_FIELDLIST(X, a) \
-X(a, STATIC,   REQUIRED, SINT32,   x,                 1) \
-X(a, STATIC,   REQUIRED, SINT32,   y,                 2) \
-X(a, STATIC,   REQUIRED, SINT32,   z,                 3)
-#define Sensor_CALLBACK NULL
-#define Sensor_DEFAULT NULL
-
-#define IMUSample_FIELDLIST(X, a) \
-X(a, STATIC,   REQUIRED, MESSAGE,  accel,             1) \
-X(a, STATIC,   REQUIRED, MESSAGE,  gyro,              2)
-#define IMUSample_CALLBACK NULL
-#define IMUSample_DEFAULT NULL
-#define IMUSample_accel_MSGTYPE Sensor
-#define IMUSample_gyro_MSGTYPE Sensor
-
-#define LoraMsg_FIELDLIST(X, a) \
-X(a, STATIC,   REQUIRED, UINT32,   buildnum,          1) \
-X(a, STATIC,   OPTIONAL, UINT32,   status,            2) \
-X(a, CALLBACK, REPEATED, MESSAGE,  imu,               3) \
-X(a, STATIC,   OPTIONAL, UINT32,   pressure,          4) \
-X(a, STATIC,   OPTIONAL, SINT32,   temperature,       5) \
-X(a, STATIC,   OPTIONAL, UINT32,   batt_voltage,      6) \
-X(a, STATIC,   OPTIONAL, UINT32,   threshold,         7) \
-X(a, STATIC,   OPTIONAL, UINT32,   configuration,     8)
-#define LoraMsg_CALLBACK pb_default_field_callback
-#define LoraMsg_DEFAULT NULL
-#define LoraMsg_imu_MSGTYPE IMUSample
-
 #define LoraMsg2_FIELDLIST(X, a) \
 X(a, STATIC,   REQUIRED, UINT32,   buildnum,          1) \
 X(a, STATIC,   OPTIONAL, UINT32,   status,            2) \
@@ -167,23 +92,14 @@ X(a, STATIC,   REQUIRED, UENUM,    flags,             3)
 #define Reprogramming_CALLBACK NULL
 #define Reprogramming_DEFAULT (const pb_byte_t*)"\x18\x01\x00"
 
-extern const pb_msgdesc_t Sensor_msg;
-extern const pb_msgdesc_t IMUSample_msg;
-extern const pb_msgdesc_t LoraMsg_msg;
 extern const pb_msgdesc_t LoraMsg2_msg;
 extern const pb_msgdesc_t Reprogramming_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
-#define Sensor_fields &Sensor_msg
-#define IMUSample_fields &IMUSample_msg
-#define LoraMsg_fields &LoraMsg_msg
 #define LoraMsg2_fields &LoraMsg2_msg
 #define Reprogramming_fields &Reprogramming_msg
 
 /* Maximum encoded size of messages (where known) */
-#define Sensor_size                              18
-#define IMUSample_size                           40
-/* LoraMsg_size depends on runtime parameters */
 #define LoraMsg2_size                            245
 #define Reprogramming_size                       1035
 
