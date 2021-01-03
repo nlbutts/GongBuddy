@@ -103,7 +103,7 @@ void DATALOG_SD_Init(void)
 uint8_t DATALOG_SD_Log_Enable(void)
 {
   static uint16_t sdcard_file_counter = 0;
-  char header[] = "T [ms],AccX [mg],AccY [mg],AccZ [mg],GyroX [mdps],GyroY [mdps],GyroZ [mdps],MagX [mgauss],MagY [mgauss],MagZ [mgauss],P [mB],T [�C],H [%]\r\n";
+  char header[] = "T [ms],AccX [mg],AccY [mg],AccZ [mg],GyroX [mdps],GyroY [mdps],GyroZ [mdps],MagX [mgauss],MagY [mgauss],MagZ [mgauss],P [mB],T [degC],H [%]\r\n";
   uint32_t byteswritten; /* written byte count */
   char file_name[30] = {0};
 

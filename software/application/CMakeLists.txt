@@ -70,7 +70,7 @@ foreach(item ${SRC_FILES})
 endforeach()
 
 # --------------------------------------------------------- DEFINE BUILD TARGET
-set(THIS_LINK_LIBS )
+set(THIS_LINK_LIBS messages)
 add_executable(${THIS_RELEASE} ${SRC_FILES})
 target_link_libraries(${THIS_RELEASE} ${THIS_LINK_LIBS})
 

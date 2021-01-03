@@ -124,6 +124,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal)
     # Libraries
     #add_subdirectory(drivers)
     #add_subdirectory(middleware)
+    add_subdirectory(messages)
 
     # Executables
     add_subdirectory(application)
@@ -140,4 +141,3 @@ else ()
 
     # Executables
 endif ()
-

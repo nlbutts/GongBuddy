@@ -6,6 +6,7 @@
 #include "FreeRTOS_CLI.h"
 #include "pingpong.h"
 #include "commandline.h"
+#include "gb_messages.pb.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -233,7 +234,24 @@ static void GetData_Thread(void const *argument)
     }
 }
 
+void packSensorSample(T_SensorsData * sample, uint8_t * buf)
+{
+    buf[0]  = (sample->acc.x >> 0)  & 0xFF;
+    buf[1]  = (sample->acc.x >> 8)  & 0xFF;
+    buf[2]  = (sample->acc.y >> 0)  & 0xFF;
+    buf[3]  = (sample->acc.y >> 8)  & 0xFF;
+    buf[4]  = (sample->acc.z >> 0)  & 0xFF;
+    buf[5]  = (sample->acc.z >> 8)  & 0xFF;
+    buf[6]  = (sample->gyro.x >> 0) & 0xFF;
+    buf[7]  = (sample->gyro.x >> 8) & 0xFF;
+    buf[8]  = (sample->gyro.y >> 0) & 0xFF;
+    buf[9]  = (sample->gyro.y >> 8) & 0xFF;
+    buf[10] = (sample->gyro.z >> 0) & 0xFF;
+    buf[11] = (sample->gyro.z >> 8) & 0xFF;
+}
 
+#define SENSOR_CIR_BUF_SIZE 15
+static T_SensorsData sensorBuffer[SENSOR_CIR_BUF_SIZE] = {0};
 /**
   * @brief  Write data in the queue on file or streaming via USB
   * @param  argument not used
@@ -245,10 +263,16 @@ static void WriteData_Thread(void const *argument)
     osEvent evt;
     T_SensorsData *rptr;
     int size;
-    char data_s[256];
+    #define SD_STR_SIZE 256
+    char data_s[SD_STR_SIZE];
     uint32_t impactTimer = 0;
     uint8_t SD_Log_Enabled = 0;
     uint8_t impactDetected = 0;
+    uint32_t sensorBufferIndex = 0;
+    uint32_t impactSensorBufferIndex = 0;
+    uint8_t impactDetectedForRF = 0;
+    uint32_t loraStatus = 0;
+    LoraMsg2 msg = {};
 
     for (;;)
     {
@@ -279,13 +303,14 @@ static void WriteData_Thread(void const *argument)
             }
         }
 
-        if (detectImpact(rptr))
+        if (detectImpact(rptr) && (impactDetected == 0))
         {
             // Set a timer to roll the SD card recording
             impactTimer = HAL_GetTick();
             impactDetected = 1;
+            impactDetectedForRF = 1;
+            impactSensorBufferIndex = sensorBufferIndex;
             osSignalSet(ledThreadId, 0x10000);
-
         }
         else if (SD_Log_Enabled && impactDetected && ((HAL_GetTick() - impactTimer) > 5000)) // 5 seconds
         {
@@ -294,12 +319,43 @@ static void WriteData_Thread(void const *argument)
             impactDetected = 0;
         }
 
-        size = sprintf(data_s, "%ld, %d, %d, %d, %d, %d, %d, %d, %d, %d, %5.2f, %5.2f, %4.1f\r\n",
-                    rptr->ms_counter,
+
+        if (impactDetected == 0)
+        {
+            // Copy sensor data into circular buffer
+            sensorBuffer[0] = *rptr;
+            sensorBufferIndex = 1;
+        }
+        else if (sensorBufferIndex < SENSOR_CIR_BUF_SIZE)
+        {
+            sensorBuffer[sensorBufferIndex++] = *rptr;
+        }
+        else if (sensorBufferIndex == SENSOR_CIR_BUF_SIZE)
+        {
+            sensorBufferIndex++;
+            // Generate the protobuf and send it to the Lora Thread
+            msg.buildnum = 123;
+            msg.status = ++loraStatus;
+            msg.pressure = (rptr->pressure * 10);
+            msg.temperature = (rptr->temperature * 10);
+
+            for (int i = 0; i < SENSOR_CIR_BUF_SIZE; i++)
+            {
+                packSensorSample(&sensorBuffer[i], &msg.imu.bytes[i*12]);
+            }
+        }
+
+        unsigned int pressure = (rptr->pressure * 10);
+        unsigned int temperature = (rptr->temperature * 10);
+        size = snprintf(data_s,
+                        SD_STR_SIZE,
+                        "%u, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\r\n",
+                    (unsigned int)rptr->ms_counter,
                     (int)rptr->acc.x, (int)rptr->acc.y, (int)rptr->acc.z,
                     (int)rptr->gyro.x, (int)rptr->gyro.y, (int)rptr->gyro.z,
                     (int)rptr->mag.x, (int)rptr->mag.y, (int)rptr->mag.z,
-                    rptr->pressure, rptr->temperature, rptr->humidity);
+                    pressure, temperature, 0);
+
         osStatus status = osPoolFree(sensorPool_id, rptr);      // free memory allocated for message
         if (status < 0)
         {
@@ -310,6 +366,7 @@ static void WriteData_Thread(void const *argument)
         {
             DATALOG_SD_writeBuf(data_s, size);
         }
+
         i2c_debug2(0);
     }
 }

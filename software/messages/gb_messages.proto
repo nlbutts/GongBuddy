@@ -9,17 +9,28 @@ message Sensor {
 message IMUSample {
     required Sensor accel = 1;
     required Sensor gyro = 2;
-    required sint32 pressure = 3;
-    required sint32 temperature = 4;
 }
 
 message LoraMsg {
     required uint32 buildnum = 1;
     optional uint32 status = 2;
     repeated IMUSample imu = 3;
-    optional uint32 batt_voltage = 4;
-    optional uint32 threshold = 5;
-    optional uint32 configuration = 6;
+    optional uint32 pressure = 4;
+    optional sint32 temperature = 5;
+    optional uint32 batt_voltage = 6;
+    optional uint32 threshold = 7;
+    optional uint32 configuration = 8;
+}
+
+message LoraMsg2 {
+    required uint32 buildnum = 1;
+    optional uint32 status = 2;
+    optional bytes imu = 3;
+    optional uint32 pressure = 4;
+    optional sint32 temperature = 5;
+    optional uint32 batt_voltage = 6;
+    optional uint32 threshold = 7;
+    optional uint32 configuration = 8;
 }
 
 message Reprogramming {
