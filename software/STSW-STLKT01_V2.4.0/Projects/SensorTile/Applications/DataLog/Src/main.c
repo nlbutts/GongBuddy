@@ -159,6 +159,8 @@ int main(void)
     i2c_expander_init(&i2c_cfg);
     i2c_lora_reset(1);
     i2c_lora_reset(0);
+    i2c_big_led(1);
+    i2c_big_led(0);
 
     osThreadDef(GetData_Thread,         GetData_Thread,       osPriorityAboveNormal,  0, configMINIMAL_STACK_SIZE*8);
     osThreadDef(WriteData_Thread,       WriteData_Thread,     osPriorityNormal,       0, configMINIMAL_STACK_SIZE*8);
@@ -215,9 +217,9 @@ static void GetData_Thread(void const *argument)
     {
         osSemaphoreWait(readDataSem_id, osWaitForever);
         i2c_debug1(1);
-        i2c_debug1(0);
         /* Try to allocate a memory block and check if is not NULL */
         mptr = osPoolAlloc(sensorPool_id);
+        BSP_LED_Toggle(LED1);
         i2c_debug1(0);
         if(mptr != NULL)
         {
@@ -238,7 +240,7 @@ static void GetData_Thread(void const *argument)
         {
             Error_Handler();
         }
-        //i2c_debug1(0);
+        i2c_debug1(0);
     }
 }
 

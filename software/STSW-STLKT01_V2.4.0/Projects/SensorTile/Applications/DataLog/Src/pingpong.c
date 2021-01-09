@@ -199,7 +199,7 @@ void pingpingThread(void const *argument)
             if (strncmp((const char *)Buffer, (const char *)PongMsg, 4) == 0)
             {
               TimerStop(&timerLed);
-              BSP_LED_Toggle(LED1);
+              //BSP_LED_Toggle(LED1);
               // LED_Off(LED_BLUE);
               // LED_Off(LED_GREEN) ;
               // LED_Off(LED_RED1) ;;

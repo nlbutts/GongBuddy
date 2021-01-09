@@ -26,6 +26,7 @@ static i2c_expander_data _cfg;
 static I2C_HandleTypeDef hi2c3;
 osMutexDef(lock);
 osMutexId _lock_id;
+uint8_t _currentValue = 0;
 
 int i2c_expander_init(i2c_expander_data *cfg)
 {
@@ -50,8 +51,8 @@ int i2c_expander_init(i2c_expander_data *cfg)
     volatile uint32_t apb1clk = HAL_RCC_GetPCLK1Freq();
 
     hi2c3.Instance = I2C3;
-    //hi2c3.Init.Timing = 0x212139D8;
-    hi2c3.Init.Timing = 0x30213030;
+    hi2c3.Init.Timing = 0x212139D8;
+    //hi2c3.Init.Timing = 0x30213030;
     hi2c3.Init.OwnAddress1 = 0;
     hi2c3.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
     hi2c3.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -134,15 +135,15 @@ int i2c_expander_read()
 
 int setIO(uint8_t value, uint8_t bit)
 {
-    int rv = i2c_expander_read();
-    if (rv >= 0)
+    //int rv = i2c_expander_read();
+    //if (rv >= 0)
     {
         uint8_t mask = 1 << bit;
-        rv &= ~mask;
-        rv |= value << bit;
-        rv = i2c_expander_write(rv);
+        _currentValue &= ~mask;
+        _currentValue |= value << bit;
+        i2c_expander_write(_currentValue);
     }
-    return rv;
+    return 0;
 }
 
 int i2c_big_led(uint8_t value)
