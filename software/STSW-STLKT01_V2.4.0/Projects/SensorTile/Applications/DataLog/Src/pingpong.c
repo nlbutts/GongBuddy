@@ -244,7 +244,7 @@ void pingpingThread(void const *argument)
             {
               // Indicates on a LED that the received frame is a PING
               TimerStop(&timerLed);
-              BSP_LED_Toggle(LED1);
+              //BSP_LED_Toggle(LED1);
 
               // LED_Off(LED_RED1);
               // LED_Off(LED_RED2) ;
@@ -372,7 +372,7 @@ void OnRxError(void)
 
 static void OnledEvent(void *context)
 {
-  BSP_LED_Toggle(LED1);
+  //BSP_LED_Toggle(LED1);
 
   // LED_Toggle(LED_BLUE) ;
   // LED_Toggle(LED_RED1) ;

@@ -752,6 +752,8 @@ void LORA_init()
 {
   GPIO_InitTypeDef  GPIO_InitStruct;
 
+__HAL_RCC_GPIOG_CLK_ENABLE();
+
   /* Configure the GPIO_LED pin */
   GPIO_InitStruct.Pin = LORA_CS_PIN;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;

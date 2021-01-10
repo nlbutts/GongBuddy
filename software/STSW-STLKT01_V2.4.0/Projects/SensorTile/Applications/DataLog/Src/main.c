@@ -128,8 +128,8 @@ int main(void)
     SystemClock_Config();
 
     /* Initialize LED */
-    BSP_LED_Init(LED1);
-    BSP_LED_Off(LED1);
+    // BSP_LED_Init(LED1);
+    // BSP_LED_Off(LED1);
 
     /* enable USB power on Pwrctrl CR2 register */
     HAL_PWREx_EnableVddUSB();
@@ -165,13 +165,13 @@ int main(void)
     osThreadDef(GetData_Thread,         GetData_Thread,       osPriorityAboveNormal,  0, configMINIMAL_STACK_SIZE*8);
     osThreadDef(WriteData_Thread,       WriteData_Thread,     osPriorityNormal,       0, configMINIMAL_STACK_SIZE*8);
     osThreadDef(blinkLedThread,         blinkLedThread,       osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
-    osThreadDef(pingpingThread,         pingpingThread,       osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
+    //osThreadDef(pingpingThread,         pingpingThread,       osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
     osThreadDef(vCommandConsoleTask,    vCommandConsoleTask,  osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
 
     GetDataThreadId     = osThreadCreate(osThread(GetData_Thread), NULL);
     WriteDataThreadId   = osThreadCreate(osThread(WriteData_Thread), NULL);
     ledThreadId         = osThreadCreate(osThread(blinkLedThread), NULL);
-    pingpongId          = osThreadCreate(osThread(pingpingThread), NULL);
+    //pingpongId          = osThreadCreate(osThread(pingpingThread), NULL);
     commandConsoleId    = osThreadCreate(osThread(vCommandConsoleTask), NULL);
 
     // if ((GetDataThreadId == NULL) ||
@@ -216,11 +216,11 @@ static void GetData_Thread(void const *argument)
     for (;;)
     {
         osSemaphoreWait(readDataSem_id, osWaitForever);
-        i2c_debug1(1);
+        //i2c_debug1(1);
         /* Try to allocate a memory block and check if is not NULL */
         mptr = osPoolAlloc(sensorPool_id);
-        BSP_LED_Toggle(LED1);
-        i2c_debug1(0);
+        //BSP_LED_Toggle(LED1);
+        //i2c_debug1(0);
         if(mptr != NULL)
         {
             if(getSensorsData(mptr) == BSP_ERROR_NONE)
@@ -240,7 +240,7 @@ static void GetData_Thread(void const *argument)
         {
             Error_Handler();
         }
-        i2c_debug1(0);
+        //i2c_debug1(0);
     }
 }
 
@@ -282,6 +282,7 @@ static void WriteData_Thread(void const *argument)
     uint32_t loraStatus = 0;
     uint8_t pb_data[250];
 
+    LORA_init();
     loraPool_id  = osPoolCreate(osPool(loraPool));
     loraQueue_id = osMessageCreate(osMessageQ(loraQueue), NULL);
 
@@ -368,7 +369,7 @@ static void WriteData_Thread(void const *argument)
                 loraData->bytesWritten = stream.bytes_written;
                 // Put the pointer into the message queue, the Lora thread will pull
                 // it out. Don't worry about the return.
-                (void)osMessagePut(loraQueue_id, (int)loraData, osWaitForever);
+                //(void)osMessagePut(loraQueue_id, (int)loraData, osWaitForever);
             }
         }
 
