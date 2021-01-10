@@ -47,9 +47,6 @@ int i2c_expander_init(i2c_expander_data *cfg)
     GPIO_InitStructure.Alternate = GPIO_AF4_I2C3;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
 
-    // Get the APB1 bus speed
-    volatile uint32_t apb1clk = HAL_RCC_GetPCLK1Freq();
-
     hi2c3.Instance = I2C3;
     hi2c3.Init.Timing = 0x212139D8;
     //hi2c3.Init.Timing = 0x30213030;

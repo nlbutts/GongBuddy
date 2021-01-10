@@ -282,9 +282,9 @@ static void WriteData_Thread(void const *argument)
     uint32_t loraStatus = 0;
     uint8_t pb_data[250];
 
-    LORA_init();
-    loraPool_id  = osPoolCreate(osPool(loraPool));
-    loraQueue_id = osMessageCreate(osMessageQ(loraQueue), NULL);
+    SD_IO_Init_LS();
+    Sensor_init_lora_interfaces();
+    LoRa_init();
 
     for (;;)
     {
@@ -322,13 +322,12 @@ static void WriteData_Thread(void const *argument)
             impactDetected = 1;
             osSignalSet(ledThreadId, 0x10000);
         }
-        else if (SD_Log_Enabled && impactDetected && ((HAL_GetTick() - impactTimer) > 5000)) // 5 seconds
-        {
-            DATALOG_SD_Log_Disable();
-            SD_Log_Enabled = 0;
-            impactDetected = 0;
-        }
-
+        // else if (SD_Log_Enabled && impactDetected && ((HAL_GetTick() - impactTimer) > 5000)) // 5 seconds
+        // {
+        //     DATALOG_SD_Log_Disable();
+        //     SD_Log_Enabled = 0;
+        //     impactDetected = 0;
+        // }
 
         if (impactDetected == 0)
         {
@@ -340,7 +339,7 @@ static void WriteData_Thread(void const *argument)
         {
             sensorBuffer[sensorBufferIndex++] = *rptr;
         }
-        else if (sensorBufferIndex == SENSOR_CIR_BUF_SIZE)
+        else if (sensorBufferIndex >= SENSOR_CIR_BUF_SIZE)
         {
             LoraMsg2 msg = LoraMsg2_init_default;
             sensorBufferIndex++;
@@ -361,16 +360,11 @@ static void WriteData_Thread(void const *argument)
             msg.imu.size = SENSOR_CIR_BUF_SIZE * 12;
             pb_ostream_t stream = pb_ostream_from_buffer(pb_data, sizeof(pb_data));
             pb_encode(&stream, LoraMsg2_fields, &msg);
+            LoRa_dataexchange(pb_data, stream.bytes_written, NULL, 0);
 
-            LoraData_t * loraData = osPoolAlloc(loraPool_id);
-            if (loraData != NULL)
-            {
-                loraData->buf = pb_data;
-                loraData->bytesWritten = stream.bytes_written;
-                // Put the pointer into the message queue, the Lora thread will pull
-                // it out. Don't worry about the return.
-                //(void)osMessagePut(loraQueue_id, (int)loraData, osWaitForever);
-            }
+            DATALOG_SD_Log_Disable();
+            SD_Log_Enabled = 0;
+            impactDetected = 0;
         }
 
         unsigned int pressure = (rptr->pressure * 10);

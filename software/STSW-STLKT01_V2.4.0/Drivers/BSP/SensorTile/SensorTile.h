@@ -187,7 +187,7 @@ void SD_IO_CS_DeInit(void);
 
 uint8_t Sensor_IO_SPI_CS_Init_All(void);
 
-void LORA_init();
+void Sensor_init_lora_interfaces();
 int LORA_ReadReg(uint8_t reg);
 
 /**

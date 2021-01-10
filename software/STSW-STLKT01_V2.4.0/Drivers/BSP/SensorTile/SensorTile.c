@@ -748,7 +748,7 @@ uint8_t Sensor_IO_SPI_CS_Init_All(void)
   return HAL_OK;
 }
 
-void LORA_init()
+void Sensor_init_lora_interfaces()
 {
   GPIO_InitTypeDef  GPIO_InitStruct;
 

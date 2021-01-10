@@ -118,13 +118,8 @@ static void OnledEvent(void *context);
 /**
  * Main application entry point.
  */
-void pingpingThread(void const *argument)
+void LoRa_init()
 {
-  bool isMaster = true;
-  uint8_t i;
-
-  osDelay(250);
-
   /*Disbale Stand-by mode*/
   LPM_SetOffMode(LPM_APPLI_Id, LPM_Disable);
 
@@ -175,18 +170,21 @@ void pingpingThread(void const *argument)
 #endif
 
   Radio.Rx(RX_TIMEOUT_VALUE);
+}
 
-  while (1)
-  {
-    osEvent evt = osMessageGet(loraQueue_id, osWaitForever);  // wait for message
-    LoraData_t * loraData = evt.value.p;
-    memcpy(Buffer, loraData->buf, loraData->bytesWritten);
-    osPoolFree(loraPool_id, loraData);
+int LoRa_dataexchange(uint8_t * txData,
+                      uint16_t txDataLen,
+                      uint8_t * rxData,
+                      uint16_t rxDataBufSize)
+{
     // Send the next PING frame
-    Radio.Send(Buffer, BufferSize);
+    Radio.Send(txData, txDataLen);
     //osDelay(1000);
-  }
 
+    return 0;
+}
+
+#if 0
   while (1)
   {
     switch (State)
@@ -327,6 +325,7 @@ void pingpingThread(void const *argument)
     ENABLE_IRQ();
   }
 }
+#endif
 
 void OnTxDone(void)
 {
