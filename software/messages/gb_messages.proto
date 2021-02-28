@@ -1,14 +1,21 @@
 syntax = "proto2";
 
+enum Status {
+    HEARTBEAT = 0;
+    IMPACT = 1;
+    ENTERING_LOW_POWER = 2;
+}
+
 message LoraMsg2 {
     required uint32 buildnum = 1;
-    optional uint32 status = 2;
+    optional Status status = 2;
     optional bytes imu = 3;
     optional uint32 pressure = 4;
     optional sint32 temperature = 5;
     optional uint32 batt_voltage = 6;
     optional uint32 threshold = 7;
     optional uint32 configuration = 8;
+    optional uint32 identifier = 9;
 }
 
 message Reprogramming {

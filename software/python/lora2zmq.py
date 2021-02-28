@@ -30,7 +30,7 @@ while True:
 	print(cfg)
 	print('Waiting for LoRa message')
 	data = rfm9x.receive(timeout=5000)
+	rfm9x.transmit(cfg)
 	print("Rssi: {}".format(rfm9x.rssi))
 	print('Sending data Lora data via ZMQ')
 	socket.send(data)
-

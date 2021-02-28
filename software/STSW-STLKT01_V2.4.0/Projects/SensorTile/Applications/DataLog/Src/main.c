@@ -286,34 +286,37 @@ static void WriteData_Thread(void const *argument)
     Sensor_init_lora_interfaces();
     LoRa_init();
 
+    // Read the unique device ID
+    uint32_t uuid = HAL_GetUIDw0();
+
     for (;;)
     {
         evt = osMessageGet(dataQueue_id, osWaitForever);  // wait for message
         i2c_debug2(1);
         rptr = evt.value.p;
         // Check to see if we had large change in acceleration
-        if (SD_Log_Enabled == 0)
-        {
-            // Start recording
-            while(SD_Log_Enabled != 1)
-            {
-                i2c_big_led(0);
-                if(DATALOG_SD_Log_Enable())
-                {
-                    SD_Log_Enabled=1;
-                    osDelay(100);
-                    //dataTimerStart();
-                }
-                else
-                {
-                    i2c_big_led(1);
-                    //DATALOG_SD_Log_Disable();
-                    DATALOG_SD_DeInit();
-                    DATALOG_SD_Init();
-                    osDelay(100);
-                }
-            }
-        }
+        // if (SD_Log_Enabled == 0)
+        // {
+        //     // Start recording
+        //     while(SD_Log_Enabled != 1)
+        //     {
+        //         i2c_big_led(0);
+        //         if(DATALOG_SD_Log_Enable())
+        //         {
+        //             SD_Log_Enabled=1;
+        //             osDelay(100);
+        //             //dataTimerStart();
+        //         }
+        //         else
+        //         {
+        //             i2c_big_led(1);
+        //             //DATALOG_SD_Log_Disable();
+        //             DATALOG_SD_DeInit();
+        //             DATALOG_SD_Init();
+        //             osDelay(100);
+        //         }
+        //     }
+        // }
 
         if (detectImpact(rptr) && (impactDetected == 0))
         {
@@ -351,6 +354,8 @@ static void WriteData_Thread(void const *argument)
             msg.pressure = (rptr->pressure * 10);
             msg.has_temperature = true;
             msg.temperature = (rptr->temperature * 10);
+            msg.has_identifier = true;
+            msg.identifier = uuid;
 
             msg.has_imu = true;
             for (int i = 0; i < SENSOR_CIR_BUF_SIZE; i++)
@@ -362,7 +367,7 @@ static void WriteData_Thread(void const *argument)
             pb_encode(&stream, LoraMsg2_fields, &msg);
             LoRa_dataexchange(pb_data, stream.bytes_written, NULL, 0);
 
-            DATALOG_SD_Log_Disable();
+            //DATALOG_SD_Log_Disable();
             SD_Log_Enabled = 0;
             impactDetected = 0;
         }
@@ -384,10 +389,10 @@ static void WriteData_Thread(void const *argument)
             Error_Handler();
         }
 
-        if (SD_Log_Enabled == 1)
-        {
-            DATALOG_SD_writeBuf(data_s, size);
-        }
+        // if (SD_Log_Enabled == 1)
+        // {
+        //     DATALOG_SD_writeBuf(data_s, size);
+        // }
 
         i2c_debug2(0);
     }
