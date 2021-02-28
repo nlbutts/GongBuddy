@@ -41,6 +41,8 @@ typedef struct _LoraMsg2 {
     uint32_t configuration;
     bool has_identifier;
     uint32_t identifier;
+    bool has_rssi;
+    int32_t rssi;
 } LoraMsg2;
 
 typedef PB_BYTES_ARRAY_T(1024) Reprogramming_data_t;
@@ -66,9 +68,9 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define LoraMsg2_init_default                    {0, false, _Status_MIN, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0}
+#define LoraMsg2_init_default                    {0, false, _Status_MIN, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0}
 #define Reprogramming_init_default               {0, {0, {0}}, Reprogramming_Flags_CONTINUE}
-#define LoraMsg2_init_zero                       {0, false, _Status_MIN, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0}
+#define LoraMsg2_init_zero                       {0, false, _Status_MIN, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0}
 #define Reprogramming_init_zero                  {0, {0, {0}}, _Reprogramming_Flags_MIN}
 
 /* Field tags (for use in manual encoding/decoding) */
@@ -81,6 +83,7 @@ extern "C" {
 #define LoraMsg2_threshold_tag                   7
 #define LoraMsg2_configuration_tag               8
 #define LoraMsg2_identifier_tag                  9
+#define LoraMsg2_rssi_tag                        10
 #define Reprogramming_address_tag                1
 #define Reprogramming_data_tag                   2
 #define Reprogramming_flags_tag                  3
@@ -95,7 +98,8 @@ X(a, STATIC,   OPTIONAL, SINT32,   temperature,       5) \
 X(a, STATIC,   OPTIONAL, UINT32,   batt_voltage,      6) \
 X(a, STATIC,   OPTIONAL, UINT32,   threshold,         7) \
 X(a, STATIC,   OPTIONAL, UINT32,   configuration,     8) \
-X(a, STATIC,   OPTIONAL, UINT32,   identifier,        9)
+X(a, STATIC,   OPTIONAL, UINT32,   identifier,        9) \
+X(a, STATIC,   OPTIONAL, SINT32,   rssi,             10)
 #define LoraMsg2_CALLBACK NULL
 #define LoraMsg2_DEFAULT NULL
 
@@ -114,7 +118,7 @@ extern const pb_msgdesc_t Reprogramming_msg;
 #define Reprogramming_fields &Reprogramming_msg
 
 /* Maximum encoded size of messages (where known) */
-#define LoraMsg2_size                            247
+#define LoraMsg2_size                            253
 #define Reprogramming_size                       1035
 
 #ifdef __cplusplus

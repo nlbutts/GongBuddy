@@ -16,6 +16,7 @@ message LoraMsg2 {
     optional uint32 threshold = 7;
     optional uint32 configuration = 8;
     optional uint32 identifier = 9;
+    optional sint32 rssi = 10;
 }
 
 message Reprogramming {

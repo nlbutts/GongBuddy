@@ -4,6 +4,7 @@ import busio
 import adafruit_rfm9x
 import time
 import zmq
+import gb_messages_pb2
 
 RADIO_FREQ_MHZ = 915.0
 CS = digitalio.DigitalInOut(board.CE1)
@@ -21,16 +22,21 @@ buf = bytes(buf)
 
 # This is the ZMQ server
 context = zmq.Context()
-socket = context.socket(zmq.REP)
+socket = context.socket(zmq.PUB)
 socket.bind("tcp://*:5555")
 
 while True:
-	print('Receiving ZMQ client message')
-	cfg = socket.recv()
-	print(cfg)
+	# print('Receiving ZMQ client message')
+	# cfg = socket.recv()
+	# print(cfg)
 	print('Waiting for LoRa message')
 	data = rfm9x.receive(timeout=5000)
-	rfm9x.transmit(cfg)
+	#rfm9x.transmit(cfg)
+	pb = gb_messages_pb2.LoraMsg2()
+	pb.ParseFromString(data)
+	pb.rssi = rfm9x.rssi
+	data = pb.SerializeToString()
+	print(data)
 	print("Rssi: {}".format(rfm9x.rssi))
 	print('Sending data Lora data via ZMQ')
 	socket.send(data)
