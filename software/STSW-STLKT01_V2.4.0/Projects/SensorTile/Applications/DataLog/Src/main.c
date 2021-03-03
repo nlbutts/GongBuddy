@@ -8,6 +8,7 @@
 #include "commandline.h"
 #include "gb_messages.pb.h"
 #include <pb_encode.h>
+#include <pb_decode.h>
 #include "common_structs.h"
 
 /* Private typedef -----------------------------------------------------------*/
@@ -81,13 +82,13 @@ static int32_t LSM6DSM_Sensor_IO_ITConfig( void );
 volatile uint32_t * dfu_key = (volatile uint32_t*)0x10000000;
 
 /* Private functions ---------------------------------------------------------*/
-uint8_t detectImpact(T_SensorsData *sensorData)
+uint8_t detectImpact(T_SensorsData *sensorData, int threshold)
 {
     float mag = (sensorData->acc.x * sensorData->acc.x) +
                 (sensorData->acc.y * sensorData->acc.y) +
                 (sensorData->acc.z * sensorData->acc.z);
 
-    if (mag > (1300*1300))
+    if (mag > (threshold*threshold))
     {
         return 1;
     }
@@ -289,6 +290,8 @@ static void WriteData_Thread(void const *argument)
     // Read the unique device ID
     uint32_t uuid = HAL_GetUIDw0();
 
+    int threshold = 1500;
+
     for (;;)
     {
         evt = osMessageGet(dataQueue_id, osWaitForever);  // wait for message
@@ -318,7 +321,7 @@ static void WriteData_Thread(void const *argument)
         //     }
         // }
 
-        if (detectImpact(rptr) && (impactDetected == 0))
+        if (detectImpact(rptr, threshold) && (impactDetected == 0))
         {
             // Set a timer to roll the SD card recording
             impactTimer = HAL_GetTick();
@@ -356,6 +359,8 @@ static void WriteData_Thread(void const *argument)
             msg.temperature = (rptr->temperature * 10);
             msg.has_identifier = true;
             msg.identifier = uuid;
+            msg.has_threshold = true;
+            msg.threshold = threshold;
 
             msg.has_imu = true;
             for (int i = 0; i < SENSOR_CIR_BUF_SIZE; i++)
@@ -365,7 +370,16 @@ static void WriteData_Thread(void const *argument)
             msg.imu.size = SENSOR_CIR_BUF_SIZE * 12;
             pb_ostream_t stream = pb_ostream_from_buffer(pb_data, sizeof(pb_data));
             pb_encode(&stream, LoraMsg2_fields, &msg);
-            LoRa_dataexchange(pb_data, stream.bytes_written, NULL, 0);
+            int retSize =
+                LoRa_dataexchange(pb_data, stream.bytes_written, pb_data, sizeof(pb_data));
+            LoraMsg2 inMsg = LoraMsg2_init_default;
+            pb_istream_t istrm = pb_istream_from_buffer(pb_data, retSize);
+            pb_decode(&istrm, LoraMsg2_fields, &inMsg);
+            if (inMsg.has_threshold)
+            {
+                if (inMsg.threshold > 1200)
+                    threshold = inMsg.threshold;
+            }
 
             //DATALOG_SD_Log_Disable();
             SD_Log_Enabled = 0;

@@ -7,6 +7,7 @@
 #include "SensorTile.h"
 #include "common_structs.h"
 #include "cmsis_os.h"
+#include "sx1276Regs-LoRa.h"
 
 #define RF_FREQUENCY                                915000000 // Hz
 #define TX_OUTPUT_POWER                             14        // dBm
@@ -172,16 +173,31 @@ void LoRa_init()
   Radio.Rx(RX_TIMEOUT_VALUE);
 }
 
+extern void SX1276OnDio0Irq( void* context );
 int LoRa_dataexchange(uint8_t * txData,
                       uint16_t txDataLen,
                       uint8_t * rxData,
                       uint16_t rxDataBufSize)
 {
-    // Send the next PING frame
-    Radio.Send(txData, txDataLen);
-    //osDelay(1000);
+  int retSize = 0;
+  // Send the next PING frame
+  Radio.Send(txData, txDataLen);
+  Radio.Rx(500);
+  uint8_t status = Radio.Read(REG_LR_IRQFLAGS);
+  while (((status & RFLR_IRQFLAGS_RXDONE) == 0) && (State != RX_TIMEOUT))
+  {
+    status = Radio.Read(REG_LR_IRQFLAGS);
+  }
+  if (status & RFLR_IRQFLAGS_RXDONE)
+    SX1276OnDio0Irq(NULL);
 
-    return 0;
+  if (State == RX)
+  {
+    memcpy(rxData, Buffer, BufferSize);
+    retSize = BufferSize;
+  }
+
+  return retSize;
 }
 
 #if 0

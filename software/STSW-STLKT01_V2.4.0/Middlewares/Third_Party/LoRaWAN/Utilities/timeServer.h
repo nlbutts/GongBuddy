@@ -29,7 +29,7 @@ Maintainer: Miguel Luis and Gregory Cristian
   *
   ******************************************************************************
   */
-  
+
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __TIMESERVER_H__
 #define __TIMESERVER_H__
@@ -40,7 +40,7 @@ Maintainer: Miguel Luis and Gregory Cristian
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdbool.h>
-#include "utilities.h" 
+#include "utilities.h"
 
 
 /* Exported types ------------------------------------------------------------*/
@@ -63,7 +63,7 @@ typedef struct TimerEvent_s
 /* Exported constants --------------------------------------------------------*/
 /* External variables --------------------------------------------------------*/
 /* Exported macros -----------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */ 
+/* Exported functions ------------------------------------------------------- */
 
 /*!
  * \brief Initializes the timer object
@@ -91,7 +91,7 @@ void TimerSetContext( TimerEvent_t *obj, void* context );
  *
  * \note e.g. it is snot needded to stop it
  */
-void TimerIrqHandler( void );
+//void TimerIrqHandler( void );
 
 /*!
  * \brief Starts and adds the timer object to the list of timer events

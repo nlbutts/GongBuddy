@@ -75,6 +75,20 @@ def processGongData(db, pb, rssi):
                 }}
         db.update_one(q, newvalues)
 
+    return pb.identifier
+
+def getCfgMsg(db, id):
+    print('Attempting to find an DB entry for {}'.format(id))
+    q = {"device_id": id}
+    res = db.find_one(q)
+    threshold = res['desired_threshold']
+    print('Found desired threshold of {}'.format(threshold))
+    # Create a new PB
+    pb = gb_messages_pb2.LoraMsg2()
+    pb.threshold = threshold
+    pb.buildnum = 1
+    return pb.SerializeToString()
+
 RADIO_FREQ_MHZ = 915.0
 CS = digitalio.DigitalInOut(board.CE1)
 RESET = digitalio.DigitalInOut(board.D25)
@@ -95,10 +109,13 @@ while True:
     data = rfm9x.receive(timeout=5000)
     pb = gb_messages_pb2.LoraMsg2()
     pb.ParseFromString(data)
+    print(pb)
     print("Msg from {} with rssi: {}".format(pb.identifier, rfm9x.rssi))
 
     # Update DB
-    processGongData(mycoll, pb, rfm9x.rssi)
+    id = processGongData(mycoll, pb, rfm9x.rssi)
+    cfg = getCfgMsg(mycoll, id)
 
     # Send config/ACK message
-    #rfm9x.transmit(cfg)
+    print('Sending message')
+    rfm9x.send(cfg)
