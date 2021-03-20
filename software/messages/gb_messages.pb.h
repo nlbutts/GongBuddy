@@ -13,7 +13,8 @@
 typedef enum _Status {
     Status_HEARTBEAT = 0,
     Status_IMPACT = 1,
-    Status_ENTERING_LOW_POWER = 2
+    Status_ENTERING_LOW_POWER = 2,
+    Status_REPROGRAMMING = 3
 } Status;
 
 typedef enum _Reprogramming_Flags {
@@ -22,10 +23,16 @@ typedef enum _Reprogramming_Flags {
 } Reprogramming_Flags;
 
 /* Struct definitions */
+typedef PB_BYTES_ARRAY_T(200) Reprogramming_data_t;
+typedef struct _Reprogramming {
+    uint32_t address;
+    Reprogramming_data_t data;
+    Reprogramming_Flags flags;
+} Reprogramming;
+
 typedef PB_BYTES_ARRAY_T(200) LoraMsg2_imu_t;
 typedef struct _LoraMsg2 {
     uint32_t buildnum;
-    bool has_status;
     Status status;
     bool has_imu;
     LoraMsg2_imu_t imu;
@@ -43,20 +50,15 @@ typedef struct _LoraMsg2 {
     uint32_t identifier;
     bool has_rssi;
     int32_t rssi;
+    bool has_reprog;
+    Reprogramming reprog;
 } LoraMsg2;
-
-typedef PB_BYTES_ARRAY_T(1024) Reprogramming_data_t;
-typedef struct _Reprogramming {
-    uint32_t address;
-    Reprogramming_data_t data;
-    Reprogramming_Flags flags;
-} Reprogramming;
 
 
 /* Helper constants for enums */
 #define _Status_MIN Status_HEARTBEAT
-#define _Status_MAX Status_ENTERING_LOW_POWER
-#define _Status_ARRAYSIZE ((Status)(Status_ENTERING_LOW_POWER+1))
+#define _Status_MAX Status_REPROGRAMMING
+#define _Status_ARRAYSIZE ((Status)(Status_REPROGRAMMING+1))
 
 #define _Reprogramming_Flags_MIN Reprogramming_Flags_LAST_PACKET
 #define _Reprogramming_Flags_MAX Reprogramming_Flags_CONTINUE
@@ -68,12 +70,15 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define LoraMsg2_init_default                    {0, false, _Status_MIN, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0}
+#define LoraMsg2_init_default                    {0, _Status_MIN, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, Reprogramming_init_default}
 #define Reprogramming_init_default               {0, {0, {0}}, Reprogramming_Flags_CONTINUE}
-#define LoraMsg2_init_zero                       {0, false, _Status_MIN, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0}
+#define LoraMsg2_init_zero                       {0, _Status_MIN, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, Reprogramming_init_zero}
 #define Reprogramming_init_zero                  {0, {0, {0}}, _Reprogramming_Flags_MIN}
 
 /* Field tags (for use in manual encoding/decoding) */
+#define Reprogramming_address_tag                1
+#define Reprogramming_data_tag                   2
+#define Reprogramming_flags_tag                  3
 #define LoraMsg2_buildnum_tag                    1
 #define LoraMsg2_status_tag                      2
 #define LoraMsg2_imu_tag                         3
@@ -84,14 +89,12 @@ extern "C" {
 #define LoraMsg2_configuration_tag               8
 #define LoraMsg2_identifier_tag                  9
 #define LoraMsg2_rssi_tag                        10
-#define Reprogramming_address_tag                1
-#define Reprogramming_data_tag                   2
-#define Reprogramming_flags_tag                  3
+#define LoraMsg2_reprog_tag                      11
 
 /* Struct field encoding specification for nanopb */
 #define LoraMsg2_FIELDLIST(X, a) \
 X(a, STATIC,   REQUIRED, UINT32,   buildnum,          1) \
-X(a, STATIC,   OPTIONAL, UENUM,    status,            2) \
+X(a, STATIC,   REQUIRED, UENUM,    status,            2) \
 X(a, STATIC,   OPTIONAL, BYTES,    imu,               3) \
 X(a, STATIC,   OPTIONAL, UINT32,   pressure,          4) \
 X(a, STATIC,   OPTIONAL, SINT32,   temperature,       5) \
@@ -99,9 +102,11 @@ X(a, STATIC,   OPTIONAL, UINT32,   batt_voltage,      6) \
 X(a, STATIC,   OPTIONAL, UINT32,   threshold,         7) \
 X(a, STATIC,   OPTIONAL, UINT32,   configuration,     8) \
 X(a, STATIC,   OPTIONAL, UINT32,   identifier,        9) \
-X(a, STATIC,   OPTIONAL, SINT32,   rssi,             10)
+X(a, STATIC,   OPTIONAL, SINT32,   rssi,             10) \
+X(a, STATIC,   OPTIONAL, MESSAGE,  reprog,           11)
 #define LoraMsg2_CALLBACK NULL
 #define LoraMsg2_DEFAULT NULL
+#define LoraMsg2_reprog_MSGTYPE Reprogramming
 
 #define Reprogramming_FIELDLIST(X, a) \
 X(a, STATIC,   REQUIRED, UINT32,   address,           1) \
@@ -118,8 +123,8 @@ extern const pb_msgdesc_t Reprogramming_msg;
 #define Reprogramming_fields &Reprogramming_msg
 
 /* Maximum encoded size of messages (where known) */
-#define LoraMsg2_size                            253
-#define Reprogramming_size                       1035
+#define LoraMsg2_size                            467
+#define Reprogramming_size                       211
 
 #ifdef __cplusplus
 } /* extern "C" */

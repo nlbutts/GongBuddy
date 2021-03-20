@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11gb_messages.proto\"\xcb\x01\n\x08LoraMsg2\x12\x10\n\x08\x62uildnum\x18\x01 \x02(\r\x12\x17\n\x06status\x18\x02 \x01(\x0e\x32\x07.Status\x12\x0b\n\x03imu\x18\x03 \x01(\x0c\x12\x10\n\x08pressure\x18\x04 \x01(\r\x12\x13\n\x0btemperature\x18\x05 \x01(\x11\x12\x14\n\x0c\x62\x61tt_voltage\x18\x06 \x01(\r\x12\x11\n\tthreshold\x18\x07 \x01(\r\x12\x15\n\rconfiguration\x18\x08 \x01(\r\x12\x12\n\nidentifier\x18\t \x01(\r\x12\x0c\n\x04rssi\x18\n \x01(\x11\"\x85\x01\n\rReprogramming\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x02(\r\x12\x0c\n\x04\x64\x61ta\x18\x02 \x02(\x0c\x12-\n\x05\x66lags\x18\x03 \x02(\x0e\x32\x14.Reprogramming.Flags:\x08\x43ONTINUE\"&\n\x05\x46lags\x12\x0f\n\x0bLAST_PACKET\x10\x00\x12\x0c\n\x08\x43ONTINUE\x10\x01*;\n\x06Status\x12\r\n\tHEARTBEAT\x10\x00\x12\n\n\x06IMPACT\x10\x01\x12\x16\n\x12\x45NTERING_LOW_POWER\x10\x02'
+  serialized_pb=b'\n\x11gb_messages.proto\"\xeb\x01\n\x08LoraMsg2\x12\x10\n\x08\x62uildnum\x18\x01 \x02(\r\x12\x17\n\x06status\x18\x02 \x02(\x0e\x32\x07.Status\x12\x0b\n\x03imu\x18\x03 \x01(\x0c\x12\x10\n\x08pressure\x18\x04 \x01(\r\x12\x13\n\x0btemperature\x18\x05 \x01(\x11\x12\x14\n\x0c\x62\x61tt_voltage\x18\x06 \x01(\r\x12\x11\n\tthreshold\x18\x07 \x01(\r\x12\x15\n\rconfiguration\x18\x08 \x01(\r\x12\x12\n\nidentifier\x18\t \x01(\r\x12\x0c\n\x04rssi\x18\n \x01(\x11\x12\x1e\n\x06reprog\x18\x0b \x01(\x0b\x32\x0e.Reprogramming\"\x85\x01\n\rReprogramming\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x02(\r\x12\x0c\n\x04\x64\x61ta\x18\x02 \x02(\x0c\x12-\n\x05\x66lags\x18\x03 \x02(\x0e\x32\x14.Reprogramming.Flags:\x08\x43ONTINUE\"&\n\x05\x46lags\x12\x0f\n\x0bLAST_PACKET\x10\x00\x12\x0c\n\x08\x43ONTINUE\x10\x01*N\n\x06Status\x12\r\n\tHEARTBEAT\x10\x00\x12\n\n\x06IMPACT\x10\x01\x12\x16\n\x12\x45NTERING_LOW_POWER\x10\x02\x12\x11\n\rREPROGRAMMING\x10\x03'
 )
 
 _STATUS = _descriptor.EnumDescriptor(
@@ -45,11 +45,16 @@ _STATUS = _descriptor.EnumDescriptor(
       serialized_options=None,
       type=None,
       create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='REPROGRAMMING', index=3, number=3,
+      serialized_options=None,
+      type=None,
+      create_key=_descriptor._internal_create_key),
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=363,
-  serialized_end=422,
+  serialized_start=395,
+  serialized_end=473,
 )
 _sym_db.RegisterEnumDescriptor(_STATUS)
 
@@ -57,6 +62,7 @@ Status = enum_type_wrapper.EnumTypeWrapper(_STATUS)
 HEARTBEAT = 0
 IMPACT = 1
 ENTERING_LOW_POWER = 2
+REPROGRAMMING = 3
 
 
 _REPROGRAMMING_FLAGS = _descriptor.EnumDescriptor(
@@ -79,8 +85,8 @@ _REPROGRAMMING_FLAGS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=323,
-  serialized_end=361,
+  serialized_start=355,
+  serialized_end=393,
 )
 _sym_db.RegisterEnumDescriptor(_REPROGRAMMING_FLAGS)
 
@@ -102,7 +108,7 @@ _LORAMSG2 = _descriptor.Descriptor(
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
       name='status', full_name='LoraMsg2.status', index=1,
-      number=2, type=14, cpp_type=8, label=1,
+      number=2, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -163,6 +169,13 @@ _LORAMSG2 = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='reprog', full_name='LoraMsg2.reprog', index=10,
+      number=11, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -176,7 +189,7 @@ _LORAMSG2 = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=22,
-  serialized_end=225,
+  serialized_end=257,
 )
 
 
@@ -222,11 +235,12 @@ _REPROGRAMMING = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=228,
-  serialized_end=361,
+  serialized_start=260,
+  serialized_end=393,
 )
 
 _LORAMSG2.fields_by_name['status'].enum_type = _STATUS
+_LORAMSG2.fields_by_name['reprog'].message_type = _REPROGRAMMING
 _REPROGRAMMING.fields_by_name['flags'].enum_type = _REPROGRAMMING_FLAGS
 _REPROGRAMMING_FLAGS.containing_type = _REPROGRAMMING
 DESCRIPTOR.message_types_by_name['LoraMsg2'] = _LORAMSG2

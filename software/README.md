@@ -1,4 +1,4 @@
-# SensorTileCmake
+# GongBuddy
 A Cmake build project for ST SensorTile
 
 # Overview

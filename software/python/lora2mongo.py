@@ -61,19 +61,33 @@ def processGongData(db, pb, rssi):
             }
         db.insert_one(mydict)
     else:
-        prevImuData = res[0]['imu']
-        prevImuData.append(imuData)
-        # Device exists, update parameters
-        newvalues = {"$set":
-                {
-                    'temperature': pb.temperature,
-                    'batt_voltage': pb.batt_voltage,
-                    'current_threshold': pb.threshold,
-                    'rssi': rssi,
-                    'updated': datetime.datetime.now(),
-                    'imu': prevImuData,
-                }}
-        db.update_one(q, newvalues)
+        if pb.HasField('status'):
+            if pb.status == gb_messages_pb2.HEARTBEAT:
+                # Device exists, update parameters
+                newvalues = {"$set":
+                        {
+                            'temperature': pb.temperature,
+                            'batt_voltage': pb.batt_voltage,
+                            'current_threshold': pb.threshold,
+                            'rssi': rssi,
+                            'updated': datetime.datetime.now(),
+                        }}
+                db.update_one(q, newvalues)
+
+            elif pb.status == gb_messages_pb2.IMPACT:
+                prevImuData = res[0]['imu']
+                prevImuData.append(imuData)
+                # Device exists, update parameters
+                newvalues = {"$set":
+                        {
+                            'temperature': pb.temperature,
+                            'batt_voltage': pb.batt_voltage,
+                            'current_threshold': pb.threshold,
+                            'rssi': rssi,
+                            'updated': datetime.datetime.now(),
+                            'imu': prevImuData,
+                        }}
+                db.update_one(q, newvalues)
 
     return pb.identifier
 

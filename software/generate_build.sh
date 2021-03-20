@@ -23,7 +23,7 @@ main()
 
     # Create builds
     create_build    arm         .           "${THIS_SCRIPT_PATH}/toolchain/arm_embedded_toolchain.txt" $1 || exit 1
-    #create_build    x86         .                                                           || exit 1
+    create_build    x86         .                                                           || exit 1
 
     # Build created projects, if option is set
     if [ "$1" == "make" ]; then

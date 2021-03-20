@@ -34,6 +34,7 @@ osThreadId WriteDataThreadId;
 osThreadId ledThreadId;
 osThreadId pingpongId;
 osThreadId commandConsoleId;
+osThreadId reprogrammingId;
 
 osMessageQId dataQueue_id;
 osMessageQDef(dataqueue, DATAQUEUE_SIZE, int);
@@ -66,6 +67,9 @@ volatile uint8_t no_T_HTS221 = 0;
 static void GetData_Thread(void const *argument);
 static void WriteData_Thread(void const *argument);
 static void blinkLedThread(void const *argument);
+static void sendLora(LoraMsg2 *msg, int * threshold, int * reprogramming);
+static void setupReprogramming(void);
+static void reprogrammingThread(void const *argument);
 
 static void Error_Handler( void );
 void dataTimer_Callback(void const *arg);
@@ -78,8 +82,6 @@ osTimerDef(SensorTimer, dataTimer_Callback);
 uint32_t  exec;
 
 static int32_t LSM6DSM_Sensor_IO_ITConfig( void );
-
-volatile uint32_t * dfu_key = (volatile uint32_t*)0x10000000;
 
 /* Private functions ---------------------------------------------------------*/
 uint8_t detectImpact(T_SensorsData *sensorData, int threshold)
@@ -95,18 +97,6 @@ uint8_t detectImpact(T_SensorsData *sensorData, int threshold)
   return 0;
 }
 
-void rebootInDFUMode()
-{
-    void (*SysMemBootJump)(void);
-    __DSB();
-    __HAL_SYSCFG_REMAPMEMORY_SYSTEMFLASH();
-    __DSB();
-    __ISB();
-    SysMemBootJump = (void (*)(void)) (*((uint32_t *) 0x1fff0004)); // Point the PC to the System Memory reset vector (+4)
-    __set_MSP(*(__IO uint32_t*) 0x1FFF0000);
-    SysMemBootJump();
-}
-
 /**
   * @brief  Main program
   * @param  None
@@ -114,14 +104,6 @@ void rebootInDFUMode()
   */
 int main(void)
 {
-    // if ((dfu_key[0] == 0xdeadbeef) && (dfu_key[1] == 0x87654321) && (RCC->CSR & (1 << 28)))
-    // {
-    //     dfu_key[0] = 0;
-    //     dfu_key[1] = 0;
-    //     rebootInDFUMode();
-    // }
-    // dfu_key[0] = 0;
-    // dfu_key[1] = 0;
     SET_BIT(RCC->CSR, 1 << 23);
     HAL_Init();
 
@@ -136,22 +118,15 @@ int main(void)
     HAL_PWREx_EnableVddUSB();
     HAL_PWREx_EnableVddIO2();
 
-    //if(LoggingInterface == USB_Datalog) /* Configure the USB */
-    {
-        /*** USB CDC Configuration ***/
-        /* Init Device Library */
-        USBD_Init(&USBD_Device, &VCP_Desc, 0);
-        /* Add Supported Class */
-        USBD_RegisterClass(&USBD_Device, USBD_CDC_CLASS);
-        /* Add Interface callbacks for AUDIO and CDC Class */
-        USBD_CDC_RegisterInterface(&USBD_Device, &USBD_CDC_fops);
-        /* Start Device Process */
-        USBD_Start(&USBD_Device);
-    }
-    //else /* Configure the SDCard */
-    {
-        DATALOG_SD_Init();
-    }
+    /*** USB CDC Configuration ***/
+    /* Init Device Library */
+    USBD_Init(&USBD_Device, &VCP_Desc, 0);
+    /* Add Supported Class */
+    USBD_RegisterClass(&USBD_Device, USBD_CDC_CLASS);
+    /* Add Interface callbacks for AUDIO and CDC Class */
+    USBD_CDC_RegisterInterface(&USBD_Device, &USBD_CDC_fops);
+    /* Start Device Process */
+    USBD_Start(&USBD_Device);
 
     i2c_expander_data i2c_cfg;
     i2c_cfg.deviceAddress = 0x40; // Includes w/r bit
@@ -166,21 +141,12 @@ int main(void)
     osThreadDef(GetData_Thread,         GetData_Thread,       osPriorityAboveNormal,  0, configMINIMAL_STACK_SIZE*8);
     osThreadDef(WriteData_Thread,       WriteData_Thread,     osPriorityNormal,       0, configMINIMAL_STACK_SIZE*8);
     osThreadDef(blinkLedThread,         blinkLedThread,       osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
-    //osThreadDef(pingpingThread,         pingpingThread,       osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
-    osThreadDef(vCommandConsoleTask,    vCommandConsoleTask,  osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
+    //osThreadDef(vCommandConsoleTask,    vCommandConsoleTask,  osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
 
     GetDataThreadId     = osThreadCreate(osThread(GetData_Thread), NULL);
     WriteDataThreadId   = osThreadCreate(osThread(WriteData_Thread), NULL);
     ledThreadId         = osThreadCreate(osThread(blinkLedThread), NULL);
-    //pingpongId          = osThreadCreate(osThread(pingpingThread), NULL);
-    commandConsoleId    = osThreadCreate(osThread(vCommandConsoleTask), NULL);
-
-    // if ((GetDataThreadId == NULL) ||
-    //     (WriteDataThreadId == NULL) ||
-    //     (ledThreadId == NULL))
-    // {
-    //     Error_Handler();
-    // }
+    //commandConsoleId    = osThreadCreate(osThread(vCommandConsoleTask), NULL);
 
     /* Start scheduler */
     osKernelStart();
@@ -217,11 +183,8 @@ static void GetData_Thread(void const *argument)
     for (;;)
     {
         osSemaphoreWait(readDataSem_id, osWaitForever);
-        //i2c_debug1(1);
         /* Try to allocate a memory block and check if is not NULL */
         mptr = osPoolAlloc(sensorPool_id);
-        //BSP_LED_Toggle(LED1);
-        //i2c_debug1(0);
         if(mptr != NULL)
         {
             if(getSensorsData(mptr) == BSP_ERROR_NONE)
@@ -241,7 +204,6 @@ static void GetData_Thread(void const *argument)
         {
             Error_Handler();
         }
-        //i2c_debug1(0);
     }
 }
 
@@ -273,15 +235,8 @@ static void WriteData_Thread(void const *argument)
     (void) argument;
     osEvent evt;
     T_SensorsData *rptr;
-    int size;
-    #define SD_STR_SIZE 256
-    char data_s[SD_STR_SIZE];
-    uint32_t impactTimer = 0;
-    uint8_t SD_Log_Enabled = 0;
     uint8_t impactDetected = 0;
     uint32_t sensorBufferIndex = 0;
-    uint32_t loraStatus = 0;
-    uint8_t pb_data[250];
 
     SD_IO_Init_LS();
     Sensor_init_lora_interfaces();
@@ -291,49 +246,21 @@ static void WriteData_Thread(void const *argument)
     uint32_t uuid = HAL_GetUIDw0();
 
     int threshold = 1500;
+    int heartbeat_counter = 0;
 
     for (;;)
     {
         evt = osMessageGet(dataQueue_id, osWaitForever);  // wait for message
         i2c_debug2(1);
+        heartbeat_counter++;
         rptr = evt.value.p;
-        // Check to see if we had large change in acceleration
-        // if (SD_Log_Enabled == 0)
-        // {
-        //     // Start recording
-        //     while(SD_Log_Enabled != 1)
-        //     {
-        //         i2c_big_led(0);
-        //         if(DATALOG_SD_Log_Enable())
-        //         {
-        //             SD_Log_Enabled=1;
-        //             osDelay(100);
-        //             //dataTimerStart();
-        //         }
-        //         else
-        //         {
-        //             i2c_big_led(1);
-        //             //DATALOG_SD_Log_Disable();
-        //             DATALOG_SD_DeInit();
-        //             DATALOG_SD_Init();
-        //             osDelay(100);
-        //         }
-        //     }
-        // }
 
         if (detectImpact(rptr, threshold) && (impactDetected == 0))
         {
             // Set a timer to roll the SD card recording
-            impactTimer = HAL_GetTick();
             impactDetected = 1;
             osSignalSet(ledThreadId, 0x10000);
         }
-        // else if (SD_Log_Enabled && impactDetected && ((HAL_GetTick() - impactTimer) > 5000)) // 5 seconds
-        // {
-        //     DATALOG_SD_Log_Disable();
-        //     SD_Log_Enabled = 0;
-        //     impactDetected = 0;
-        // }
 
         if (impactDetected == 0)
         {
@@ -351,8 +278,7 @@ static void WriteData_Thread(void const *argument)
             sensorBufferIndex++;
             // Generate the protobuf and send it to the Lora Thread
             msg.buildnum = 123;
-            msg.has_status = true;
-            msg.status = ++loraStatus;
+            msg.status = Status_IMPACT;
             msg.has_pressure = true;
             msg.pressure = (rptr->pressure * 10);
             msg.has_temperature = true;
@@ -368,34 +294,47 @@ static void WriteData_Thread(void const *argument)
                 packSensorSample(&sensorBuffer[i], &msg.imu.bytes[i*12]);
             }
             msg.imu.size = SENSOR_CIR_BUF_SIZE * 12;
-            pb_ostream_t stream = pb_ostream_from_buffer(pb_data, sizeof(pb_data));
-            pb_encode(&stream, LoraMsg2_fields, &msg);
-            int retSize =
-                LoRa_dataexchange(pb_data, stream.bytes_written, pb_data, sizeof(pb_data));
-            LoraMsg2 inMsg = LoraMsg2_init_default;
-            pb_istream_t istrm = pb_istream_from_buffer(pb_data, retSize);
-            pb_decode(&istrm, LoraMsg2_fields, &inMsg);
-            if (inMsg.has_threshold)
-            {
-                if (inMsg.threshold > 1200)
-                    threshold = inMsg.threshold;
-            }
+            heartbeat_counter = 0;
+            int reprogramming;
+            sendLora(&msg, &threshold, &reprogramming);
 
             //DATALOG_SD_Log_Disable();
-            SD_Log_Enabled = 0;
             impactDetected = 0;
         }
 
-        unsigned int pressure = (rptr->pressure * 10);
-        unsigned int temperature = (rptr->temperature * 10);
-        size = snprintf(data_s,
-                        SD_STR_SIZE,
-                        "%u, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\r\n",
-                    (unsigned int)rptr->ms_counter,
-                    (int)rptr->acc.x, (int)rptr->acc.y, (int)rptr->acc.z,
-                    (int)rptr->gyro.x, (int)rptr->gyro.y, (int)rptr->gyro.z,
-                    (int)rptr->mag.x, (int)rptr->mag.y, (int)rptr->mag.z,
-                    pressure, temperature, 0);
+        if (heartbeat_counter > 500)
+        {
+            heartbeat_counter = 0;
+            LoraMsg2 msg = LoraMsg2_init_default;
+            msg.buildnum = 123;
+            msg.status = Status_HEARTBEAT;
+            msg.has_pressure = true;
+            msg.pressure = (rptr->pressure * 10);
+            msg.has_temperature = true;
+            msg.temperature = (rptr->temperature * 10);
+            msg.has_identifier = true;
+            msg.identifier = uuid;
+            msg.has_threshold = true;
+            msg.threshold = threshold;
+
+            int reprogramming;
+            sendLora(&msg, &threshold, &reprogramming);
+            if (reprogramming > 0)
+            {
+                setupReprogramming();
+            }
+        }
+
+        // unsigned int pressure = (rptr->pressure * 10);
+        // unsigned int temperature = (rptr->temperature * 10);
+        // size = snprintf(data_s,
+        //                 SD_STR_SIZE,
+        //                 "%u, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\r\n",
+        //             (unsigned int)rptr->ms_counter,
+        //             (int)rptr->acc.x, (int)rptr->acc.y, (int)rptr->acc.z,
+        //             (int)rptr->gyro.x, (int)rptr->gyro.y, (int)rptr->gyro.z,
+        //             (int)rptr->mag.x, (int)rptr->mag.y, (int)rptr->mag.z,
+        //             pressure, temperature, 0);
 
         osStatus status = osPoolFree(sensorPool_id, rptr);      // free memory allocated for message
         if (status < 0)
@@ -403,12 +342,74 @@ static void WriteData_Thread(void const *argument)
             Error_Handler();
         }
 
-        // if (SD_Log_Enabled == 1)
-        // {
-        //     DATALOG_SD_writeBuf(data_s, size);
-        // }
-
         i2c_debug2(0);
+    }
+}
+
+static void sendLora(LoraMsg2 *msg, int * threshold, int * reprogramming)
+{
+    uint8_t pb_data[250];
+
+    *reprogramming = 0;
+
+    pb_ostream_t stream = pb_ostream_from_buffer(pb_data, sizeof(pb_data));
+    pb_encode(&stream, LoraMsg2_fields, msg);
+    int retSize =
+        LoRa_dataexchange(pb_data, stream.bytes_written, pb_data, sizeof(pb_data));
+    LoraMsg2 inMsg = LoraMsg2_init_default;
+    pb_istream_t istrm = pb_istream_from_buffer(pb_data, retSize);
+    pb_decode(&istrm, LoraMsg2_fields, &inMsg);
+    if (inMsg.has_threshold)
+    {
+        if (inMsg.threshold > 1200)
+            *threshold = inMsg.threshold;
+    }
+    if (inMsg.status == Status_REPROGRAMMING)
+    {
+        *reprogramming = 1;
+    }
+}
+
+static void setupReprogramming(void)
+{
+    osThreadTerminate(GetDataThreadId);
+    osThreadTerminate(WriteDataThreadId);
+
+    osThreadDef(reprogrammingThread,         reprogrammingThread,       osPriorityAboveNormal,  0, configMINIMAL_STACK_SIZE*8);
+    // Start the reprogramming code
+    reprogrammingId = osThreadCreate(osThread(reprogrammingThread), NULL);
+}
+
+static void reprogrammingThread(void const *argument)
+{
+    uint8_t pb_data[250];
+
+    char buf[200];
+    strcpy(buf, "Entering programming mode\n");
+    CDC_Fill_Buffer((uint8_t*)buf, strlen(buf));
+
+    while (1)
+    {
+        osSignalSet(ledThreadId, 0x10000);
+
+        LoraMsg2 msg = LoraMsg2_init_default;
+        msg.buildnum = 123;
+        msg.status = Status_REPROGRAMMING;
+
+        int reprogramming = 0;
+
+        pb_ostream_t stream = pb_ostream_from_buffer(pb_data, sizeof(pb_data));
+        pb_encode(&stream, LoraMsg2_fields, &msg);
+        int retSize =
+            LoRa_dataexchange(pb_data, stream.bytes_written, pb_data, sizeof(pb_data));
+        LoraMsg2 inMsg = LoraMsg2_init_default;
+        pb_istream_t istrm = pb_istream_from_buffer(pb_data, retSize);
+        pb_decode(&istrm, LoraMsg2_fields, &inMsg);
+        if (inMsg.has_reprog)
+        {
+            snprintf(buf, 200, "ADDR: %08X data[0]: %02X flags: %d\n", inMsg.reprog.address, inMsg.reprog.data.bytes[0], inMsg.reprog.flags);
+            CDC_Fill_Buffer((uint8_t*)buf, strlen(buf));
+        }
     }
 }
 

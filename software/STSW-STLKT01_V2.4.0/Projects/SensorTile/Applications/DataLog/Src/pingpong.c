@@ -125,10 +125,10 @@ void LoRa_init()
   LPM_SetOffMode(LPM_APPLI_Id, LPM_Disable);
 
   /* Led Timers*/
-  TimerInit(&timerLed, OnledEvent);
-  TimerSetValue(&timerLed, LED_PERIOD_MS);
+  //TimerInit(&timerLed, OnledEvent);
+  //TimerSetValue(&timerLed, LED_PERIOD_MS);
 
-  TimerStart(&timerLed);
+  //TimerStart(&timerLed);
 
   // Radio initialization
   RadioEvents.TxDone = OnTxDone;
@@ -181,6 +181,7 @@ int LoRa_dataexchange(uint8_t * txData,
 {
   int retSize = 0;
   // Send the next PING frame
+  State = TX;
   Radio.Send(txData, txDataLen);
   Radio.Rx(500);
   uint8_t status = Radio.Read(REG_LR_IRQFLAGS);
@@ -196,6 +197,8 @@ int LoRa_dataexchange(uint8_t * txData,
     memcpy(rxData, Buffer, BufferSize);
     retSize = BufferSize;
   }
+
+  Radio.Sleep();
 
   return retSize;
 }

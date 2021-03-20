@@ -4,11 +4,12 @@ enum Status {
     HEARTBEAT = 0;
     IMPACT = 1;
     ENTERING_LOW_POWER = 2;
+    REPROGRAMMING = 3;
 }
 
 message LoraMsg2 {
     required uint32 buildnum = 1;
-    optional Status status = 2;
+    required Status status = 2;
     optional bytes imu = 3;
     optional uint32 pressure = 4;
     optional sint32 temperature = 5;
@@ -17,6 +18,7 @@ message LoraMsg2 {
     optional uint32 configuration = 8;
     optional uint32 identifier = 9;
     optional sint32 rssi = 10;
+    optional Reprogramming reprog = 11;
 }
 
 message Reprogramming {

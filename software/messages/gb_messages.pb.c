@@ -9,7 +9,7 @@
 PB_BIND(LoraMsg2, LoraMsg2, 2)
 
 
-PB_BIND(Reprogramming, Reprogramming, 2)
+PB_BIND(Reprogramming, Reprogramming, AUTO)
 
 
 

@@ -80,7 +80,6 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal)
     # Test coverage flags
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftest-coverage -fprofile-arcs")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgcov")
-    add_definitions(-DSTM32F40_41xxx)
 endif()
 
 
@@ -138,6 +137,7 @@ else ()
 
     # Libraries
     add_subdirectory(third-party/tclap-1.2.1)
+    add_subdirectory(imagegen)
 
     # Executables
 endif ()
