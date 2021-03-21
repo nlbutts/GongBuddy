@@ -10,7 +10,10 @@
 #include <pb_encode.h>
 #include <pb_decode.h>
 #include "common_structs.h"
+#include "utilities_conf.h"
 
+
+#pragma GCC optimize("O0")
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 
@@ -84,6 +87,12 @@ uint32_t  exec;
 static int32_t LSM6DSM_Sensor_IO_ITConfig( void );
 
 /* Private functions ---------------------------------------------------------*/
+void print(char * buf)
+{
+    CDC_Fill_Buffer((uint8_t*)buf, strlen(buf));
+}
+
+
 uint8_t detectImpact(T_SensorsData *sensorData, int threshold)
 {
     float mag = (sensorData->acc.x * sensorData->acc.x) +
@@ -319,6 +328,9 @@ static void WriteData_Thread(void const *argument)
 
             int reprogramming;
             sendLora(&msg, &threshold, &reprogramming);
+            char buf[100];
+            snprintf(buf, 100, "Sent heartbeat, received t:%d r:%d\n", threshold, reprogramming);
+            OutputTrace(buf, strlen(buf));
             if (reprogramming > 0)
             {
                 setupReprogramming();
@@ -372,9 +384,6 @@ static void sendLora(LoraMsg2 *msg, int * threshold, int * reprogramming)
 
 static void setupReprogramming(void)
 {
-    osThreadTerminate(GetDataThreadId);
-    osThreadTerminate(WriteDataThreadId);
-
     osThreadDef(reprogrammingThread,         reprogrammingThread,       osPriorityAboveNormal,  0, configMINIMAL_STACK_SIZE*8);
     // Start the reprogramming code
     reprogrammingId = osThreadCreate(osThread(reprogrammingThread), NULL);
@@ -384,9 +393,27 @@ static void reprogrammingThread(void const *argument)
 {
     uint8_t pb_data[250];
 
+    osStatus status;
+
     char buf[200];
     strcpy(buf, "Entering programming mode\n");
-    CDC_Fill_Buffer((uint8_t*)buf, strlen(buf));
+    print(buf);
+
+    status = osThreadTerminate(GetDataThreadId);
+    if (status != osOK)
+    {
+        strcpy(buf, "Failed to kill GetDataThread\n");
+        print(buf);
+    }
+
+    status = osThreadTerminate(WriteDataThreadId);
+    if (status != osOK)
+    {
+        strcpy(buf, "Failed to kill WriteDataThread\n");
+        print(buf);
+    }
+
+    uint32_t progAddress = 0;
 
     while (1)
     {
@@ -395,6 +422,10 @@ static void reprogrammingThread(void const *argument)
         LoraMsg2 msg = LoraMsg2_init_default;
         msg.buildnum = 123;
         msg.status = Status_REPROGRAMMING;
+        msg.has_reprog = true;
+        msg.reprog.address = progAddress;
+        msg.reprog.flags = Reprogramming_Flags_CONTINUE;
+        msg.reprog.data.size = 0;
 
         int reprogramming = 0;
 
@@ -407,9 +438,11 @@ static void reprogrammingThread(void const *argument)
         pb_decode(&istrm, LoraMsg2_fields, &inMsg);
         if (inMsg.has_reprog)
         {
-            snprintf(buf, 200, "ADDR: %08X data[0]: %02X flags: %d\n", inMsg.reprog.address, inMsg.reprog.data.bytes[0], inMsg.reprog.flags);
-            CDC_Fill_Buffer((uint8_t*)buf, strlen(buf));
+            progAddress = inMsg.reprog.address;
+            snprintf(buf, 200, "ADDR: %08X data[0]: %02X flags: %d\n", progAddress, inMsg.reprog.data.bytes[0], inMsg.reprog.flags);
+            print(buf);
         }
+        osDelay(25);
     }
 }
 
@@ -526,6 +559,7 @@ void vApplicationStackOverflowHook(TaskHandle_t task, signed char *pcTaskName)
         volatile TaskHandle_t localTask = task;
     }
 }
+
 
 #ifdef  USE_FULL_ASSERT
 

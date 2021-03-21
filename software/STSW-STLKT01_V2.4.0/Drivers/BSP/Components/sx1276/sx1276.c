@@ -1,3 +1,5 @@
+#pragma GCC optimize("O0")
+
 /*!
  * \file      sx1276.c
  *

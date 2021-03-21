@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11gb_messages.proto\"\xeb\x01\n\x08LoraMsg2\x12\x10\n\x08\x62uildnum\x18\x01 \x02(\r\x12\x17\n\x06status\x18\x02 \x02(\x0e\x32\x07.Status\x12\x0b\n\x03imu\x18\x03 \x01(\x0c\x12\x10\n\x08pressure\x18\x04 \x01(\r\x12\x13\n\x0btemperature\x18\x05 \x01(\x11\x12\x14\n\x0c\x62\x61tt_voltage\x18\x06 \x01(\r\x12\x11\n\tthreshold\x18\x07 \x01(\r\x12\x15\n\rconfiguration\x18\x08 \x01(\r\x12\x12\n\nidentifier\x18\t \x01(\r\x12\x0c\n\x04rssi\x18\n \x01(\x11\x12\x1e\n\x06reprog\x18\x0b \x01(\x0b\x32\x0e.Reprogramming\"\x85\x01\n\rReprogramming\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x02(\r\x12\x0c\n\x04\x64\x61ta\x18\x02 \x02(\x0c\x12-\n\x05\x66lags\x18\x03 \x02(\x0e\x32\x14.Reprogramming.Flags:\x08\x43ONTINUE\"&\n\x05\x46lags\x12\x0f\n\x0bLAST_PACKET\x10\x00\x12\x0c\n\x08\x43ONTINUE\x10\x01*N\n\x06Status\x12\r\n\tHEARTBEAT\x10\x00\x12\n\n\x06IMPACT\x10\x01\x12\x16\n\x12\x45NTERING_LOW_POWER\x10\x02\x12\x11\n\rREPROGRAMMING\x10\x03'
+  serialized_pb=b'\n\x11gb_messages.proto\"\xeb\x01\n\x08LoraMsg2\x12\x17\n\x06status\x18\x01 \x02(\x0e\x32\x07.Status\x12\x10\n\x08\x62uildnum\x18\x02 \x01(\r\x12\x0b\n\x03imu\x18\x03 \x01(\x0c\x12\x10\n\x08pressure\x18\x04 \x01(\r\x12\x13\n\x0btemperature\x18\x05 \x01(\x11\x12\x14\n\x0c\x62\x61tt_voltage\x18\x06 \x01(\r\x12\x11\n\tthreshold\x18\x07 \x01(\r\x12\x15\n\rconfiguration\x18\x08 \x01(\r\x12\x12\n\nidentifier\x18\t \x01(\r\x12\x0c\n\x04rssi\x18\n \x01(\x11\x12\x1e\n\x06reprog\x18\x0b \x01(\x0b\x32\x0e.Reprogramming\"\x85\x01\n\rReprogramming\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x02(\r\x12\x0c\n\x04\x64\x61ta\x18\x02 \x02(\x0c\x12-\n\x05\x66lags\x18\x03 \x02(\x0e\x32\x14.Reprogramming.Flags:\x08\x43ONTINUE\"&\n\x05\x46lags\x12\x0f\n\x0bLAST_PACKET\x10\x00\x12\x0c\n\x08\x43ONTINUE\x10\x01*N\n\x06Status\x12\r\n\tHEARTBEAT\x10\x00\x12\n\n\x06IMPACT\x10\x01\x12\x16\n\x12\x45NTERING_LOW_POWER\x10\x02\x12\x11\n\rREPROGRAMMING\x10\x03'
 )
 
 _STATUS = _descriptor.EnumDescriptor(
@@ -100,15 +100,15 @@ _LORAMSG2 = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='buildnum', full_name='LoraMsg2.buildnum', index=0,
-      number=1, type=13, cpp_type=3, label=2,
+      name='status', full_name='LoraMsg2.status', index=0,
+      number=1, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='status', full_name='LoraMsg2.status', index=1,
-      number=2, type=14, cpp_type=8, label=2,
+      name='buildnum', full_name='LoraMsg2.buildnum', index=1,
+      number=2, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,

@@ -8,6 +8,8 @@ import time
 import pymongo
 import datetime
 import struct
+import os
+import re
 
 def formatImu(pb):
     imuData = {}
@@ -100,8 +102,71 @@ def getCfgMsg(db, id):
     # Create a new PB
     pb = gb_messages_pb2.LoraMsg2()
     pb.threshold = threshold
-    pb.buildnum = 1
+    pb.status = gb_messages_pb2.Status.HEARTBEAT
     return pb.SerializeToString()
+
+def getFwBuildNum(file):
+    m = re.search('app_(.*).lzma', file)
+    if m is not None:
+        cur_sw_version = int(m.group(1))
+        return cur_sw_version
+    return 0
+
+def checkFWUpdate(build_num):
+    files = os.listdir()
+    for file in files:
+        file_build_num = getFwBuildNum(file)
+        if (file_build_num > 0) and (file_build_num > build_num):
+            return True, file
+    return False, ''
+
+def updateFirware(updatefile, rfm9x):
+    timeout = 10000
+    with open(updatefile, 'rb') as f:
+        updatedata = f.read()
+
+    address = 0
+    dataToSend = len(updatedata)
+
+    while timeout > 0:
+        time.sleep(0.01)
+        timeout -= 10
+
+        start = time.time()
+        data = rfm9x.receive(timeout=5000)
+        if data is not None:
+            timeout = 10000
+            pb = gb_messages_pb2.LoraMsg2()
+            pb.ParseFromString(data)
+            print('Received data from GB')
+            print(pb)
+            if pb.status != gb_messages_pb2.Status.REPROGRAMMING:
+                # Put the unit into programming mode
+                print('Putting unit into reprogramming mode')
+                pb.Clear()
+                pb.status = gb_messages_pb2.Status.REPROGRAMMING
+                data = pb.SerializeToString()
+                rfm9x.send(data)
+            else:
+                pb.Clear()
+                pb.status = gb_messages_pb2.Status.REPROGRAMMING
+                pb.reprog.address = address
+                txamount = min(dataToSend, 40)
+                pb.reprog.data = updatedata[address:address + txamount]
+                address += txamount
+                dataToSend -= txamount
+                if dataToSend == 0:
+                    pb.reprog.flags = gb_messages_pb2.Reprogramming.Flags.LAST_PACKET
+                    timeout = 0
+                    print('Last packet of data')
+                else:
+                    pb.reprog.flags = gb_messages_pb2.Reprogramming.Flags.CONTINUE
+
+                data = pb.SerializeToString()
+                print('Sending {} bytes of data to address {}'.format(len(data), address))
+                rfm9x.send(data)
+                stop = time.time()
+                print('Total time {}'.format(stop - start))
 
 RADIO_FREQ_MHZ = 915.0
 CS = digitalio.DigitalInOut(board.CE1)
@@ -121,15 +186,27 @@ mycoll = mydb['users']
 while True:
     print('Waiting for LoRa message')
     data = rfm9x.receive(timeout=5000)
-    pb = gb_messages_pb2.LoraMsg2()
-    pb.ParseFromString(data)
-    print(pb)
-    print("Msg from {} with rssi: {}".format(pb.identifier, rfm9x.rssi))
+    if data is not None:
+        start = time.time()
+        print('Received {} bytes'.format(len(data)))
+        pb = gb_messages_pb2.LoraMsg2()
+        pb.ParseFromString(data)
+        print(pb)
+        print("Msg from {} with rssi: {}".format(pb.identifier, rfm9x.rssi))
 
-    # Update DB
-    id = processGongData(mycoll, pb, rfm9x.rssi)
-    cfg = getCfgMsg(mycoll, id)
+        # Update DB
+        id = processGongData(mycoll, pb, rfm9x.rssi)
+        cfg = getCfgMsg(mycoll, id)
 
-    # Send config/ACK message
-    print('Sending message')
-    rfm9x.send(cfg)
+        ret, updatefile = checkFWUpdate(pb.buildnum)
+        if ret == True:
+            print('Need to update firmware')
+            updateFirware(updatefile, rfm9x)
+
+        # Send config/ACK message
+        print('Sending {} bytes'.format(len(cfg)))
+        rfm9x.send(cfg)
+        stop = time.time()
+        print('It took {} seconds to receive and send a message'.format(stop-start))
+    else:
+        print('Timeout')

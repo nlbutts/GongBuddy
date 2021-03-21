@@ -1,3 +1,5 @@
+#pragma GCC optimize("O0")
+
 /* Includes ------------------------------------------------------------------*/
 #include <string.h>
 #include "hw.h"
@@ -8,6 +10,7 @@
 #include "common_structs.h"
 #include "cmsis_os.h"
 #include "sx1276Regs-LoRa.h"
+#include "utilities_conf.h"
 
 #define RF_FREQUENCY                                915000000 // Hz
 #define TX_OUTPUT_POWER                             14        // dBm
@@ -79,6 +82,8 @@ static  TimerEvent_t timerLed;
 // Defined in main.c
 extern osMessageQId loraQueue_id;
 extern osPoolId loraPool_id;
+// osTimerId timerTickId;
+// osTimerDef(TimerTick, TimerIrqHandler);
 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -173,32 +178,71 @@ void LoRa_init()
   Radio.Rx(RX_TIMEOUT_VALUE);
 }
 
+int poll(uint8_t flag, int timeout)
+{
+  TickType_t start = xTaskGetTickCount();
+  TickType_t stop  = xTaskGetTickCount();
+
+  uint8_t flags = Radio.Read(REG_LR_IRQFLAGS);
+  while (((flags & flag) == 0) && ((stop - start) < timeout))
+  {
+    flags = Radio.Read(REG_LR_IRQFLAGS);
+    stop = xTaskGetTickCount();
+  }
+
+  if ((flags & flag) == flag)
+  {
+    return true;
+  }
+  return false;
+}
+
 extern void SX1276OnDio0Irq( void* context );
 int LoRa_dataexchange(uint8_t * txData,
                       uint16_t txDataLen,
                       uint8_t * rxData,
                       uint16_t rxDataBufSize)
 {
+  char buf[100];
   int retSize = 0;
+  uint8_t flags;
   // Send the next PING frame
   State = TX;
+  Radio.Write(REG_LR_IRQFLAGS, 0xFF);
   Radio.Send(txData, txDataLen);
-  Radio.Rx(500);
-  uint8_t status = Radio.Read(REG_LR_IRQFLAGS);
-  while (((status & RFLR_IRQFLAGS_RXDONE) == 0) && (State != RX_TIMEOUT))
+
+  if (poll(RFLR_IRQFLAGS_TXDONE, 100) > 0)
   {
-    status = Radio.Read(REG_LR_IRQFLAGS);
+    strcpy(buf, "Successfully transmitted LoRa\n");
+    OutputTrace(buf, strlen(buf));
   }
-  if (status & RFLR_IRQFLAGS_RXDONE)
+  else
+  {
+    strcpy(buf, "Failed to transmitted LoRa\n");
+    OutputTrace(buf, strlen(buf));
+  }
+
+  Radio.Write(REG_LR_IRQFLAGS, 0xFF);
+  Radio.Rx(1000);
+
+  if (poll(RFLR_IRQFLAGS_RXDONE, 500) > 0)
+  {
     SX1276OnDio0Irq(NULL);
 
-  if (State == RX)
-  {
+    snprintf(buf, 100, "Received %d bytes\n", BufferSize);
+    OutputTrace(buf, strlen(buf));
+
     memcpy(rxData, Buffer, BufferSize);
     retSize = BufferSize;
   }
+  else
+  {
+    Radio.IoInit();
+    strcpy(buf, "Failed to receive LoRa\n");
+    OutputTrace(buf, strlen(buf));
+  }
 
-  Radio.Sleep();
+  //Radio.Sleep();
 
   return retSize;
 }

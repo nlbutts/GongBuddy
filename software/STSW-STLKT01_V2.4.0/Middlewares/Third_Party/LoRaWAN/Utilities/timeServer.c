@@ -100,8 +100,8 @@ static bool TimerExists( TimerEvent_t *obj );
 static void TimerIrqHandler( void const *arg );
 
 uint8_t timerTickInit = 0;
-osTimerId timerTickId;
-osTimerDef(TimerTick, TimerIrqHandler);
+// osTimerId timerTickId;
+// osTimerDef(TimerTick, TimerIrqHandler);
 #define TIMER_TICK_PERIOD_MS 100
 
 void TimerInit( TimerEvent_t *obj, void ( *callback )( void *context ) )
@@ -118,12 +118,12 @@ void TimerInit( TimerEvent_t *obj, void ( *callback )( void *context ) )
   if (timerTickInit == 0)
   {
     timerTickInit = 1;
-    timerTickId = osTimerCreate(osTimer(TimerTick), osTimerPeriodic, NULL);
-    osStatus status = osTimerStart (timerTickId, TIMER_TICK_PERIOD_MS);                // start timer
-    while (status != osOK)
-    {
-        // Timer could not be started
-    }
+    // timerTickId = osTimerCreate(osTimer(TimerTick), osTimerPeriodic, NULL);
+    // osStatus status = osTimerStart (timerTickId, TIMER_TICK_PERIOD_MS);                // start timer
+    // while (status != osOK)
+    // {
+    //     // Timer could not be started
+    // }
 
   }
 }

@@ -8,8 +8,8 @@ enum Status {
 }
 
 message LoraMsg2 {
-    required uint32 buildnum = 1;
-    required Status status = 2;
+    required Status status = 1;
+    optional uint32 buildnum = 2;
     optional bytes imu = 3;
     optional uint32 pressure = 4;
     optional sint32 temperature = 5;
