@@ -70,7 +70,7 @@ volatile uint8_t no_T_HTS221 = 0;
 static void GetData_Thread(void const *argument);
 static void WriteData_Thread(void const *argument);
 static void blinkLedThread(void const *argument);
-static void sendLora(LoraMsg2 *msg, int * threshold, int * reprogramming);
+static void sendLora(LoraMsg2 *inMsg, LoraMsg2 *outMsg);
 static void setupReprogramming(void);
 static void reprogrammingThread(void const *argument);
 
@@ -87,12 +87,6 @@ uint32_t  exec;
 static int32_t LSM6DSM_Sensor_IO_ITConfig( void );
 
 /* Private functions ---------------------------------------------------------*/
-void print(char * buf)
-{
-    CDC_Fill_Buffer((uint8_t*)buf, strlen(buf));
-}
-
-
 uint8_t detectImpact(T_SensorsData *sensorData, int threshold)
 {
     float mag = (sensorData->acc.x * sensorData->acc.x) +
@@ -283,58 +277,67 @@ static void WriteData_Thread(void const *argument)
         }
         else if (sensorBufferIndex >= SENSOR_CIR_BUF_SIZE)
         {
-            LoraMsg2 msg = LoraMsg2_init_default;
+            uint32_t dstDev;
+            LoraMsg2 txMsg = LoraMsg2_init_default;
+            LoraMsg2 rxMsg = LoraMsg2_init_default;
             sensorBufferIndex++;
             // Generate the protobuf and send it to the Lora Thread
-            msg.buildnum = 123;
-            msg.status = Status_IMPACT;
-            msg.has_pressure = true;
-            msg.pressure = (rptr->pressure * 10);
-            msg.has_temperature = true;
-            msg.temperature = (rptr->temperature * 10);
-            msg.has_identifier = true;
-            msg.identifier = uuid;
-            msg.has_threshold = true;
-            msg.threshold = threshold;
+            txMsg.status = Status_IMPACT;
+            txMsg.identifier = uuid;
+            txMsg.has_buildnum = true;
+            txMsg.buildnum = 123;
+            txMsg.has_pressure = true;
+            txMsg.pressure = (rptr->pressure * 10);
+            txMsg.has_temperature = true;
+            txMsg.temperature = (rptr->temperature * 10);
+            txMsg.has_threshold = true;
+            txMsg.threshold = threshold;
 
-            msg.has_imu = true;
+            txMsg.has_imu = true;
             for (int i = 0; i < SENSOR_CIR_BUF_SIZE; i++)
             {
-                packSensorSample(&sensorBuffer[i], &msg.imu.bytes[i*12]);
+                packSensorSample(&sensorBuffer[i], &txMsg.imu.bytes[i*12]);
             }
-            msg.imu.size = SENSOR_CIR_BUF_SIZE * 12;
+            txMsg.imu.size = SENSOR_CIR_BUF_SIZE * 12;
             heartbeat_counter = 0;
             int reprogramming;
-            sendLora(&msg, &threshold, &reprogramming);
+            sendLora(&txMsg, &rxMsg);
 
-            //DATALOG_SD_Log_Disable();
             impactDetected = 0;
         }
 
         if (heartbeat_counter > 500)
         {
             heartbeat_counter = 0;
-            LoraMsg2 msg = LoraMsg2_init_default;
-            msg.buildnum = 123;
-            msg.status = Status_HEARTBEAT;
-            msg.has_pressure = true;
-            msg.pressure = (rptr->pressure * 10);
-            msg.has_temperature = true;
-            msg.temperature = (rptr->temperature * 10);
-            msg.has_identifier = true;
-            msg.identifier = uuid;
-            msg.has_threshold = true;
-            msg.threshold = threshold;
+            LoraMsg2 txMsg = LoraMsg2_init_default;
+            LoraMsg2 rxMsg = LoraMsg2_init_default;
+            txMsg.identifier = uuid;
+            txMsg.status = Status_HEARTBEAT;
+            txMsg.has_buildnum = true;
+            txMsg.buildnum = 123;
+            txMsg.has_pressure = true;
+            txMsg.pressure = (rptr->pressure * 10);
+            txMsg.has_temperature = true;
+            txMsg.temperature = (rptr->temperature * 10);
+            txMsg.has_threshold = true;
+            txMsg.threshold = threshold;
 
             int reprogramming;
-            sendLora(&msg, &threshold, &reprogramming);
-            char buf[100];
-            snprintf(buf, 100, "Sent heartbeat, received t:%d r:%d\n", threshold, reprogramming);
-            OutputTrace(buf, strlen(buf));
-            if (reprogramming > 0)
+            sendLora(&txMsg, &rxMsg);
+
+            if (rxMsg.identifier == uuid)
             {
-                setupReprogramming();
+                if (rxMsg.has_threshold && (rxMsg.threshold > 1500))
+                {
+                    threshold = rxMsg.threshold;
+                }
+                if (rxMsg.status == Status_REPROGRAMMING)
+                {
+                    setupReprogramming();
+                }
+                DBGPRINTF("Sent heartbeat, received t:%d s:%d\n", threshold, rxMsg.status);
             }
+
         }
 
         // unsigned int pressure = (rptr->pressure * 10);
@@ -358,28 +361,16 @@ static void WriteData_Thread(void const *argument)
     }
 }
 
-static void sendLora(LoraMsg2 *msg, int * threshold, int * reprogramming)
+static void sendLora(LoraMsg2 *inMsg, LoraMsg2 *outMsg)
 {
     uint8_t pb_data[250];
 
-    *reprogramming = 0;
-
     pb_ostream_t stream = pb_ostream_from_buffer(pb_data, sizeof(pb_data));
-    pb_encode(&stream, LoraMsg2_fields, msg);
+    pb_encode(&stream, LoraMsg2_fields, inMsg);
     int retSize =
         LoRa_dataexchange(pb_data, stream.bytes_written, pb_data, sizeof(pb_data));
-    LoraMsg2 inMsg = LoraMsg2_init_default;
     pb_istream_t istrm = pb_istream_from_buffer(pb_data, retSize);
-    pb_decode(&istrm, LoraMsg2_fields, &inMsg);
-    if (inMsg.has_threshold)
-    {
-        if (inMsg.threshold > 1200)
-            *threshold = inMsg.threshold;
-    }
-    if (inMsg.status == Status_REPROGRAMMING)
-    {
-        *reprogramming = 1;
-    }
+    pb_decode(&istrm, LoraMsg2_fields, outMsg);
 }
 
 static void setupReprogramming(void)
@@ -389,38 +380,71 @@ static void setupReprogramming(void)
     reprogrammingId = osThreadCreate(osThread(reprogrammingThread), NULL);
 }
 
+static uint64_t getBigInt(uint8_t * buf)
+{
+    uint64_t bigint = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        bigint |= ((uint64_t)buf[i]) << (8 * i);
+    }
+    return bigint;
+}
+
 static void reprogrammingThread(void const *argument)
 {
     uint8_t pb_data[250];
 
+    uint32_t uuid = HAL_GetUIDw0();
+    uint32_t start = xTaskGetTickCount();
+
     osStatus status;
 
-    char buf[200];
-    strcpy(buf, "Entering programming mode\n");
-    print(buf);
+    DBGPRINTF("Entering programming mode\n");
 
     status = osThreadTerminate(GetDataThreadId);
     if (status != osOK)
     {
-        strcpy(buf, "Failed to kill GetDataThread\n");
-        print(buf);
+        DBGPRINTF("Failed to kill GetDataThread\n");
     }
 
     status = osThreadTerminate(WriteDataThreadId);
     if (status != osOK)
     {
-        strcpy(buf, "Failed to kill WriteDataThread\n");
-        print(buf);
+        DBGPRINTF("Failed to kill WriteDataThread\n");
+    }
+
+    DBGPRINTF("Erasing flash\n");
+    HAL_StatusTypeDef flashStatus;
+    FLASH_EraseInitTypeDef eraseop;
+    uint32_t pageError;
+    eraseop.TypeErase  = FLASH_TYPEERASE_PAGES;
+    eraseop.Banks      = FLASH_BANK_2;
+    eraseop.Page       = 0;
+    eraseop.NbPages    = 64;
+    __HAL_FLASH_CLEAR_FLAG(0xFFFFFFFF);
+    HAL_FLASH_Unlock();
+    flashStatus = HAL_FLASHEx_Erase(&eraseop, &pageError);
+    if (flashStatus != HAL_OK)
+    {
+        DBGPRINTF("Failed to erase flash\n");
     }
 
     uint32_t progAddress = 0;
+    uint32_t rxAddress;
+    int run = 1;
 
-    while (1)
+    while (run)
     {
+        uint32_t stop = xTaskGetTickCount();
+        if ((stop - start) > 10000)
+        {
+            DBGPRINTF("Programming timeout, rebooting\n");
+            __NVIC_SystemReset();
+        }
         osSignalSet(ledThreadId, 0x10000);
 
         LoraMsg2 msg = LoraMsg2_init_default;
-        msg.buildnum = 123;
+        msg.identifier = uuid;
         msg.status = Status_REPROGRAMMING;
         msg.has_reprog = true;
         msg.reprog.address = progAddress;
@@ -438,12 +462,44 @@ static void reprogrammingThread(void const *argument)
         pb_decode(&istrm, LoraMsg2_fields, &inMsg);
         if (inMsg.has_reprog)
         {
-            progAddress = inMsg.reprog.address;
-            snprintf(buf, 200, "ADDR: %08X data[0]: %02X flags: %d\n", progAddress, inMsg.reprog.data.bytes[0], inMsg.reprog.flags);
-            print(buf);
+            rxAddress = inMsg.reprog.address;
+            if (rxAddress != progAddress)
+            {
+                DBGPRINTF("Error, required address and send address different: %08X %08X\n", progAddress, rxAddress);
+            }
+            else
+            {
+                DBGPRINTF("ADDR: %08X data[0]: %02X flags: %d\n", progAddress, inMsg.reprog.data.bytes[0], inMsg.reprog.flags);
+                progAddress += inMsg.reprog.data.size;
+                rxAddress += 0x8080000;
+                for (int i = 0; i < inMsg.reprog.data.size; i += 8, rxAddress += 8)
+                {
+                    uint64_t bigint = getBigInt(&inMsg.reprog.data.bytes[i]);
+                    __HAL_FLASH_CLEAR_FLAG(0xFFFFFFFF);
+                    flashStatus = HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, rxAddress, bigint);
+                    if (flashStatus != HAL_OK)
+                    {
+                        DBGPRINTF("Failed to program flash\n");
+                    }
+                    else
+                    {
+                        start = xTaskGetTickCount();
+                    }
+
+                }
+            }
+
+            if (inMsg.reprog.flags == Reprogramming_Flags_LAST_PACKET)
+            {
+                run = 0;
+            }
         }
-        osDelay(25);
+        osDelay(20);
     }
+
+    DBGPRINTF("Data received, verifying CRC\n");
+    DBGPRINTF("Decompressing and programming\n");
+    DBGPRINTF("Done\n");
 }
 
 static void blinkLedThread(void const *argument)

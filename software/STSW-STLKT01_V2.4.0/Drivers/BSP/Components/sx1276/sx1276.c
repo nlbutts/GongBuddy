@@ -1218,11 +1218,11 @@ int16_t SX1276ReadRssi( RadioModems_t modem )
 
 void SX1276Reset( void )
 {
-    GPIO_InitTypeDef initStruct = { 0 };
+    //GPIO_InitTypeDef initStruct = { 0 };
 
-    initStruct.Mode =GPIO_MODE_OUTPUT_PP;
-    initStruct.Pull = GPIO_NOPULL;
-    initStruct.Speed = GPIO_SPEED_HIGH;
+    // initStruct.Mode =GPIO_MODE_OUTPUT_PP;
+    // initStruct.Pull = GPIO_NOPULL;
+    // initStruct.Speed = GPIO_SPEED_HIGH;
 
     // Set RESET pin to 0
     i2c_lora_reset(0);
@@ -1233,7 +1233,7 @@ void SX1276Reset( void )
     DelayMs( 1 );
 
     // Configure RESET as input
-    initStruct.Mode = GPIO_NOPULL;
+    //initStruct.Mode = GPIO_NOPULL;
     //HW_GPIO_Init( RADIO_RESET_PORT, RADIO_RESET_PIN, &initStruct );
     i2c_lora_reset(1);
 

@@ -129,13 +129,13 @@ void SX1276SetXO( uint8_t state )
 }
 void SX1276IoInit( void )
 {
-  GPIO_InitTypeDef initStruct={0};
+  //GPIO_InitTypeDef initStruct={0};
 
   SX1276BoardInit( &BoardCallbacks );
 
-  initStruct.Mode = GPIO_MODE_IT_RISING;
-  initStruct.Pull = GPIO_PULLDOWN;
-  initStruct.Speed = GPIO_SPEED_HIGH;
+//   initStruct.Mode = GPIO_MODE_IT_RISING;
+//   initStruct.Pull = GPIO_PULLDOWN;
+//   initStruct.Speed = GPIO_SPEED_HIGH;
 
 //   HW_GPIO_Init( RADIO_DIO_0_PORT, RADIO_DIO_0_PIN, &initStruct );
 //   HW_GPIO_Init( RADIO_DIO_1_PORT, RADIO_DIO_1_PIN, &initStruct );
@@ -153,10 +153,10 @@ void SX1276IoIrqInit( DioIrqHandler **irqHandlers )
 
 void SX1276IoDeInit( void )
 {
-  GPIO_InitTypeDef initStruct={0};
+//   GPIO_InitTypeDef initStruct={0};
 
-  initStruct.Mode = GPIO_MODE_IT_RISING ;
-  initStruct.Pull = GPIO_PULLDOWN;
+//   initStruct.Mode = GPIO_MODE_IT_RISING ;
+//   initStruct.Pull = GPIO_PULLDOWN;
 
 //   HW_GPIO_Init( RADIO_DIO_0_PORT, RADIO_DIO_0_PIN, &initStruct );
 //   HW_GPIO_Init( RADIO_DIO_1_PORT, RADIO_DIO_1_PIN, &initStruct );

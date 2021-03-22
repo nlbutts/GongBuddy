@@ -20,6 +20,9 @@
 #include "hw.h"
 #include "vcom.h"
 #include "SensorTile_conf.h"
+#include <stdio.h>
+#include <stdarg.h>
+#include "usbd_cdc_interface.h"
 
 
 /* Private typedef -----------------------------------------------------------*/
@@ -29,7 +32,7 @@
 /* Uart Handle */
 //static UART_HandleTypeDef UartHandle;
 
-static void (*TxCpltCallback)(void);
+//static void (*TxCpltCallback)(void);
 /* Private function prototypes -----------------------------------------------*/
 /* Functions Definition ------------------------------------------------------*/
 void vcom_Init(void (*TxCb)(void))
@@ -67,7 +70,25 @@ void vcom_Trace(uint8_t *p_data, uint16_t size)
   //HAL_UART_Transmit_DMA(&UartHandle, p_data, size);
   CDC_Fill_Buffer(( uint8_t * )p_data, size);
 }
+
+int vcom_printf(const char *format, ...)
+{
+  char buf[256];
+  va_list arg;
+  int done;
+
+  va_start (arg, format);
+  done = vsnprintf(buf, 256, format, arg);
+  va_end (arg);
+
+  vcom_Trace((uint8_t*)buf, strlen(buf));
+
+  return done;
+}
+
 #if 0
+
+
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
   /* buffer transmission complete*/

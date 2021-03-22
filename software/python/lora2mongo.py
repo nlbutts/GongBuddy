@@ -103,6 +103,7 @@ def getCfgMsg(db, id):
     pb = gb_messages_pb2.LoraMsg2()
     pb.threshold = threshold
     pb.status = gb_messages_pb2.Status.HEARTBEAT
+    pb.identifier = id
     return pb.SerializeToString()
 
 def getFwBuildNum(file):
@@ -120,44 +121,31 @@ def checkFWUpdate(build_num):
             return True, file
     return False, ''
 
-def updateFirware(updatefile, rfm9x):
-    timeout = 10000
-    with open(updatefile, 'rb') as f:
-        updatedata = f.read()
-
+def sendData(updatedata, rfm9x, id):
+    run = True
     address = 0
-    dataToSend = len(updatedata)
+    datasize = len(updatedata)
 
-    while timeout > 0:
-        time.sleep(0.01)
-        timeout -= 10
-
+    while run:
         start = time.time()
         data = rfm9x.receive(timeout=5000)
         if data is not None:
-            timeout = 10000
             pb = gb_messages_pb2.LoraMsg2()
             pb.ParseFromString(data)
-            print('Received data from GB')
-            print(pb)
-            if pb.status != gb_messages_pb2.Status.REPROGRAMMING:
-                # Put the unit into programming mode
-                print('Putting unit into reprogramming mode')
+            if pb.identifier == id:
+                print(pb)
+                if pb.HasField('reprog'):
+                    address = pb.reprog.address
+
                 pb.Clear()
                 pb.status = gb_messages_pb2.Status.REPROGRAMMING
-                data = pb.SerializeToString()
-                rfm9x.send(data)
-            else:
-                pb.Clear()
-                pb.status = gb_messages_pb2.Status.REPROGRAMMING
+                pb.identifier = id
                 pb.reprog.address = address
-                txamount = min(dataToSend, 40)
-                pb.reprog.data = updatedata[address:address + txamount]
-                address += txamount
-                dataToSend -= txamount
-                if dataToSend == 0:
+                dataToSend = min(datasize - address, 40)
+                pb.reprog.data = updatedata[address:address + dataToSend]
+                if (address + dataToSend) == datasize:
                     pb.reprog.flags = gb_messages_pb2.Reprogramming.Flags.LAST_PACKET
-                    timeout = 0
+                    run = False
                     print('Last packet of data')
                 else:
                     pb.reprog.flags = gb_messages_pb2.Reprogramming.Flags.CONTINUE
@@ -167,6 +155,39 @@ def updateFirware(updatefile, rfm9x):
                 rfm9x.send(data)
                 stop = time.time()
                 print('Total time {}'.format(stop - start))
+
+
+def updateFirware(updatefile, rfm9x, id):
+    timeout = 10000
+    with open(updatefile, 'rb') as f:
+        updatedata = f.read()
+
+    while timeout > 0:
+        time.sleep(0.01)
+        timeout -= 10
+        if timeout == 0:
+            print('Timed out while communicating with GB')
+
+        data = rfm9x.receive(timeout=5000)
+        if data is not None:
+            pb = gb_messages_pb2.LoraMsg2()
+            pb.ParseFromString(data)
+            print(pb)
+            if pb.identifier == id:
+                timeout = 10000
+                print('Received data from GB')
+                if pb.status != gb_messages_pb2.Status.REPROGRAMMING:
+                    # Put the unit into programming mode
+                    print('Putting unit into reprogramming mode')
+                    pb.Clear()
+                    pb.status = gb_messages_pb2.Status.REPROGRAMMING
+                    pb.identifier = id
+                    data = pb.SerializeToString()
+                    rfm9x.send(data)
+                else:
+                    timeout = 0
+                    sendData(updatedata, rfm9x, id)
+
 
 RADIO_FREQ_MHZ = 915.0
 CS = digitalio.DigitalInOut(board.CE1)
@@ -201,7 +222,7 @@ while True:
         ret, updatefile = checkFWUpdate(pb.buildnum)
         if ret == True:
             print('Need to update firmware')
-            updateFirware(updatefile, rfm9x)
+            updateFirware(updatefile, rfm9x, id)
 
         # Send config/ACK message
         print('Sending {} bytes'.format(len(cfg)))

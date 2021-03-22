@@ -182,13 +182,9 @@ bool TimerIsStarted( TimerEvent_t *obj )
 
 void TimerIrqHandler( void const *arg )
 {
-  static uint32_t freetimer = 0;
-  freetimer += TIMER_TICK_PERIOD_MS;
   TimerEvent_t* cur;
   TimerEvent_t* next;
 
-  uint32_t old =  HW_RTC_GetTimerContext( );
-  uint32_t now =  HW_RTC_SetTimerContext( );
   //uint32_t DeltaContext = now - old; //intentionnal wrap around
   uint32_t DeltaContext = TIMER_TICK_PERIOD_MS;
 

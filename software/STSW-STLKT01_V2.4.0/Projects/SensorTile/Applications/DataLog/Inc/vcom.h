@@ -46,6 +46,8 @@ void vcom_Init(void (*Txcb)(void));
 */
 void vcom_Trace(uint8_t *p_data, uint16_t size);
 
+int vcom_printf(const char *format, ...);
+
 /**
 * @brief  DeInit the VCOM.
 * @param  None

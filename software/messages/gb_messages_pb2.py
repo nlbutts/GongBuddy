@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto2',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x11gb_messages.proto\"\xeb\x01\n\x08LoraMsg2\x12\x17\n\x06status\x18\x01 \x02(\x0e\x32\x07.Status\x12\x10\n\x08\x62uildnum\x18\x02 \x01(\r\x12\x0b\n\x03imu\x18\x03 \x01(\x0c\x12\x10\n\x08pressure\x18\x04 \x01(\r\x12\x13\n\x0btemperature\x18\x05 \x01(\x11\x12\x14\n\x0c\x62\x61tt_voltage\x18\x06 \x01(\r\x12\x11\n\tthreshold\x18\x07 \x01(\r\x12\x15\n\rconfiguration\x18\x08 \x01(\r\x12\x12\n\nidentifier\x18\t \x01(\r\x12\x0c\n\x04rssi\x18\n \x01(\x11\x12\x1e\n\x06reprog\x18\x0b \x01(\x0b\x32\x0e.Reprogramming\"\x85\x01\n\rReprogramming\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x02(\r\x12\x0c\n\x04\x64\x61ta\x18\x02 \x02(\x0c\x12-\n\x05\x66lags\x18\x03 \x02(\x0e\x32\x14.Reprogramming.Flags:\x08\x43ONTINUE\"&\n\x05\x46lags\x12\x0f\n\x0bLAST_PACKET\x10\x00\x12\x0c\n\x08\x43ONTINUE\x10\x01*N\n\x06Status\x12\r\n\tHEARTBEAT\x10\x00\x12\n\n\x06IMPACT\x10\x01\x12\x16\n\x12\x45NTERING_LOW_POWER\x10\x02\x12\x11\n\rREPROGRAMMING\x10\x03'
+  serialized_pb=b'\n\x11gb_messages.proto\"\xeb\x01\n\x08LoraMsg2\x12\x17\n\x06status\x18\x01 \x02(\x0e\x32\x07.Status\x12\x12\n\nidentifier\x18\x02 \x02(\r\x12\x10\n\x08\x62uildnum\x18\x03 \x01(\r\x12\x0b\n\x03imu\x18\x04 \x01(\x0c\x12\x10\n\x08pressure\x18\x05 \x01(\r\x12\x13\n\x0btemperature\x18\x06 \x01(\x11\x12\x14\n\x0c\x62\x61tt_voltage\x18\x07 \x01(\r\x12\x11\n\tthreshold\x18\x08 \x01(\r\x12\x15\n\rconfiguration\x18\t \x01(\r\x12\x0c\n\x04rssi\x18\n \x01(\x11\x12\x1e\n\x06reprog\x18\x0b \x01(\x0b\x32\x0e.Reprogramming\"\x85\x01\n\rReprogramming\x12\x0f\n\x07\x61\x64\x64ress\x18\x01 \x02(\r\x12\x0c\n\x04\x64\x61ta\x18\x02 \x02(\x0c\x12-\n\x05\x66lags\x18\x03 \x02(\x0e\x32\x14.Reprogramming.Flags:\x08\x43ONTINUE\"&\n\x05\x46lags\x12\x0f\n\x0bLAST_PACKET\x10\x00\x12\x0c\n\x08\x43ONTINUE\x10\x01*N\n\x06Status\x12\r\n\tHEARTBEAT\x10\x00\x12\n\n\x06IMPACT\x10\x01\x12\x16\n\x12\x45NTERING_LOW_POWER\x10\x02\x12\x11\n\rREPROGRAMMING\x10\x03'
 )
 
 _STATUS = _descriptor.EnumDescriptor(
@@ -107,56 +107,56 @@ _LORAMSG2 = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='buildnum', full_name='LoraMsg2.buildnum', index=1,
-      number=2, type=13, cpp_type=3, label=1,
+      name='identifier', full_name='LoraMsg2.identifier', index=1,
+      number=2, type=13, cpp_type=3, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='imu', full_name='LoraMsg2.imu', index=2,
-      number=3, type=12, cpp_type=9, label=1,
+      name='buildnum', full_name='LoraMsg2.buildnum', index=2,
+      number=3, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='imu', full_name='LoraMsg2.imu', index=3,
+      number=4, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='pressure', full_name='LoraMsg2.pressure', index=3,
-      number=4, type=13, cpp_type=3, label=1,
+      name='pressure', full_name='LoraMsg2.pressure', index=4,
+      number=5, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='temperature', full_name='LoraMsg2.temperature', index=4,
-      number=5, type=17, cpp_type=1, label=1,
+      name='temperature', full_name='LoraMsg2.temperature', index=5,
+      number=6, type=17, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='batt_voltage', full_name='LoraMsg2.batt_voltage', index=5,
-      number=6, type=13, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='threshold', full_name='LoraMsg2.threshold', index=6,
+      name='batt_voltage', full_name='LoraMsg2.batt_voltage', index=6,
       number=7, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='configuration', full_name='LoraMsg2.configuration', index=7,
+      name='threshold', full_name='LoraMsg2.threshold', index=7,
       number=8, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='identifier', full_name='LoraMsg2.identifier', index=8,
+      name='configuration', full_name='LoraMsg2.configuration', index=8,
       number=9, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,

@@ -33,6 +33,7 @@ typedef struct _Reprogramming {
 typedef PB_BYTES_ARRAY_T(200) LoraMsg2_imu_t;
 typedef struct _LoraMsg2 {
     Status status;
+    uint32_t identifier;
     bool has_buildnum;
     uint32_t buildnum;
     bool has_imu;
@@ -47,8 +48,6 @@ typedef struct _LoraMsg2 {
     uint32_t threshold;
     bool has_configuration;
     uint32_t configuration;
-    bool has_identifier;
-    uint32_t identifier;
     bool has_rssi;
     int32_t rssi;
     bool has_reprog;
@@ -71,9 +70,9 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define LoraMsg2_init_default                    {_Status_MIN, false, 0, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, Reprogramming_init_default}
+#define LoraMsg2_init_default                    {_Status_MIN, 0, false, 0, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, Reprogramming_init_default}
 #define Reprogramming_init_default               {0, {0, {0}}, Reprogramming_Flags_CONTINUE}
-#define LoraMsg2_init_zero                       {_Status_MIN, false, 0, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, Reprogramming_init_zero}
+#define LoraMsg2_init_zero                       {_Status_MIN, 0, false, 0, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, Reprogramming_init_zero}
 #define Reprogramming_init_zero                  {0, {0, {0}}, _Reprogramming_Flags_MIN}
 
 /* Field tags (for use in manual encoding/decoding) */
@@ -81,28 +80,28 @@ extern "C" {
 #define Reprogramming_data_tag                   2
 #define Reprogramming_flags_tag                  3
 #define LoraMsg2_status_tag                      1
-#define LoraMsg2_buildnum_tag                    2
-#define LoraMsg2_imu_tag                         3
-#define LoraMsg2_pressure_tag                    4
-#define LoraMsg2_temperature_tag                 5
-#define LoraMsg2_batt_voltage_tag                6
-#define LoraMsg2_threshold_tag                   7
-#define LoraMsg2_configuration_tag               8
-#define LoraMsg2_identifier_tag                  9
+#define LoraMsg2_identifier_tag                  2
+#define LoraMsg2_buildnum_tag                    3
+#define LoraMsg2_imu_tag                         4
+#define LoraMsg2_pressure_tag                    5
+#define LoraMsg2_temperature_tag                 6
+#define LoraMsg2_batt_voltage_tag                7
+#define LoraMsg2_threshold_tag                   8
+#define LoraMsg2_configuration_tag               9
 #define LoraMsg2_rssi_tag                        10
 #define LoraMsg2_reprog_tag                      11
 
 /* Struct field encoding specification for nanopb */
 #define LoraMsg2_FIELDLIST(X, a) \
 X(a, STATIC,   REQUIRED, UENUM,    status,            1) \
-X(a, STATIC,   OPTIONAL, UINT32,   buildnum,          2) \
-X(a, STATIC,   OPTIONAL, BYTES,    imu,               3) \
-X(a, STATIC,   OPTIONAL, UINT32,   pressure,          4) \
-X(a, STATIC,   OPTIONAL, SINT32,   temperature,       5) \
-X(a, STATIC,   OPTIONAL, UINT32,   batt_voltage,      6) \
-X(a, STATIC,   OPTIONAL, UINT32,   threshold,         7) \
-X(a, STATIC,   OPTIONAL, UINT32,   configuration,     8) \
-X(a, STATIC,   OPTIONAL, UINT32,   identifier,        9) \
+X(a, STATIC,   REQUIRED, UINT32,   identifier,        2) \
+X(a, STATIC,   OPTIONAL, UINT32,   buildnum,          3) \
+X(a, STATIC,   OPTIONAL, BYTES,    imu,               4) \
+X(a, STATIC,   OPTIONAL, UINT32,   pressure,          5) \
+X(a, STATIC,   OPTIONAL, SINT32,   temperature,       6) \
+X(a, STATIC,   OPTIONAL, UINT32,   batt_voltage,      7) \
+X(a, STATIC,   OPTIONAL, UINT32,   threshold,         8) \
+X(a, STATIC,   OPTIONAL, UINT32,   configuration,     9) \
 X(a, STATIC,   OPTIONAL, SINT32,   rssi,             10) \
 X(a, STATIC,   OPTIONAL, MESSAGE,  reprog,           11)
 #define LoraMsg2_CALLBACK NULL

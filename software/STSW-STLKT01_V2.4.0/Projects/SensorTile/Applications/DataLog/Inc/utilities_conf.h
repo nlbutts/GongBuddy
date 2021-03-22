@@ -37,6 +37,7 @@ typedef enum
 
 #define OutputInit  vcom_Init
 #define OutputTrace vcom_Trace
+#define DBGPRINTF vcom_printf
 
 #define VERBOSE_LEVEL_0 0
 #define VERBOSE_LEVEL_1 1

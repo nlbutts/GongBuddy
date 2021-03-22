@@ -9,14 +9,14 @@ enum Status {
 
 message LoraMsg2 {
     required Status status = 1;
-    optional uint32 buildnum = 2;
-    optional bytes imu = 3;
-    optional uint32 pressure = 4;
-    optional sint32 temperature = 5;
-    optional uint32 batt_voltage = 6;
-    optional uint32 threshold = 7;
-    optional uint32 configuration = 8;
-    optional uint32 identifier = 9;
+    required uint32 identifier = 2;
+    optional uint32 buildnum = 3;
+    optional bytes imu = 4;
+    optional uint32 pressure = 5;
+    optional sint32 temperature = 6;
+    optional uint32 batt_voltage = 7;
+    optional uint32 threshold = 8;
+    optional uint32 configuration = 9;
     optional sint32 rssi = 10;
     optional Reprogramming reprog = 11;
 }
