@@ -24,17 +24,16 @@
 
 #include <tclap/CmdLine.h>
 
-#include <appareo/BuildConstants.h>
-namespace BuildConstants = Appareo::BuildConstants;
+extern "C" {
+#include <BuildConstants.h>
 
-#include <appareo/update/ImageHeader.h>
-using Appareo::Update::ImageHeader;
+}
 
-#include <appareo/crc/Crc32.h>
-using Appareo::Crc::Crc32_Normal;
+#include <firmware/ImageHeader.h>
+using Firmware::ImageHeader;
 
-#include <appareo/imagegen/LzmaDeflate.h>
-using Appareo::Imagegen::LzmaDeflate;
+#include <firmware/LzmaDeflate.h>
+using Firmware::LzmaDeflate;
 
 
 // --------------------------------------------------- Local functions and data
@@ -166,7 +165,7 @@ int main(int argc, char **argv)
         TCLAP::ValueArg<uint32_t> hwCompatParam("w", "hardware",
             "Hardware compatibility bitfield. See confluence for detailed usage.",
             false,
-            BuildConstants::getHardwareCompatBitfield(),
+            getHardwareCompatBitfield(),
             "bitfield");
         cmd.add( hwCompatParam );
 
@@ -271,9 +270,8 @@ int main(int argc, char **argv)
 
     // -------------------------------- Create image header
     {
-        Crc32_Normal crcFunction;
         ImageHeader header(imageType, hwCompatField,
-                           &(payload[0]), payload.size(), crcFunction);
+                           &(payload[0]), payload.size());
 
         uint8_t serialized[ImageHeader::IMAGE_HEADER_LENGTH];
         header.serializeHeader(serialized);

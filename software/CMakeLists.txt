@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.7)
 
 
 # ---------------------------------------------------------------- PROJECT NAME
-project(sensortile LANGUAGES C CXX ASM)
+project(gongbuddy LANGUAGES C CXX ASM)
 
 Message(STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR})
 Message(STATUS "CMAKE_SYSTEM_NAME: " ${CMAKE_SYSTEM_NAME})
@@ -124,6 +124,8 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal)
     #add_subdirectory(drivers)
     #add_subdirectory(middleware)
     add_subdirectory(messages)
+    add_subdirectory(libupdate)
+    add_subdirectory(libbuildinfo)
 
     # Executables
     add_subdirectory(application)
@@ -136,6 +138,8 @@ else ()
     add_definitions(-DSYS_LOG_LEVEL=LOG_NONE)
 
     # Libraries
+    add_subdirectory(libupdate)
+    add_subdirectory(libbuildinfo)
     add_subdirectory(third-party/tclap-1.2.1)
     add_subdirectory(imagegen)
 

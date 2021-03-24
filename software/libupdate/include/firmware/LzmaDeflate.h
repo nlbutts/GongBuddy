@@ -1,27 +1,9 @@
-/**
- * Copyright (c) 2015 Appareo Systems, LLC.
- * 1810 NDSU Research Park Circle North
- * Fargo ND, 58102
- * All rights reserved.
- *
- * This is the confidential and proprietary information of Appareo Systems, LLC. You shall not
- * disclose such confidential information and shall use it only in accordance with the terms
- * of the license agreement you entered into with Appareo.
- *
- * File: LzmaDeflate.h
- * Creator: bschleusner
- * Date: May 12, 2015
- *
- * Copyright Version 1.0
- */
-
-#ifndef APPAREO_IMAGEGEN_LZMA_DEFLATE_H
-#define APPAREO_IMAGEGEN_LZMA_DEFLATE_H
+#ifndef FIRMWARE_LZMA_DEFLATE_H
+#define FIRMWARE_LZMA_DEFLATE_H
 
 #include <vector>
 
-namespace Appareo {
-namespace Imagegen {
+namespace Firmware {
 
 /**
  * @brief Compressed payload creator
@@ -108,7 +90,6 @@ private:
     static void* lzmaAlloc(void *p, size_t size);
 };
 
-} // namespace Imagegen
-} // namespace Appareo
+} // namespace Firmware
 
-#endif /* APPAREO_IMAGEGEN_LZMA_DEFLATE_H */
+#endif /* FIRMWARE_LZMA_DEFLATE_H */

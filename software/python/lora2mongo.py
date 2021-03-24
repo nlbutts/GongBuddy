@@ -151,11 +151,13 @@ def sendData(updatedata, rfm9x, id):
                     pb.reprog.flags = gb_messages_pb2.Reprogramming.Flags.CONTINUE
 
                 data = pb.SerializeToString()
-                print('Sending {} bytes of data to address {}'.format(len(data), address))
+                per = round((address / datasize) * 100, 1)
+                print('Updating {}% Sending {} bytes of data to address {}'.format(per, len(data), address))
                 rfm9x.send(data)
                 stop = time.time()
-                print('Total time {}'.format(stop - start))
+                #print('Total time {}'.format(stop - start))
 
+    print('Done programming unit')
 
 def updateFirware(updatefile, rfm9x, id):
     timeout = 10000

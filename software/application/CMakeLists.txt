@@ -119,11 +119,11 @@ target_include_directories(${THIS_DEBUG}
 # ----------------------------------------------------------- SET LINKER SCRIPT
 set(LDSCRIPTS_PATH ${PROJECT_SOURCE_DIR}/linker)
 
-target_link_libraries(${THIS_RELEASE}
+target_link_libraries(${THIS_RELEASE} buildinfo update
     "-T ${LDSCRIPTS_PATH}/STM32L476RGTx_FLASH.ld -L${LDSCRIPTS_PATH}"
 )
 
-target_link_libraries(${THIS_DEBUG}
+target_link_libraries(${THIS_DEBUG} buildinfo update
     "-T ${LDSCRIPTS_PATH}/STM32L476RGTx_FLASH.ld -L${LDSCRIPTS_PATH}"
 )
 

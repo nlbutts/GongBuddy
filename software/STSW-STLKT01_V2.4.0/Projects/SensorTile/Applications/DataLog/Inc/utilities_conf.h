@@ -21,6 +21,8 @@
 #ifndef __UTLITIES_CONF_H
 #define __UTLITIES_CONF_H
 
+#include "vcom.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

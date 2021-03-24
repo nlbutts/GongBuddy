@@ -11,6 +11,7 @@
 #include <pb_decode.h>
 #include "common_structs.h"
 #include "utilities_conf.h"
+#include "firmware/FWUpdate.h"
 
 
 #pragma GCC optimize("O0")
@@ -73,6 +74,8 @@ static void blinkLedThread(void const *argument);
 static void sendLora(LoraMsg2 *inMsg, LoraMsg2 *outMsg);
 static void setupReprogramming(void);
 static void reprogrammingThread(void const *argument);
+static int verifyCRCOfUpdate();
+static void decompressAndProgram();
 
 static void Error_Handler( void );
 void dataTimer_Callback(void const *arg);
@@ -183,6 +186,9 @@ static void GetData_Thread(void const *argument)
 
     dataTimerStart();
 
+    // Test
+    FWUpdate_execute(0x08080000, 128*1024);
+
     for (;;)
     {
         osSemaphoreWait(readDataSem_id, osWaitForever);
@@ -277,7 +283,6 @@ static void WriteData_Thread(void const *argument)
         }
         else if (sensorBufferIndex >= SENSOR_CIR_BUF_SIZE)
         {
-            uint32_t dstDev;
             LoraMsg2 txMsg = LoraMsg2_init_default;
             LoraMsg2 rxMsg = LoraMsg2_init_default;
             sensorBufferIndex++;
@@ -300,7 +305,6 @@ static void WriteData_Thread(void const *argument)
             }
             txMsg.imu.size = SENSOR_CIR_BUF_SIZE * 12;
             heartbeat_counter = 0;
-            int reprogramming;
             sendLora(&txMsg, &rxMsg);
 
             impactDetected = 0;
@@ -322,7 +326,6 @@ static void WriteData_Thread(void const *argument)
             txMsg.has_threshold = true;
             txMsg.threshold = threshold;
 
-            int reprogramming;
             sendLora(&txMsg, &rxMsg);
 
             if (rxMsg.identifier == uuid)
@@ -451,8 +454,6 @@ static void reprogrammingThread(void const *argument)
         msg.reprog.flags = Reprogramming_Flags_CONTINUE;
         msg.reprog.data.size = 0;
 
-        int reprogramming = 0;
-
         pb_ostream_t stream = pb_ostream_from_buffer(pb_data, sizeof(pb_data));
         pb_encode(&stream, LoraMsg2_fields, &msg);
         int retSize =
@@ -491,6 +492,7 @@ static void reprogrammingThread(void const *argument)
 
             if (inMsg.reprog.flags == Reprogramming_Flags_LAST_PACKET)
             {
+                DBGPRINTF("Last packet, existing\n");
                 run = 0;
             }
         }
@@ -498,8 +500,45 @@ static void reprogrammingThread(void const *argument)
     }
 
     DBGPRINTF("Data received, verifying CRC\n");
-    DBGPRINTF("Decompressing and programming\n");
-    DBGPRINTF("Done\n");
+    if (verifyCRCOfUpdate())
+    {
+        // If this is successful, we will not return
+        DBGPRINTF("Decompressing and programming\n");
+        decompressAndProgram();
+    }
+
+    DBGPRINTF("CRC failed\n");
+    osDelay(1000);
+    __NVIC_SystemReset();
+}
+
+static int verifyCRCOfUpdate()
+{
+    // Verify the header sum
+    uint16_t calcSum = 0;
+    uint8_t *img = (uint8_t*)0x8080000;
+    for (int i = 0; i < 32; i++)
+    {
+        calcSum += *(img + i);
+    }
+
+    uint16_t * headerSum = (uint16_t*)0x8080000;
+    if (calcSum != *headerSum)
+    {
+        DBGPRINTF("Header sum failed\n");
+        osDelay(1000);
+    }
+    else
+    {
+        DBGPRINTF("Header sum is good\n");
+        osDelay(1000);
+    }
+    return false;
+}
+
+static void decompressAndProgram()
+{
+    __NVIC_SystemReset();
 }
 
 static void blinkLedThread(void const *argument)

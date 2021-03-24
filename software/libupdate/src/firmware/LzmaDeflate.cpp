@@ -1,19 +1,3 @@
-/**
- * Copyright (c) 2015 Appareo Systems, LLC.
- * 1810 NDSU Research Park Circle North
- * Fargo ND, 58102
- * All rights reserved.
- *
- * This is the confidential and proprietary information of Appareo Systems, LLC. You shall not
- * disclose such confidential information and shall use it only in accordance with the terms
- * of the license agreement you entered into with Appareo.
- *
- * File: LzmaDeflate.cpp
- * Creator: bschleusner
- * Date: May 12, 2015
- *
- * Copyright Version 1.0
- */
 #include <string>
 #include <iostream>
 #include <stdint.h>
@@ -21,13 +5,12 @@
 
 #include <lzma/LzmaEnc.h>
 
-#include <appareo/update/LzmaInflate.h>
-using Appareo::Update::LzmaInflate;
+#include <firmware/LzmaInflate.h>
+using Firmware::LzmaInflate;
 
-#include <appareo/imagegen/LzmaDeflate.h>
+#include <firmware/LzmaDeflate.h>
 
-namespace Appareo {
-namespace Imagegen {
+namespace Firmware {
 
 static SRes lzmaProgress(void *p, UInt64 inSize, UInt64 outSize);
 
@@ -223,5 +206,4 @@ static SRes lzmaProgress(void *p, UInt64 inSize, UInt64 outSize)
     return SZ_OK;
 }
 
-} // namespace Imagegen
-} // namespace Appareo
+} // namespace Firmware

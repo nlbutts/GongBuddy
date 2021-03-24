@@ -39,3 +39,17 @@ is a protobuf. The source and destination address are present in there.
 
 There is already a CRC on the LoRa packet, therefore additional data integrity
 checks are not present.
+
+# Firmware Update
+The raw binary firmware image is compressed using LZMA and then wrapped in an
+image header. The image header is defined below:
+
+| Element | Size | Description |
+| -- | -- | -- |
+| SUM16 | 2 | This is a simple 16-bit sum of image header |
+| CCITT-32 CRC | 4 | This is a CCITT-32 CRC of the next element and payload |
+| Payload length | 4 | length of the entire payload |
+| Image type | 1 | 0=Invalid, 1 = App, 2 = App LZMA |
+| HW compatibility | 4 | A 32-bit field that is used to indicate compatiblity a hardware platform |
+| Reserved | 17 | |
+| Payload | N | The uncompressed or compressed payload |

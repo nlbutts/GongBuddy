@@ -78,7 +78,7 @@ int8_t RssiValue = 0;
 int8_t SnrValue = 0;
 
 /* Led Timers objects*/
-static  TimerEvent_t timerLed;
+//static  TimerEvent_t timerLed;
 // Defined in main.c
 extern osMessageQId loraQueue_id;
 extern osPoolId loraPool_id;
@@ -120,7 +120,7 @@ void OnRxError(void);
 /*!
  * \brief Function executed on when led timer elapses
  */
-static void OnledEvent(void *context);
+//static void OnledEvent(void *context);
 /**
  * Main application entry point.
  */
@@ -203,9 +203,7 @@ int LoRa_dataexchange(uint8_t * txData,
                       uint8_t * rxData,
                       uint16_t rxDataBufSize)
 {
-  char buf[100];
   int retSize = 0;
-  uint8_t flags;
   // Send the next PING frame
   State = TX;
   Radio.Write(REG_LR_IRQFLAGS, 0xFF);
@@ -213,13 +211,11 @@ int LoRa_dataexchange(uint8_t * txData,
 
   if (poll(RFLR_IRQFLAGS_TXDONE, 100) > 0)
   {
-    strcpy(buf, "Successfully transmitted LoRa\n");
-    OutputTrace(buf, strlen(buf));
+    DBGPRINTF("Successfully transmitted LoRa\n");
   }
   else
   {
-    strcpy(buf, "Failed to transmitted LoRa\n");
-    OutputTrace(buf, strlen(buf));
+    DBGPRINTF("Failed to transmitted LoRa\n");
   }
 
   Radio.Write(REG_LR_IRQFLAGS, 0xFF);
@@ -229,8 +225,7 @@ int LoRa_dataexchange(uint8_t * txData,
   {
     SX1276OnDio0Irq(NULL);
 
-    snprintf(buf, 100, "Received %d bytes\n", BufferSize);
-    OutputTrace(buf, strlen(buf));
+    DBGPRINTF("Received %d bytes\n", BufferSize);
 
     memcpy(rxData, Buffer, BufferSize);
     retSize = BufferSize;
@@ -238,8 +233,7 @@ int LoRa_dataexchange(uint8_t * txData,
   else
   {
     Radio.IoInit();
-    strcpy(buf, "Failed to receive LoRa\n");
-    OutputTrace(buf, strlen(buf));
+    DBGPRINTF("Failed to receive LoRa\n");
   }
 
   //Radio.Sleep();
@@ -432,14 +426,14 @@ void OnRxError(void)
   PRINTF("OnRxError\n\r");
 }
 
-static void OnledEvent(void *context)
-{
-  //BSP_LED_Toggle(LED1);
+// static void OnledEvent(void *context)
+// {
+//   //BSP_LED_Toggle(LED1);
 
-  // LED_Toggle(LED_BLUE) ;
-  // LED_Toggle(LED_RED1) ;
-  // LED_Toggle(LED_RED2) ;
-  // LED_Toggle(LED_GREEN) ;
+//   // LED_Toggle(LED_BLUE) ;
+//   // LED_Toggle(LED_RED1) ;
+//   // LED_Toggle(LED_RED2) ;
+//   // LED_Toggle(LED_GREEN) ;
 
-  TimerStart(&timerLed);
-}
+//   TimerStart(&timerLed);
+// }
