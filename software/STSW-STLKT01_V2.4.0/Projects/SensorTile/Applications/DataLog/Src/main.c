@@ -22,6 +22,8 @@
 
 #define DATALOG_CMD_STARTSTOP  (0x00000007)
 
+#define BUILD_NUM   123
+
 typedef enum
 {
   THREAD_1 = 0,
@@ -90,13 +92,36 @@ uint32_t  exec;
 static int32_t LSM6DSM_Sensor_IO_ITConfig( void );
 
 /* Private functions ---------------------------------------------------------*/
-uint8_t detectImpact(T_SensorsData *sensorData, int threshold)
+#define AXIS_X      0
+#define AXIS_Y      1
+#define AXIS_Z      2
+#define AXIS_ALL    3
+uint8_t detectImpact(T_SensorsData *sensorData, int threshold, int axis)
 {
-    float mag = (sensorData->acc.x * sensorData->acc.x) +
-                (sensorData->acc.y * sensorData->acc.y) +
-                (sensorData->acc.z * sensorData->acc.z);
+    int compareAgainst = 0;
+    switch (axis)
+    {
+        case AXIS_X:
+            compareAgainst = sensorData->acc.x;
+            break;
+        case AXIS_Y:
+            compareAgainst = sensorData->acc.y;
+            break;
+        case AXIS_Z:
+            compareAgainst = sensorData->acc.z;
+            break;
+        case AXIS_ALL:
+            compareAgainst = (sensorData->acc.x * sensorData->acc.x) +
+                             (sensorData->acc.y * sensorData->acc.y) +
+                             (sensorData->acc.z * sensorData->acc.z);
+            threshold = threshold * threshold;
+            break;
+        default:
+            compareAgainst = 0x7FFFFFFF;
+            break;
+    }
 
-    if (mag > (threshold*threshold))
+    if (compareAgainst > threshold)
     {
         return 1;
     }
@@ -147,7 +172,6 @@ int main(void)
     osThreadDef(GetData_Thread,         GetData_Thread,       osPriorityAboveNormal,  0, configMINIMAL_STACK_SIZE*8);
     osThreadDef(WriteData_Thread,       WriteData_Thread,     osPriorityNormal,       0, configMINIMAL_STACK_SIZE*8);
     osThreadDef(blinkLedThread,         blinkLedThread,       osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
-    //osThreadDef(vCommandConsoleTask,    vCommandConsoleTask,  osPriorityNormal,       0, configMINIMAL_STACK_SIZE);
 
     GetDataThreadId     = osThreadCreate(osThread(GetData_Thread), NULL);
     WriteDataThreadId   = osThreadCreate(osThread(WriteData_Thread), NULL);
@@ -260,11 +284,12 @@ static void WriteData_Thread(void const *argument)
     for (;;)
     {
         evt = osMessageGet(dataQueue_id, osWaitForever);  // wait for message
+
         i2c_debug2(1);
         heartbeat_counter++;
         rptr = evt.value.p;
 
-        if (detectImpact(rptr, threshold) && (impactDetected == 0))
+        if (detectImpact(rptr, threshold, AXIS_Z) && (impactDetected == 0))
         {
             // Set a timer to roll the SD card recording
             impactDetected = 1;
@@ -290,7 +315,7 @@ static void WriteData_Thread(void const *argument)
             txMsg.status = Status_IMPACT;
             txMsg.identifier = uuid;
             txMsg.has_buildnum = true;
-            txMsg.buildnum = 123;
+            txMsg.buildnum = BUILD_NUM;
             txMsg.has_pressure = true;
             txMsg.pressure = (rptr->pressure * 10);
             txMsg.has_temperature = true;
@@ -318,7 +343,7 @@ static void WriteData_Thread(void const *argument)
             txMsg.identifier = uuid;
             txMsg.status = Status_HEARTBEAT;
             txMsg.has_buildnum = true;
-            txMsg.buildnum = 123;
+            txMsg.buildnum = BUILD_NUM;
             txMsg.has_pressure = true;
             txMsg.pressure = (rptr->pressure * 10);
             txMsg.has_temperature = true;
@@ -330,7 +355,7 @@ static void WriteData_Thread(void const *argument)
 
             if (rxMsg.identifier == uuid)
             {
-                if (rxMsg.has_threshold && (rxMsg.threshold > 1500))
+                if (rxMsg.has_threshold && (rxMsg.threshold > 1300))
                 {
                     threshold = rxMsg.threshold;
                 }
@@ -641,10 +666,11 @@ static void Error_Handler( void )
     // volatile HeapStats_t stats;
     // vPortGetHeapStats(&stats);
     volatile int foo = 0;
-    while (1)
+    while (0)
     {
         foo++;
     }
+    __NVIC_SystemReset();
 }
 
 void vApplicationStackOverflowHook(TaskHandle_t task, signed char *pcTaskName)

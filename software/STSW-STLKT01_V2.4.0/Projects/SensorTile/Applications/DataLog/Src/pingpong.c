@@ -157,7 +157,7 @@ void LoRa_init()
   Radio.SetRxConfig(MODEM_LORA, LORA_BANDWIDTH, LORA_SPREADING_FACTOR,
                     LORA_CODINGRATE, 0, LORA_PREAMBLE_LENGTH,
                     LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON,
-                    0, true, 0, 0, LORA_IQ_INVERSION_ON, true);
+                    0, true, 0, 0, LORA_IQ_INVERSION_ON, false);
 
 #elif defined( USE_MODEM_FSK )
 
@@ -219,7 +219,7 @@ int LoRa_dataexchange(uint8_t * txData,
   }
 
   Radio.Write(REG_LR_IRQFLAGS, 0xFF);
-  Radio.Rx(1000);
+  Radio.Rx(0);
 
   if (poll(RFLR_IRQFLAGS_RXDONE, 500) > 0)
   {

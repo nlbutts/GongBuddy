@@ -48,7 +48,7 @@ extern "C" {
 
 #define LSM6DSM_ACC_ODR 52.0f /* ODR = 52Hz */
 
-#define LSM6DSM_ACC_FS 2 /* FS = 2g */
+#define LSM6DSM_ACC_FS 16 /* FS = 2g */
 
 #define LSM6DSM_GYRO_ODR 52.0f /* ODR = 52Hz */
 

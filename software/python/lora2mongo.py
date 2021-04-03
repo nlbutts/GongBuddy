@@ -125,23 +125,31 @@ def sendData(updatedata, rfm9x, id):
     run = True
     address = 0
     datasize = len(updatedata)
+    transfer_size = 50
 
     while run:
         start = time.time()
+        print('Waiting for msg')
         data = rfm9x.receive(timeout=5000)
-        if data is not None:
+        data = bytearray()
+        for i in range(100):
+            data.append(0)
+        rfm9x.send(data)
+
+        if 0:
+        #if data is not None:
             pb = gb_messages_pb2.LoraMsg2()
             pb.ParseFromString(data)
             if pb.identifier == id:
-                print(pb)
+                #print(pb)
                 if pb.HasField('reprog'):
                     address = pb.reprog.address
 
-                pb.Clear()
+                pb = gb_messages_pb2.LoraMsg2()
                 pb.status = gb_messages_pb2.Status.REPROGRAMMING
                 pb.identifier = id
                 pb.reprog.address = address
-                dataToSend = min(datasize - address, 40)
+                dataToSend = min(datasize - address, transfer_size)
                 pb.reprog.data = updatedata[address:address + dataToSend]
                 if (address + dataToSend) == datasize:
                     pb.reprog.flags = gb_messages_pb2.Reprogramming.Flags.LAST_PACKET
@@ -152,10 +160,14 @@ def sendData(updatedata, rfm9x, id):
 
                 data = pb.SerializeToString()
                 per = round((address / datasize) * 100, 1)
-                print('Updating {}% Sending {} bytes of data to address {}'.format(per, len(data), address))
                 rfm9x.send(data)
                 stop = time.time()
+                print('Updating {}% Sending {} bytes of data to address {}'.format(per, len(data), address))
                 #print('Total time {}'.format(stop - start))
+            else:
+                print('Wrong ID')
+        else:
+            print('Bad data')
 
     print('Done programming unit')
 
@@ -210,26 +222,31 @@ while True:
     print('Waiting for LoRa message')
     data = rfm9x.receive(timeout=5000)
     if data is not None:
-        start = time.time()
-        print('Received {} bytes'.format(len(data)))
-        pb = gb_messages_pb2.LoraMsg2()
-        pb.ParseFromString(data)
-        print(pb)
-        print("Msg from {} with rssi: {}".format(pb.identifier, rfm9x.rssi))
+        if len(data) >= 255:
+            print('Big Message of {} bytes CRC errors: {}'.format(len(data), rfm9x.crc_error_count))
+            print(data)
+            #print('{:02x} '.format(x) for x in data)
+        else:
+            start = time.time()
+            print('Received {} bytes'.format(len(data)))
+            pb = gb_messages_pb2.LoraMsg2()
+            pb.ParseFromString(data)
+            print(pb)
+            print("Msg from {} with rssi: {}".format(pb.identifier, rfm9x.rssi))
 
-        # Update DB
-        id = processGongData(mycoll, pb, rfm9x.rssi)
-        cfg = getCfgMsg(mycoll, id)
+            # Update DB
+            id = processGongData(mycoll, pb, rfm9x.rssi)
+            cfg = getCfgMsg(mycoll, id)
 
-        ret, updatefile = checkFWUpdate(pb.buildnum)
-        if ret == True:
-            print('Need to update firmware')
-            updateFirware(updatefile, rfm9x, id)
+            ret, updatefile = checkFWUpdate(pb.buildnum)
+            if ret == True:
+                print('Need to update firmware')
+                updateFirware(updatefile, rfm9x, id)
 
-        # Send config/ACK message
-        print('Sending {} bytes'.format(len(cfg)))
-        rfm9x.send(cfg)
-        stop = time.time()
-        print('It took {} seconds to receive and send a message'.format(stop-start))
+            # Send config/ACK message
+            print('Sending {} bytes'.format(len(cfg)))
+            rfm9x.send(cfg)
+            stop = time.time()
+            print('It took {} seconds to receive and send a message'.format(stop-start))
     else:
         print('Timeout')
