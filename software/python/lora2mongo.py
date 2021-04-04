@@ -10,6 +10,7 @@ import datetime
 import struct
 import os
 import re
+import systemd_watchdog
 
 def formatImu(pb):
     imuData = {}
@@ -218,7 +219,11 @@ myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 mydb = myclient['gongbuddy']
 mycoll = mydb['users']
 
+wd = systemd_watchdog.watchdog()
+wd.ready()
+
 while True:
+    wd.notify()
     print('Waiting for LoRa message')
     data = rfm9x.receive(timeout=5000)
     if data is not None:
@@ -238,10 +243,10 @@ while True:
             id = processGongData(mycoll, pb, rfm9x.rssi)
             cfg = getCfgMsg(mycoll, id)
 
-            ret, updatefile = checkFWUpdate(pb.buildnum)
-            if ret == True:
-                print('Need to update firmware')
-                updateFirware(updatefile, rfm9x, id)
+            # ret, updatefile = checkFWUpdate(pb.buildnum)
+            # if ret == True:
+            #     print('Need to update firmware')
+            #     updateFirware(updatefile, rfm9x, id)
 
             # Send config/ACK message
             print('Sending {} bytes'.format(len(cfg)))
