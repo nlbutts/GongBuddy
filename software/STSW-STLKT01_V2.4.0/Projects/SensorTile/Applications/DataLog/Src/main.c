@@ -22,7 +22,7 @@
 
 #define DATALOG_CMD_STARTSTOP  (0x00000007)
 
-#define BUILD_NUM   123
+#define BUILD_NUM   124
 
 typedef enum
 {
@@ -355,7 +355,7 @@ static void WriteData_Thread(void const *argument)
 
             if (rxMsg.identifier == uuid)
             {
-                if (rxMsg.has_threshold && (rxMsg.threshold > 1300))
+                if (rxMsg.has_threshold)
                 {
                     threshold = rxMsg.threshold;
                 }
@@ -365,7 +365,6 @@ static void WriteData_Thread(void const *argument)
                 }
                 DBGPRINTF("Sent heartbeat, received t:%d s:%d\n", threshold, rxMsg.status);
             }
-
         }
 
         // unsigned int pressure = (rptr->pressure * 10);
