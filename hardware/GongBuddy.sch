@@ -537,7 +537,7 @@ F 3 "" H 4500 3900 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	5300 3950 4850 3950
+	5300 3950 5200 3950
 Wire Wire Line
 	5300 4150 4500 4150
 Wire Wire Line
@@ -846,11 +846,11 @@ Wire Wire Line
 Wire Wire Line
 	4650 6250 4650 6600
 Text Label 8350 2350 0    50   ~ 0
+LORA_CS
+Text Label 8350 2150 0    50   ~ 0
 SD_CS
-Text Label 8800 2150 2    50   ~ 0
-LORA_RESET
 Text Label 8350 1650 0    50   ~ 0
-DIO0
+PG
 $Comp
 L Device:LED D4
 U 1 1 5F9C2AE8
@@ -1150,7 +1150,7 @@ DIO1
 Text Label 9250 5350 0    50   ~ 0
 DIO0
 Text Label 8350 2250 0    50   ~ 0
-PG
+LORA_RESET
 Wire Wire Line
 	10450 1350 10100 1350
 Text Label 10100 1350 0    50   ~ 0
@@ -1248,9 +1248,9 @@ Wire Wire Line
 Text Label 6050 5900 0    50   ~ 0
 SPI_MISO
 Text Label 6050 5700 0    50   ~ 0
-SPI_MOSI
-Text Label 6050 5800 0    50   ~ 0
 SPI_CLK
+Text Label 6050 5800 0    50   ~ 0
+SPI_MOSI
 Wire Wire Line
 	6550 5900 6050 5900
 Wire Wire Line
@@ -1342,13 +1342,13 @@ IO_CS
 Text Label 7000 2200 0    50   ~ 0
 IO_RESET
 Text Label 8350 2050 0    50   ~ 0
-LORA_CS
-Text Label 8350 1750 0    50   ~ 0
-DIO1
-Text Label 8350 1850 0    50   ~ 0
-LED1
-Text Label 8350 1950 0    50   ~ 0
 BUTTON1
+Text Label 8350 1750 0    50   ~ 0
+DIO0
+Text Label 8350 1850 0    50   ~ 0
+DIO1
+Text Label 8350 1950 0    50   ~ 0
+LED1
 $Comp
 L dk_USB-DVI-HDMI-Connectors:10103594-0001LF J1
 U 1 1 60A18E00
@@ -1644,4 +1644,89 @@ Text Label 6050 5100 0    50   ~ 0
 DIO0
 Text Label 6050 5200 0    50   ~ 0
 DIO1
+$Comp
+L Connector:TestPoint TP11
+U 1 1 6098CF77
+P 10800 2900
+F 0 "TP11" V 10754 3088 50  0000 L CNN
+F 1 "TestPoint" V 10845 3088 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 11000 2900 50  0001 C CNN
+F 3 "~" H 11000 2900 50  0001 C CNN
+	1    10800 2900
+	0    1    1    0   
+$EndComp
+Connection ~ 10800 2900
+$Comp
+L Connector:TestPoint TP7
+U 1 1 6098D620
+P 9700 3450
+F 0 "TP7" V 9654 3638 50  0000 L CNN
+F 1 "TestPoint" V 9745 3638 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 9900 3450 50  0001 C CNN
+F 3 "~" H 9900 3450 50  0001 C CNN
+	1    9700 3450
+	-1   0    0    1   
+$EndComp
+$Comp
+L Connector:TestPoint TP12
+U 1 1 6098E6DE
+P 10800 4850
+F 0 "TP12" V 10754 5038 50  0000 L CNN
+F 1 "TestPoint" V 10845 5038 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 11000 4850 50  0001 C CNN
+F 3 "~" H 11000 4850 50  0001 C CNN
+	1    10800 4850
+	0    1    1    0   
+$EndComp
+Connection ~ 10800 4850
+$Comp
+L Connector:TestPoint TP10
+U 1 1 6098F2FA
+P 10500 4950
+F 0 "TP10" V 10454 5138 50  0000 L CNN
+F 1 "TestPoint" V 10545 5138 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 10700 4950 50  0001 C CNN
+F 3 "~" H 10700 4950 50  0001 C CNN
+	1    10500 4950
+	0    1    1    0   
+$EndComp
+Connection ~ 10500 4950
+$Comp
+L Connector:TestPoint TP9
+U 1 1 6098F5E5
+P 10200 5050
+F 0 "TP9" V 10154 5238 50  0000 L CNN
+F 1 "TestPoint" V 10245 5238 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 10400 5050 50  0001 C CNN
+F 3 "~" H 10400 5050 50  0001 C CNN
+	1    10200 5050
+	0    1    1    0   
+$EndComp
+Connection ~ 10200 5050
+$Comp
+L Connector:TestPoint TP8
+U 1 1 6098F91E
+P 9900 5150
+F 0 "TP8" V 9854 5338 50  0000 L CNN
+F 1 "TestPoint" V 9945 5338 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 10100 5150 50  0001 C CNN
+F 3 "~" H 10100 5150 50  0001 C CNN
+	1    9900 5150
+	0    1    1    0   
+$EndComp
+Connection ~ 9900 5150
+$Comp
+L Connector:TestPoint TP6
+U 1 1 6098FB91
+P 5200 3950
+F 0 "TP6" V 5154 4138 50  0000 L CNN
+F 1 "TestPoint" V 5245 4138 50  0000 L CNN
+F 2 "TestPoint:TestPoint_Pad_D1.0mm" H 5400 3950 50  0001 C CNN
+F 3 "~" H 5400 3950 50  0001 C CNN
+	1    5200 3950
+	1    0    0    -1  
+$EndComp
+Connection ~ 5200 3950
+Wire Wire Line
+	5200 3950 4850 3950
 $EndSCHEMATC
