@@ -1248,9 +1248,9 @@ Wire Wire Line
 Text Label 6050 5900 0    50   ~ 0
 SPI_MISO
 Text Label 6050 5700 0    50   ~ 0
-SPI_MOSI
-Text Label 6050 5800 0    50   ~ 0
 SPI_CLK
+Text Label 6050 5800 0    50   ~ 0
+SPI_MOSI
 Wire Wire Line
 	6550 5900 6050 5900
 Wire Wire Line
