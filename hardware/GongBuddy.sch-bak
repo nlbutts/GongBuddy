@@ -286,8 +286,6 @@ Wire Wire Line
 	1700 2750 1550 2750
 Wire Wire Line
 	1550 2750 1550 2800
-Wire Wire Line
-	1700 2650 1350 2650
 Text Label 1350 2650 0    50   ~ 0
 VBAT
 Wire Wire Line
@@ -599,7 +597,7 @@ SWD_CLK
 Text Label 7050 4350 2    50   ~ 0
 NRST
 Text Label 7050 4550 2    50   ~ 0
-IO_RESET
+VBAT_ADC
 Text Label 7050 4650 2    50   ~ 0
 IO_CS
 Text Label 7050 4750 2    50   ~ 0
@@ -753,98 +751,8 @@ Wire Wire Line
 	7050 850  7050 950 
 Wire Wire Line
 	7500 950  7500 1150
-$Comp
-L power:GND #PWR09
-U 1 1 5F9214FC
-P 3900 7500
-F 0 "#PWR09" H 3900 7250 50  0001 C CNN
-F 1 "GND" H 3905 7327 50  0000 C CNN
-F 2 "" H 3900 7500 50  0001 C CNN
-F 3 "" H 3900 7500 50  0001 C CNN
-	1    3900 7500
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
-	4750 7200 4150 7200
-Wire Wire Line
-	4750 7000 4150 7000
-Wire Wire Line
-	4750 6700 4150 6700
-Text Label 4150 6700 0    50   ~ 0
-SD_CS
-Text Label 4150 7000 0    50   ~ 0
-SPI_CLK
-Text Label 4150 7200 0    50   ~ 0
-SPI_MISO
-Wire Wire Line
-	4750 7100 3900 7100
-Wire Wire Line
-	3900 7100 3900 7300
-Wire Wire Line
-	3900 7300 4750 7300
-Connection ~ 3900 7300
-Wire Wire Line
-	3900 7300 3900 7400
-$Comp
-L power:VCC #PWR08
-U 1 1 5F94FE5B
-P 3900 6450
-F 0 "#PWR08" H 3900 6300 50  0001 C CNN
-F 1 "VCC" H 3915 6623 50  0000 C CNN
-F 2 "" H 3900 6450 50  0001 C CNN
-F 3 "" H 3900 6450 50  0001 C CNN
-	1    3900 6450
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	4750 6900 3900 6900
-Wire Wire Line
-	3900 6900 3900 6750
-$Comp
-L Device:C C3
-U 1 1 5F957FC0
-P 3500 7000
-F 0 "C3" H 3615 7046 50  0000 L CNN
-F 1 "0.1u" H 3615 6955 50  0000 L CNN
-F 2 "Capacitor_SMD:C_0603_1608Metric" H 3538 6850 50  0001 C CNN
-F 3 "~" H 3500 7000 50  0001 C CNN
-	1    3500 7000
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	3500 6850 3500 6750
-Wire Wire Line
-	3500 6750 3900 6750
-Connection ~ 3900 6750
-Wire Wire Line
-	3900 6750 3900 6450
-Wire Wire Line
-	3500 7150 3500 7300
-Wire Wire Line
-	3500 7300 3900 7300
-Wire Wire Line
-	4750 6800 4150 6800
-Text Label 4150 6800 0    50   ~ 0
-SPI_MOSI
-$Comp
-L power:GND #PWR014
-U 1 1 5F96F38A
-P 4500 6350
-F 0 "#PWR014" H 4500 6100 50  0001 C CNN
-F 1 "GND" H 4505 6177 50  0000 C CNN
-F 2 "" H 4500 6350 50  0001 C CNN
-F 3 "" H 4500 6350 50  0001 C CNN
-	1    4500 6350
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	4750 6600 4650 6600
-Wire Wire Line
-	4650 6250 4500 6250
-Wire Wire Line
-	4500 6250 4500 6350
-Wire Wire Line
-	4650 6250 4650 6600
+	5450 6300 5300 6300
 Text Label 8350 2350 0    50   ~ 0
 LORA_CS
 Text Label 8350 2150 0    50   ~ 0
@@ -1156,31 +1064,6 @@ Wire Wire Line
 Text Label 10100 1350 0    50   ~ 0
 VDD_OUT
 $Comp
-L dk_Memory-Connectors-PC-Card-Sockets:2908-05WB-MG J3
-U 1 1 5F8ED138
-P 5350 6900
-F 0 "J3" H 5978 6928 60  0000 L CNN
-F 1 "2908-05WB-MG" H 5978 6822 60  0000 L CNN
-F 2 "digikey-footprints:MicroSD_2908-05WB-MG" H 5550 7100 60  0001 L CNN
-F 3 "http://multimedia.3m.com/mws/media/416257O/3mtm-card-connector-microsdtm-2900-series-ts2197.pdf" H 5550 7200 60  0001 L CNN
-F 4 "3M5607CT-ND" H 5550 7300 60  0001 L CNN "Digi-Key_PN"
-F 5 "2908-05WB-MG" H 5550 7400 60  0001 L CNN "MPN"
-F 6 "Connectors, Interconnects" H 5550 7500 60  0001 L CNN "Category"
-F 7 "Memory Connectors - PC Card Sockets" H 5550 7600 60  0001 L CNN "Family"
-F 8 "http://multimedia.3m.com/mws/media/416257O/3mtm-card-connector-microsdtm-2900-series-ts2197.pdf" H 5550 7700 60  0001 L CNN "DK_Datasheet_Link"
-F 9 "/product-detail/en/3m/2908-05WB-MG/3M5607CT-ND/1242498" H 5550 7800 60  0001 L CNN "DK_Detail_Page"
-F 10 "CONN MICRO SD CARD PUSH-PUSH R/A" H 5550 7900 60  0001 L CNN "Description"
-F 11 "3M" H 5550 8000 60  0001 L CNN "Manufacturer"
-F 12 "Active" H 5550 8100 60  0001 L CNN "Status"
-	1    5350 6900
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	4750 7400 3900 7400
-Connection ~ 3900 7400
-Wire Wire Line
-	3900 7400 3900 7500
-$Comp
 L power:GND #PWR0101
 U 1 1 5F964A26
 P 7500 1150
@@ -1442,61 +1325,61 @@ $EndComp
 $Comp
 L Connector:Conn_ARM_JTAG_SWD_10 J2
 U 1 1 60AA6D67
-P 2000 6750
-F 0 "J2" H 1557 6796 50  0000 R CNN
-F 1 "Conn_ARM_JTAG_SWD_10" H 1557 6705 50  0000 R CNN
-F 2 "KicadFootprint:CortexSWD" H 2000 6750 50  0001 C CNN
-F 3 "http://infocenter.arm.com/help/topic/com.arm.doc.ddi0314h/DDI0314H_coresight_components_trm.pdf" V 1650 5500 50  0001 C CNN
-	1    2000 6750
+P 1200 6750
+F 0 "J2" H 757 6796 50  0000 R CNN
+F 1 "Conn_ARM_JTAG_SWD_10" H 757 6705 50  0000 R CNN
+F 2 "KicadFootprint:CortexSWD" H 1200 6750 50  0001 C CNN
+F 3 "http://infocenter.arm.com/help/topic/com.arm.doc.ddi0314h/DDI0314H_coresight_components_trm.pdf" V 850 5500 50  0001 C CNN
+	1    1200 6750
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2500 6450 2900 6450
+	1700 6450 2100 6450
 Wire Wire Line
-	2500 6650 2900 6650
+	1700 6650 2100 6650
 Wire Wire Line
-	2500 6750 2900 6750
-NoConn ~ 2500 6850
-NoConn ~ 2500 6950
+	1700 6750 2100 6750
+NoConn ~ 1700 6850
+NoConn ~ 1700 6950
 $Comp
 L power:VCC #PWR02
 U 1 1 60ADF77F
-P 2000 5950
-F 0 "#PWR02" H 2000 5800 50  0001 C CNN
-F 1 "VCC" H 2015 6123 50  0000 C CNN
-F 2 "" H 2000 5950 50  0001 C CNN
-F 3 "" H 2000 5950 50  0001 C CNN
-	1    2000 5950
+P 1200 5950
+F 0 "#PWR02" H 1200 5800 50  0001 C CNN
+F 1 "VCC" H 1215 6123 50  0000 C CNN
+F 2 "" H 1200 5950 50  0001 C CNN
+F 3 "" H 1200 5950 50  0001 C CNN
+	1    1200 5950
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2000 5950 2000 6150
-Text Label 2900 6450 2    50   ~ 0
+	1200 5950 1200 6150
+Text Label 2100 6450 2    50   ~ 0
 NRST
-Text Label 2900 6650 2    50   ~ 0
+Text Label 2100 6650 2    50   ~ 0
 SWD_CLK
-Text Label 2900 6750 2    50   ~ 0
+Text Label 2100 6750 2    50   ~ 0
 SWD_IO
 $Comp
 L power:GND #PWR04
 U 1 1 60AECBA8
-P 2000 7500
-F 0 "#PWR04" H 2000 7250 50  0001 C CNN
-F 1 "GND" H 2005 7327 50  0000 C CNN
-F 2 "" H 2000 7500 50  0001 C CNN
-F 3 "" H 2000 7500 50  0001 C CNN
-	1    2000 7500
+P 1200 7500
+F 0 "#PWR04" H 1200 7250 50  0001 C CNN
+F 1 "GND" H 1205 7327 50  0000 C CNN
+F 2 "" H 1200 7500 50  0001 C CNN
+F 3 "" H 1200 7500 50  0001 C CNN
+	1    1200 7500
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	2000 7350 2000 7450
+	1200 7350 1200 7450
 Wire Wire Line
-	1900 7350 1900 7450
+	1100 7350 1100 7450
 Wire Wire Line
-	1900 7450 2000 7450
-Connection ~ 2000 7450
+	1100 7450 1200 7450
+Connection ~ 1200 7450
 Wire Wire Line
-	2000 7450 2000 7500
+	1200 7450 1200 7500
 $Comp
 L Device:LED D1
 U 1 1 60B0457A
@@ -1564,8 +1447,6 @@ F 3 "" H 9700 2700 50  0001 C CNN
 $EndComp
 Wire Wire Line
 	9700 2700 9700 2800
-Wire Wire Line
-	9350 3450 9700 3450
 Text Label 9350 3450 0    50   ~ 0
 BUTTON1
 $Comp
@@ -1729,4 +1610,270 @@ $EndComp
 Connection ~ 5200 3950
 Wire Wire Line
 	5200 3950 4850 3950
+Wire Wire Line
+	4700 7450 4700 7550
+Connection ~ 4700 7450
+Wire Wire Line
+	5550 7450 4700 7450
+$Comp
+L dk_Memory-Connectors-PC-Card-Sockets:2908-05WB-MG J3
+U 1 1 5F8ED138
+P 6150 6950
+F 0 "J3" H 6778 6978 60  0000 L CNN
+F 1 "2908-05WB-MG" H 6778 6872 60  0000 L CNN
+F 2 "digikey-footprints:MicroSD_2908-05WB-MG" H 6350 7150 60  0001 L CNN
+F 3 "http://multimedia.3m.com/mws/media/416257O/3mtm-card-connector-microsdtm-2900-series-ts2197.pdf" H 6350 7250 60  0001 L CNN
+F 4 "3M5607CT-ND" H 6350 7350 60  0001 L CNN "Digi-Key_PN"
+F 5 "2908-05WB-MG" H 6350 7450 60  0001 L CNN "MPN"
+F 6 "Connectors, Interconnects" H 6350 7550 60  0001 L CNN "Category"
+F 7 "Memory Connectors - PC Card Sockets" H 6350 7650 60  0001 L CNN "Family"
+F 8 "http://multimedia.3m.com/mws/media/416257O/3mtm-card-connector-microsdtm-2900-series-ts2197.pdf" H 6350 7750 60  0001 L CNN "DK_Datasheet_Link"
+F 9 "/product-detail/en/3m/2908-05WB-MG/3M5607CT-ND/1242498" H 6350 7850 60  0001 L CNN "DK_Detail_Page"
+F 10 "CONN MICRO SD CARD PUSH-PUSH R/A" H 6350 7950 60  0001 L CNN "Description"
+F 11 "3M" H 6350 8050 60  0001 L CNN "Manufacturer"
+F 12 "Active" H 6350 8150 60  0001 L CNN "Status"
+	1    6150 6950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5450 6300 5450 6650
+Wire Wire Line
+	5300 6300 5300 6400
+Wire Wire Line
+	5550 6650 5450 6650
+$Comp
+L power:GND #PWR014
+U 1 1 5F96F38A
+P 5300 6400
+F 0 "#PWR014" H 5300 6150 50  0001 C CNN
+F 1 "GND" H 5305 6227 50  0000 C CNN
+F 2 "" H 5300 6400 50  0001 C CNN
+F 3 "" H 5300 6400 50  0001 C CNN
+	1    5300 6400
+	1    0    0    -1  
+$EndComp
+Text Label 4950 6850 0    50   ~ 0
+SPI_MOSI
+Wire Wire Line
+	5550 6850 4950 6850
+Wire Wire Line
+	4300 7350 4700 7350
+Wire Wire Line
+	4300 7200 4300 7350
+Wire Wire Line
+	4700 6800 4700 6500
+Connection ~ 4700 6800
+Wire Wire Line
+	4300 6800 4700 6800
+Wire Wire Line
+	4300 6900 4300 6800
+$Comp
+L Device:C C3
+U 1 1 5F957FC0
+P 4300 7050
+F 0 "C3" H 4415 7096 50  0000 L CNN
+F 1 "0.1u" H 4415 7005 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 4338 6900 50  0001 C CNN
+F 3 "~" H 4300 7050 50  0001 C CNN
+	1    4300 7050
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4700 6950 4700 6800
+Wire Wire Line
+	5550 6950 4700 6950
+$Comp
+L power:VCC #PWR08
+U 1 1 5F94FE5B
+P 4700 6500
+F 0 "#PWR08" H 4700 6350 50  0001 C CNN
+F 1 "VCC" H 4715 6673 50  0000 C CNN
+F 2 "" H 4700 6500 50  0001 C CNN
+F 3 "" H 4700 6500 50  0001 C CNN
+	1    4700 6500
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4700 7350 4700 7450
+Connection ~ 4700 7350
+Wire Wire Line
+	4700 7350 5550 7350
+Wire Wire Line
+	4700 7150 4700 7350
+Wire Wire Line
+	5550 7150 4700 7150
+Text Label 4950 7250 0    50   ~ 0
+SPI_MISO
+Text Label 4950 7050 0    50   ~ 0
+SPI_CLK
+Text Label 4950 6750 0    50   ~ 0
+SD_CS
+Wire Wire Line
+	5550 6750 4950 6750
+Wire Wire Line
+	5550 7050 4950 7050
+Wire Wire Line
+	5550 7250 4950 7250
+$Comp
+L power:GND #PWR09
+U 1 1 5F9214FC
+P 4700 7550
+F 0 "#PWR09" H 4700 7300 50  0001 C CNN
+F 1 "GND" H 4705 7377 50  0000 C CNN
+F 2 "" H 4700 7550 50  0001 C CNN
+F 3 "" H 4700 7550 50  0001 C CNN
+	1    4700 7550
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R4
+U 1 1 60A65374
+P 3250 7000
+F 0 "R4" H 3320 7046 50  0000 L CNN
+F 1 "24.3" H 3320 6955 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 3180 7000 50  0001 C CNN
+F 3 "~" H 3250 7000 50  0001 C CNN
+	1    3250 7000
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R3
+U 1 1 60A661CD
+P 3250 6450
+F 0 "R3" H 3320 6496 50  0000 L CNN
+F 1 "49.9" H 3320 6405 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 3180 6450 50  0001 C CNN
+F 3 "~" H 3250 6450 50  0001 C CNN
+	1    3250 6450
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R8
+U 1 1 60A66623
+P 7000 3350
+F 0 "R8" H 7070 3396 50  0000 L CNN
+F 1 "DNP" H 7070 3305 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 6930 3350 50  0001 C CNN
+F 3 "~" H 7000 3350 50  0001 C CNN
+	1    7000 3350
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6850 3350 6500 3350
+Text Label 6500 3350 0    50   ~ 0
+SWD_IO
+Text Label 7500 3350 2    50   ~ 0
+IO_RESET
+$Comp
+L Device:R R18
+U 1 1 60A95B7B
+P 7700 3100
+F 0 "R18" H 7770 3146 50  0000 L CNN
+F 1 "10k" H 7770 3055 50  0000 L CNN
+F 2 "Resistor_SMD:R_0603_1608Metric" V 7630 3100 50  0001 C CNN
+F 3 "~" H 7700 3100 50  0001 C CNN
+	1    7700 3100
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:VCC #PWR038
+U 1 1 60A962A7
+P 7700 2850
+F 0 "#PWR038" H 7700 2700 50  0001 C CNN
+F 1 "VCC" H 7715 3023 50  0000 C CNN
+F 2 "" H 7700 2850 50  0001 C CNN
+F 3 "" H 7700 2850 50  0001 C CNN
+	1    7700 2850
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	7700 2850 7700 2950
+Wire Wire Line
+	7700 3350 7700 3250
+Wire Wire Line
+	7150 3350 7700 3350
+Wire Wire Line
+	2900 6150 3250 6150
+Wire Wire Line
+	3250 6150 3250 6300
+Wire Wire Line
+	3250 6600 3250 6750
+Wire Wire Line
+	3250 6750 2900 6750
+Connection ~ 3250 6750
+Wire Wire Line
+	3250 6750 3250 6850
+$Comp
+L power:GND #PWR037
+U 1 1 60AE51B9
+P 3250 7250
+F 0 "#PWR037" H 3250 7000 50  0001 C CNN
+F 1 "GND" H 3255 7077 50  0000 C CNN
+F 2 "" H 3250 7250 50  0001 C CNN
+F 3 "" H 3250 7250 50  0001 C CNN
+	1    3250 7250
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	3250 7150 3250 7250
+Text Label 2900 6150 0    50   ~ 0
+VBAT
+Text Label 2900 6750 0    50   ~ 0
+VBAT_ADC
+Wire Wire Line
+	900  2650 900  2750
+Wire Wire Line
+	900  2650 1700 2650
+$Comp
+L power:GND #PWR036
+U 1 1 60A753BD
+P 900 3200
+F 0 "#PWR036" H 900 2950 50  0001 C CNN
+F 1 "GND" H 905 3027 50  0000 C CNN
+F 2 "" H 900 3200 50  0001 C CNN
+F 3 "" H 900 3200 50  0001 C CNN
+	1    900  3200
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	900  3050 900  3200
+$Comp
+L Diode:ESD9B5.0ST5G D11
+U 1 1 60A861EF
+P 9150 3700
+F 0 "D11" V 9104 3779 50  0000 L CNN
+F 1 "DESD5V0U1BA-7" V 9195 3779 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-323" H 9150 3700 50  0001 C CNN
+F 3 "https://www.onsemi.com/pub/Collateral/ESD9B-D.PDF" H 9150 3700 50  0001 C CNN
+	1    9150 3700
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	9150 3550 9150 3450
+Wire Wire Line
+	9150 3450 9700 3450
+$Comp
+L power:GND #PWR039
+U 1 1 60A986EE
+P 9150 3950
+F 0 "#PWR039" H 9150 3700 50  0001 C CNN
+F 1 "GND" H 9155 3777 50  0000 C CNN
+F 2 "" H 9150 3950 50  0001 C CNN
+F 3 "" H 9150 3950 50  0001 C CNN
+	1    9150 3950
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	9150 3850 9150 3950
+$Comp
+L Diode:ESD9B5.0ST5G D10
+U 1 1 60AAE0CA
+P 900 2900
+F 0 "D10" V 854 2979 50  0000 L CNN
+F 1 "DESD5V0U1BA-7" V 945 2979 50  0000 L CNN
+F 2 "Diode_SMD:D_SOD-323" H 900 2900 50  0001 C CNN
+F 3 "https://www.onsemi.com/pub/Collateral/ESD9B-D.PDF" H 900 2900 50  0001 C CNN
+	1    900  2900
+	0    1    1    0   
+$EndComp
 $EndSCHEMATC

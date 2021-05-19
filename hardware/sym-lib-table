@@ -8,4 +8,6 @@
   (lib (name dk_USB-DVI-HDMI-Connectors)(type Legacy)(uri C:/projects/digikey-kicad-library/digikey-symbols/dk_USB-DVI-HDMI-Connectors.lib)(options "")(descr ""))
   (lib (name dk_Pushbutton-Switches)(type Legacy)(uri C:/projects/digikey-kicad-library/digikey-symbols/dk_Pushbutton-Switches.lib)(options "")(descr ""))
   (lib (name PTS645SK50SMTR92LFS)(type Legacy)(uri ${KIPRJMOD}/mechanical/PTS645SK50SMTR92LFS.lib)(options "")(descr ""))
+  (lib (name dk_TVS-Diodes)(type Legacy)(uri C:/projects/digikey-kicad-library/digikey-symbols/dk_TVS-Diodes.lib)(options "")(descr ""))
+  (lib (name dk_TVS-Mixed-Technology)(type Legacy)(uri C:/projects/digikey-kicad-library/digikey-symbols/dk_TVS-Mixed-Technology.lib)(options "")(descr ""))
 )
