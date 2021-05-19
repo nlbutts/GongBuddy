@@ -1341,17 +1341,6 @@ Wire Wire Line
 	1700 6750 2100 6750
 NoConn ~ 1700 6850
 NoConn ~ 1700 6950
-$Comp
-L power:VCC #PWR02
-U 1 1 60ADF77F
-P 1200 5950
-F 0 "#PWR02" H 1200 5800 50  0001 C CNN
-F 1 "VCC" H 1215 6123 50  0000 C CNN
-F 2 "" H 1200 5950 50  0001 C CNN
-F 3 "" H 1200 5950 50  0001 C CNN
-	1    1200 5950
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
 	1200 5950 1200 6150
 Text Label 2100 6450 2    50   ~ 0
@@ -1876,4 +1865,8 @@ F 3 "https://www.onsemi.com/pub/Collateral/ESD9B-D.PDF" H 900 2900 50  0001 C CN
 	1    900  2900
 	0    1    1    0   
 $EndComp
+Wire Wire Line
+	1200 5950 1500 5950
+Text Label 1500 5950 2    50   ~ 0
+VDD_OUT
 $EndSCHEMATC
