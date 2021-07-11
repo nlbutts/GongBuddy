@@ -1,6 +1,5 @@
 # ------------------------------------------------------- MINIMUM CMAKE VERSION
-cmake_minimum_required(VERSION 3.7)
-
+cmake_minimum_required(VERSION 3.10)
 
 # ---------------------------------------------------------------- PROJECT NAME
 project(gongbuddy LANGUAGES C CXX ASM)
@@ -121,15 +120,16 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal)
     # build for arm only
 
     # Libraries
+    add_subdirectory(cubemx)
     #add_subdirectory(drivers)
     #add_subdirectory(middleware)
     add_subdirectory(messages)
-    add_subdirectory(libupdate)
-    add_subdirectory(libbuildinfo)
+    #add_subdirectory(libupdate)
+    #add_subdirectory(libbuildinfo)
 
     # Executables
-    add_subdirectory(application)
-    add_subdirectory(fwimages)
+    #add_subdirectory(application)
+    #add_subdirectory(fwimages)
 
 else ()
     # --------------------------------------------------STRATUS DEBUG LOG LEVEL

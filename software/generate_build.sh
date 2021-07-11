@@ -9,6 +9,10 @@
 
 main()
 {
+    if [[ -z ${TOOLCHAIN_PATH} ]]; then
+        echo "Define TOOLCHAIN_PATH to the root of the compiler tools"
+        exit
+    fi
     # Get the directory that this script lives in
     THIS_SCRIPT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
