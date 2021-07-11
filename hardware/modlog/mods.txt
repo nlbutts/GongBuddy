@@ -1,7 +1,3 @@
-Q1 is a BJT, replace with a NFET or MOSFET or TPS22943
-U6 is REALLY hard to solder. Lengen the pads so I can get an iron onto the footprints.
 J1 USB connector is not right. The alignment holes are off.
 On/Off switch
-Better silkscreen
-Sensortile MOSI and MISO are backwards
-SD card is inserted backwards
+JTAG is, of course, not correct.
