@@ -9,9 +9,11 @@
 
 main()
 {
-    if [[ -z ${TOOLCHAIN_PATH} ]]; then
-        echo "Define TOOLCHAIN_PATH to the root of the compiler tools"
-        exit
+    if [[ -h gcc-arm-none-eabi ]]; then
+        echo "Symlink to gcc exists, using that as the toolchain"
+        export TOOLCHAIN_PATH=gcc-arm-none-eabi
+    else
+        echo "Add a symlink called gcc-arm-none-eabi that points to the toolchain"
     fi
     # Get the directory that this script lives in
     THIS_SCRIPT_PATH=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
@@ -20,6 +22,8 @@ main()
     if [ -z "${BUILD_ROOT_PATH}" ]; then
         BUILD_ROOT_PATH=${THIS_SCRIPT_PATH}/build
     fi
+
+    prepare_environment
 
     # Remove all previous builds
     mkdir -p ${BUILD_ROOT_PATH}
@@ -92,6 +96,13 @@ function create_build()
         printf "\n[ERROR - ${LINENO}] Build step failed\n"
         exit 1
     fi
+}
+
+#This function prepares the environment for CMake
+function prepare_environment()
+{
+    cd third-party
+    tar -xf SEGGER_RTT_V686e.tgz
 }
 
 #Builds all directories in "BUILD_ROOT_PATH" when called.

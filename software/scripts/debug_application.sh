@@ -11,7 +11,7 @@ source ${SCRIPT_WORKING_DIR}/set_paths.sh
 
 # -------------------------------------------------------- Find the target file
 BUILD_DIR=${PROJECT_DIR}/build/arm
-TARGET_FILE=${BUILD_DIR}/cubemx/application
+TARGET_FILE=${BUILD_DIR}/application/application.elf
 
 if [[ ! -e ${BUILD_DIR} ]]; then
     cd ${PROJECT_DIR}

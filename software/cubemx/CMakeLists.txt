@@ -26,7 +26,7 @@ file(GLOB_RECURSE CSRC ${CMAKE_CURRENT_LIST_DIR}/Core/*.c
                        ${CMAKE_CURRENT_LIST_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/*.c
                        ${CMAKE_CURRENT_LIST_DIR}/Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
                        ${CMAKE_CURRENT_LIST_DIR}/USB_DEVICE/*.c
-    )
+                       )
 
 # ------------------------------------------------ FILE EXCLUSION FOR STM32F469
 foreach(item ${CSRC})
@@ -45,6 +45,7 @@ endforeach()
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal)
     # ----------------------------------------------- DEFINE BUILD TARGET (ARM)
     add_executable(${LOCAL_PROJ_NAME} ${CSRC})
+    target_link_libraries(${LOCAL_PROJ_NAME} gongbuddy)
 
     #------------------------------------------------- ADD INCLUDE PATHS (ARM)
     target_include_directories(${LOCAL_PROJ_NAME}
@@ -78,7 +79,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal)
 
 else()
     # -------------------------------------------- DEFINE BUILD TARGET (X86/UT)
-    add_library(${LOCAL_PROJ_NAME} INTERFACE)
+    #add_library(${LOCAL_PROJ_NAME} INTERFACE)
 
     # ---------------------------------------------------- ADD HEADERS (X86/UT)
     file(GLOB_RECURSE LOCAL_HEADERS ${CMAKE_CURRENT_LIST_DIR}/*.h)

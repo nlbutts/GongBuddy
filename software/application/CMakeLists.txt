@@ -1,8 +1,8 @@
 # ------------------------------------------------------- MINIMUM CMAKE VERSION
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.10)
 
 # RANT: ST vomits dependency all over the place. You can't really isolate
-# parts of the code. Thereofre I have one big CMakeList file because ST
+# parts of the code. Therefore I have one big CMakeList file because ST
 # can't figure out how to isolate their code
 
 
@@ -16,55 +16,44 @@ endif()
 set(THIS_RELEASE application.elf)
 set(THIS_DEBUG application_debug.elf)
 
-# ------------------------------------------------------------ Aliases
-set(SENSOR_TILE_DIR ${CMAKE_SOURCE_DIR}/STSW-STLKT01_V2.4.0)
-set(APPLICATION_DIR ${SENSOR_TILE_DIR}/Projects/SensorTile/Applications/DataLog)
-set(DRIVER_DIR      ${SENSOR_TILE_DIR}/Drivers)
-set(MIDDLEWARE_DIR  ${SENSOR_TILE_DIR}/Middlewares)
+
+# ---------------------------------------------------------------- DEFINIATIONS
+add_definitions(-DUSE_HAL_DRIVER -DSTM32L476xx)
+
+# ----------------------------------------------------------------------- ALIAS
+set(CUBEMXDIR       ${CMAKE_SOURCE_DIR}/cubemx)
+set(CORE_DIR        ${CUBEMXDIR}/Core)
+set(DRIVER_DIR      ${CUBEMXDIR}/Drivers)
+set(MIDDLEWARE_DIR  ${CUBEMXDIR}/Middlewares)
+set(USB_DIR         ${CUBEMXDIR}/USB_DEVICE)
+message(STATUS ${CUBEMXDIR})
 
 # -------------------------------------------------------------- FIND SRC FILES
 file(GLOB_RECURSE SRC_FILES
-    ${APPLICATION_DIR}/Src/*.c
-    ${APPLICATION_DIR}/STM32CubeIDE/*.s
-    ${DRIVER_DIR}/BSP/*.c
-    ${DRIVER_DIR}/STM32L4xx_HAL_Driver/*.c
-    ${MIDDLEWARE_DIR}/ST/STM32_USB_Device_Library/Core/*.c
-    ${MIDDLEWARE_DIR}/ST/STM32_USB_Device_Library/Class/CDC/*.c
-    ${MIDDLEWARE_DIR}/Third_Party/FatFs/src/diskio.c
-    ${MIDDLEWARE_DIR}/Third_Party/FatFs/src/ff_gen_drv.c
-    ${MIDDLEWARE_DIR}/Third_Party/FatFs/src/ff.c
-    ${MIDDLEWARE_DIR}/Third_Party/FatFs/src/option/syscall.c
-    ${MIDDLEWARE_DIR}/Third_Party/FatFs/src/option/unicode.c
-    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/list.c
-    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/tasks.c
-    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/timers.c
-    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/queue.c
-    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c
-    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
-    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
-    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
-    ${CMAKE_CURRENT_LIST_DIR}/../FreeRTOS-Plus-CLI/FreeRTOS_CLI.c
-    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Crypto/*
-    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Mac/*
-    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Phy/*
-    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Utilities/*
+        ${CMAKE_CURRENT_LIST_DIR}/src/*.c
+        ${CORE_DIR}/*.c
+        ${CUBEMXDIR}/startup_stm32l476xx.s
+        ${DRIVER_DIR}/CMSIS/Device/ST/STM32L4xx/system_stm32l4xx.c
+        #${DRIVER_DIR}/CMSIS/RTOS2/*.c
+        ${DRIVER_DIR}/STM32L4xx_HAL_Driver/Src/*.c
+        ${MIDDLEWARE_DIR}/ST/*.c
+        ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/croutine.c
+        ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/event_groups.c
+        ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/list.c
+        ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/queue.c
+        ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/stream_buffer.c
+        ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/tasks.c
+        ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/timers.c
+        ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/*.c
+        ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F/*.c
+        ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c
+        ${USB_DIR}/*.c
 )
 
 foreach(item ${SRC_FILES})
-    if(${item} MATCHES ".*template.*")
-            message(STATUS "excluding for template: ${item}")
-            list(REMOVE_ITEM SRC_FILES ${item})
-    endif()
-    if(${item} MATCHES ".*Template.*")
-            message(STATUS "excluding for Template directory: ${item}")
-            list(REMOVE_ITEM SRC_FILES ${item})
-    endif()
-    if(${item} MATCHES "SensorTile_audio_out.c")
-            message(STATUS "excluding for STM32F405: ${item}")
-            list(REMOVE_ITEM SRC_FILES ${item})
-    endif()
-    if(${item} MATCHES "syscalls.c")
-            message(STATUS "excluding for STM32F405: ${item}")
+    message(STATUS ${item})
+    if(${item} MATCHES ".*template.*" OR ${item} MATCHES ".*Template.*")
+            message(STATUS "excluding: ${item}")
             list(REMOVE_ITEM SRC_FILES ${item})
     endif()
 endforeach()
@@ -79,32 +68,19 @@ target_link_libraries(${THIS_DEBUG} ${THIS_LINK_LIBS})
 
 # ------------------------------------------------------------- INCLUDE FOLDERS
 set (INC_DIRS
-    ${APPLICATION_DIR}/Inc
-    ${MIDDLEWARE_DIR}/ST/STM32_USB_Device_Library/Core/Inc
-    ${MIDDLEWARE_DIR}/ST/STM32_USB_Device_Library/Class/CDC/Inc
-    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/CMSIS_RTOS
-    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/include
-    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
-    ${MIDDLEWARE_DIR}/Third_Party/FatFs/src
-    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Conf
-    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Crypto
-    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Mac
-    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Patterns
-    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Phy
-    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Utilities
+    ${CMAKE_CURRENT_LIST_DIR}/inc
+    ${CORE_DIR}/Inc
     ${DRIVER_DIR}/CMSIS/Include
     ${DRIVER_DIR}/CMSIS/Device/ST/STM32L4xx/Include
+    ${DRIVER_DIR}/CMSIS/RTOS2/Include
     ${DRIVER_DIR}/STM32L4xx_HAL_Driver/Inc
-    ${DRIVER_DIR}/BSP/Components/Common
-    ${DRIVER_DIR}/BSP/Components/hts221
-    ${DRIVER_DIR}/BSP/Components/lps22hb
-    ${DRIVER_DIR}/BSP/Components/lsm303agr
-    ${DRIVER_DIR}/BSP/Components/lsm6dsm
-    ${DRIVER_DIR}/BSP/Components/pcm1774
-    ${DRIVER_DIR}/BSP/Components/stc3115
-    ${DRIVER_DIR}/BSP/Components/sx1276
-    ${DRIVER_DIR}/BSP/SensorTile
-    ${CMAKE_CURRENT_LIST_DIR}/../FreeRTOS-Plus-CLI
+    ${MIDDLEWARE_DIR}/ST/STM32_USB_Device_Library/Class/CDC/Inc
+    ${MIDDLEWARE_DIR}/ST/STM32_USB_Device_Library/Core/Inc
+    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/include
+    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+    ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
+    ${USB_DIR}/App
+    ${USB_DIR}/Target
 )
 
 target_include_directories(${THIS_RELEASE}
@@ -117,14 +93,12 @@ target_include_directories(${THIS_DEBUG}
 
 
 # ----------------------------------------------------------- SET LINKER SCRIPT
-set(LDSCRIPTS_PATH ${PROJECT_SOURCE_DIR}/linker)
-
-target_link_libraries(${THIS_RELEASE} buildinfo update
-    "-T ${LDSCRIPTS_PATH}/STM32L476RGTx_FLASH.ld -L${LDSCRIPTS_PATH}"
+target_link_libraries(${THIS_RELEASE} buildinfo third_party
+    "-T ${CUBEMXDIR}/STM32L476JGYx_FLASH.ld -L${CUBEMXDIR}"
 )
 
-target_link_libraries(${THIS_DEBUG} buildinfo update
-    "-T ${LDSCRIPTS_PATH}/STM32L476RGTx_FLASH.ld -L${LDSCRIPTS_PATH}"
+target_link_libraries(${THIS_DEBUG} buildinfo third_party
+    "-T ${CUBEMXDIR}/STM32L476JGYx_FLASH.ld -L${CUBEMXDIR}"
 )
 
 
@@ -135,17 +109,6 @@ target_link_libraries(${THIS_RELEASE}
 
 target_link_libraries(${THIS_DEBUG}
     "-Xlinker -Map=${CMAKE_CURRENT_BINARY_DIR}/${THIS_DEBUG}.map"
-)
-
-
-# ----------------------------------------------------- ADD VERSION INFORMATION
-set_property(
-    SOURCE ${CMAKE_CURRENT_LIST_DIR}/src/appareo/application/FirmwareVersion.cpp
-    APPEND PROPERTY COMPILE_DEFINITIONS
-        SMART_NOZZLE_APP_PN=\"${APP_PN}\"
-        SMART_NOZZLE_BUILD_VERSION=\"${BUILD_VERSION}\"
-        SMART_NOZZLE_BUILD_DATE=\"${BUILD_DATE}\"
-        SMART_NOZZLE_VCS_HASH=\"${VCS_HASH}\"
 )
 
 

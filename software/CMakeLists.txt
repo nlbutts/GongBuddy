@@ -120,15 +120,17 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal)
     # build for arm only
 
     # Libraries
-    add_subdirectory(cubemx)
+    add_subdirectory(third-party)
     #add_subdirectory(drivers)
     #add_subdirectory(middleware)
     add_subdirectory(messages)
     #add_subdirectory(libupdate)
-    #add_subdirectory(libbuildinfo)
+    add_subdirectory(libbuildinfo)
+    #add_subdirectory(libgongbuddy)
+    #add_subdirectory(cubemx)
 
     # Executables
-    #add_subdirectory(application)
+    add_subdirectory(application)
     #add_subdirectory(fwimages)
 
 else ()
