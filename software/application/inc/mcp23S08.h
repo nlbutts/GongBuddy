@@ -1,6 +1,19 @@
+/**
+ * @file mcp23S08.h
+ * @author Nick Butts (nlbutts@ieee.org)
+ * @brief This file is a simple driver for the MCP23S08 SPI IO expanders.
+ * @version 1.0
+ * @date 2021-07-30
+ *
+ * @copyright Copyright (c) 2021
+ *
+ *
+ * TODO: Implement interrupt support
+ */
+
+*/
 #ifndef MCP23S08_H_
 #define MCP23S08_H_
-
 
 #include <stdint.h>
 

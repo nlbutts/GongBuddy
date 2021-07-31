@@ -69,6 +69,7 @@ target_link_libraries(${THIS_DEBUG} ${THIS_LINK_LIBS})
 # ------------------------------------------------------------- INCLUDE FOLDERS
 set (INC_DIRS
     ${CMAKE_CURRENT_LIST_DIR}/inc
+    ${CMAKE_CURRENT_LIST_DIR}/inc/test
     ${CORE_DIR}/Inc
     ${DRIVER_DIR}/CMSIS/Include
     ${DRIVER_DIR}/CMSIS/Device/ST/STM32L4xx/Include

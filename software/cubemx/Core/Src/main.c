@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "gong_io.h"
+#include "gong_io_test.h"
 #include "SEGGER_RTT.h"
 /* USER CODE END Includes */
 
@@ -552,19 +552,11 @@ void StartDefaultTask(void *argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
-  gong_io_init(&hspi3);
-  int state = 0;
+  //gong_io_test_main(&hspi3);
   /* Infinite loop */
   for(;;)
   {
     osDelay(1000);
-    gong_io_set_led(state);
-    state = !state;
-    int button = gong_io_read_button();
-    int PG = gong_io_read_pg();
-    int dio0 = gong_io_read_dio0();
-    int dio1 = gong_io_read_dio1();
-    SEGGER_RTT_printf(0, "Button: %d  PG: %d  DIO0: %d  DIO1: %d\n", button, PG, dio0, dio1);
   }
   /* USER CODE END 5 */
 }

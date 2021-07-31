@@ -1,3 +1,14 @@
+/**
+ * @file gong_io.h
+ * @author Nick Butts (nlbutts@ieee.org)
+ * @brief IO sub-system for the GongBuddy
+ * @version 0.1
+ * @date 2021-07-30
+ *
+ * @copyright Copyright (c) 2021
+ *
+ *
+ */
 #ifndef GONG_IO_H_
 #define GONG_IO_H_
 
