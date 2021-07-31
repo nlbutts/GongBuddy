@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include "gong_io_test.h"
 #include "gong_io.h"
-#include "SEGGER_RTT.h"
+#include "debug_print.h"
 #include "cmsis_os.h"
 
 int gong_io_test_main(SPI_HandleTypeDef * spi)
@@ -18,6 +18,6 @@ int gong_io_test_main(SPI_HandleTypeDef * spi)
         int PG = gong_io_read_pg();
         int dio0 = gong_io_read_dio0();
         int dio1 = gong_io_read_dio1();
-        SEGGER_RTT_printf(0, "Button: %d  PG: %d  DIO0: %d  DIO1: %d\n", button, PG, dio0, dio1);
+        DEBUG_PRINTF(0, "Button: %d  PG: %d  DIO0: %d  DIO1: %d\n", button, PG, dio0, dio1);
     }
 }

@@ -10,8 +10,6 @@
  *
  * TODO: Implement interrupt support
  */
-
-*/
 #ifndef MCP23S08_H_
 #define MCP23S08_H_
 

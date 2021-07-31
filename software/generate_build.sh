@@ -52,7 +52,7 @@ function realpath()
 function create_build()
 {
     build_path="${BUILD_ROOT_PATH}/$1"
-    cmake_args=""
+    cmake_args="-DENABLE_DEBUG_PRINT=1"
 
     if [ -z "$1" ]; then
         printf "\n[ERROR - ${LINENO}] Bad arguments\n"
@@ -102,7 +102,16 @@ function create_build()
 function prepare_environment()
 {
     cd third-party
-    tar -xf SEGGER_RTT_V686e.tgz
+    if [[ ! -e /opt/SEGGER/JLink ]]; then
+        echo "JLink is not installed on this computer. Please install via:"
+        echo "sudo dpkg -i third-party/JLink_Linux_<whatever is in that directory>"
+        exit 1
+    fi
+
+    RTT_VER=`ls /opt/SEGGER/JLink/Samples/RTT/*RTT*`
+    echo "Found RTT file: ${RTT_VER}"
+
+    tar -xf ${RTT_VER}
 }
 
 #Builds all directories in "BUILD_ROOT_PATH" when called.

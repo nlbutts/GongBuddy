@@ -131,7 +131,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm_baremetal)
 
     # Executables
     add_subdirectory(application)
-    #add_subdirectory(fwimages)
+    add_subdirectory(fwimages)
 
 else ()
     # --------------------------------------------------STRATUS DEBUG LOG LEVEL
@@ -140,6 +140,7 @@ else ()
     add_definitions(-DSYS_LOG_LEVEL=LOG_NONE)
 
     # Libraries
+    add_subdirectory(third-party)
     add_subdirectory(libupdate)
     add_subdirectory(libbuildinfo)
     add_subdirectory(third-party/tclap-1.2.1)

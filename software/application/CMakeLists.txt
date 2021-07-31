@@ -34,7 +34,6 @@ file(GLOB_RECURSE SRC_FILES
         ${CORE_DIR}/*.c
         ${CUBEMXDIR}/startup_stm32l476xx.s
         ${DRIVER_DIR}/CMSIS/Device/ST/STM32L4xx/system_stm32l4xx.c
-        #${DRIVER_DIR}/CMSIS/RTOS2/*.c
         ${DRIVER_DIR}/STM32L4xx_HAL_Driver/Src/*.c
         ${MIDDLEWARE_DIR}/ST/*.c
         ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/croutine.c
@@ -51,7 +50,6 @@ file(GLOB_RECURSE SRC_FILES
 )
 
 foreach(item ${SRC_FILES})
-    message(STATUS ${item})
     if(${item} MATCHES ".*template.*" OR ${item} MATCHES ".*Template.*")
             message(STATUS "excluding: ${item}")
             list(REMOVE_ITEM SRC_FILES ${item})

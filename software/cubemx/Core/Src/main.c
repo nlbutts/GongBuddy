@@ -552,7 +552,7 @@ void StartDefaultTask(void *argument)
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 5 */
-  //gong_io_test_main(&hspi3);
+  gong_io_test_main(&hspi3);
   /* Infinite loop */
   for(;;)
   {

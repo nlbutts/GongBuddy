@@ -82,12 +82,12 @@ int mcp23s08_toggle_pin(uint8_t gpio)
 
 int mcp23s08_read_interrupt_captured()
 {
-
+    return 0;
 }
 
 int mcp23s08_read_interrupt_flag()
 {
-
+    return 0;
 }
 
 int mcp23s08_read_inputs()

@@ -15,4 +15,3 @@ set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS}
 set(PROTO_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_encode.c ${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_decode.c ${CMAKE_CURRENT_SOURCE_DIR}/../nanopb/pb_common.c)
 add_library(${THIS} gb_messages.pb.c ${PROTO_SRCS} ${PROTO_HDRS})
 target_include_directories(${THIS} PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${NANOPB_INCLUDE_DIRS})
-message(STATUS "***MESSAGES ${PROTO_SRCS}")

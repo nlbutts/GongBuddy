@@ -15,14 +15,18 @@ in the toolchain directory.
 
 [CMake 3.7 or newer] (https://cmake.org/download/)
 
-
+Install the Segger JLink version that is located in the **third-party** directory.
+This will overwrite any existing JLink installed in your system.
 
 # Building
-Set the path to the toolchain in the environment
-
+There are two ways to specifiy the toolchain. You can export the path to the
+compiler like this:
 ```
 export TOOLCHAIN_PATH=~/gcc-arm-none-eabi-9-2020-q2-update/
 ```
+
+or you can put a soft link next to the main CMakeLists.txt file that is a
+soft link called **gcc-arm-none-eabi** that points to the toolchain.
 
 ```
 mkdir build
@@ -53,3 +57,13 @@ image header. The image header is defined below:
 | HW compatibility | 4 | A 32-bit field that is used to indicate compatiblity a hardware platform |
 | Reserved | 17 | |
 | Payload | N | The uncompressed or compressed payload |
+
+# Debugging
+
+The project uses Segger RTT system. The project uses JLink V752a. To debug
+you need to build a debug version of the code.
+
+Run the RTT Viewer located at
+**scripts/start_rtt.sh**
+
+This will connect to the RTT viewer and you will see the debug messages
