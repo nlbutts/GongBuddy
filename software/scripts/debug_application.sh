@@ -20,7 +20,7 @@ fi
 
 if [[ ! -e ${TARGET_FILE} ]]; then
     cd ${BUILD_DIR}
-    make -j4
+    make -j10
 fi
 
 if [[ ! -e ${TARGET_FILE} ]]; then

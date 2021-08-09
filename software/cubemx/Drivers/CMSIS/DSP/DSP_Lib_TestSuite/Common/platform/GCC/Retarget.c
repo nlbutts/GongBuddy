@@ -32,39 +32,39 @@ int SER_GetChar (void) {
 extern int  __HeapBase;
 extern int  __HeapLimit;
 
-int _open (const char * path, int flags, ...)
+int _open (const char * path, int flags, ...) 
 {
   return (-1);
 }
 
-int _close (int fd)
+int _close (int fd) 
 {
   return (-1);
 }
 
-int _lseek (int fd, int ptr, int dir)
+int _lseek (int fd, int ptr, int dir) 
 {
   return (0);
 }
 
-int __attribute__((weak)) _fstat (int fd, struct stat * st)
+int __attribute__((weak)) _fstat (int fd, struct stat * st) 
 {
   memset (st, 0, sizeof (* st));
   st->st_mode = S_IFCHR;
   return (0);
 }
 
-int _isatty (int fd)
+int _isatty (int fd) 
 {
   return (1);
 }
 
-int _read (int fd, char * ptr, int len)
+int _read (int fd, char * ptr, int len) 
 {
   char c;
   int  i;
 
-  for (i = 0; i < len; i++)
+  for (i = 0; i < len; i++) 
   {
     c = SER_GetChar();
     if (c == 0x0D) break;
@@ -74,7 +74,7 @@ int _read (int fd, char * ptr, int len)
   return (len - i);
 }
 
-int _write (int fd, char * ptr, int len)
+int _write (int fd, char * ptr, int len) 
 {
   int i;
 
@@ -82,24 +82,24 @@ int _write (int fd, char * ptr, int len)
   return (i);
 }
 
-caddr_t _sbrk (int incr)
+caddr_t _sbrk (int incr) 
 {
   static char * heap;
          char * prev_heap;
 
-  if (heap == NULL)
+  if (heap == NULL) 
   {
     heap = (char *)&__HeapBase;
   }
-
+  
   prev_heap = heap;
 
-  if ((heap + incr) > (char *)&__HeapLimit)
+  if ((heap + incr) > (char *)&__HeapLimit) 
   {
     errno = ENOMEM;
     return (caddr_t) -1;
   }
-
+  
   heap += incr;
 
   return (caddr_t) prev_heap;

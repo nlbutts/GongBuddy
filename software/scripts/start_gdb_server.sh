@@ -10,4 +10,4 @@ source ${SCRIPT_WORKING_DIR}/set_paths.sh
 
 
 # ----------------------------------------------------- Start the J-Link server
-JLinkGDBServer -device STM32L476RG -if SWD -speed 4000
+JLinkGDBServer -device STM32L476RG -if SWD -speed 8000

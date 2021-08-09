@@ -27,9 +27,8 @@ endif()
 # --------------------------------------------------------- DEFINE BUILD TARGET
 add_library(${LOCAL_PROJ_NAME} STATIC ${SRC_FILES})
 
-#target_link_libraries(${LOCAL_PROJ_NAME} PUBLIC)
+target_link_libraries(${LOCAL_PROJ_NAME} PUBLIC third_party)
 
 # -------------------------------------------------------------- FIND SRC FILES
 target_include_directories(${LOCAL_PROJ_NAME} PUBLIC
-                           ${CMAKE_CURRENT_LIST_DIR}/include
-                           ${gongbuddy_SOURCE_DIR}/STSW-STLKT01_V2.4.0/Projects/SensorTile/Applications/DataLog/Inc)
+                           ${CMAKE_CURRENT_LIST_DIR}/include)

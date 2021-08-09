@@ -19,12 +19,12 @@ set(APPLICATION_DEBUG_HEX application_debug.hex)
 set(APPLICATION_CRC_HEX application_crc.hex)
 set(APPLICATION_CRC_BIN application_crc.bin)
 
-add_custom_command(
-    OUTPUT ${APPLICATION_BIN}
-    COMMAND ${OC} -O binary $<TARGET_FILE:${APPLICATION_ELF}> ${APPLICATION_BIN}
-    DEPENDS ${APPLICATION_ELF}
-    COMMENT "Building ${APPLICATION_BIN}"
-)
+# add_custom_command(
+#     OUTPUT ${APPLICATION_BIN}
+#     COMMAND ${OC} -O binary $<TARGET_FILE:${APPLICATION_ELF}> ${APPLICATION_BIN}
+#     DEPENDS ${APPLICATION_ELF}
+#     COMMENT "Building ${APPLICATION_BIN}"
+# )
 
 add_custom_command(
     OUTPUT ${APPLICATION_DEBUG_HEX}
@@ -40,7 +40,7 @@ add_custom_command(
                 -fill 0xFF 0x08040008 0x08040200
                 -crc32_little_endian 0x08040000
                 -o ${APPLICATION_CRC_HEX} -intel
-    DEPENDS ${APPLICATION_HEX}
+    DEPENDS ${APPLICATION_DEBUG_ELF}
     COMMENT "Building ${APPLICATION_CRC_HEX}"
 )
 

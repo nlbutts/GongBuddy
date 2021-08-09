@@ -54,12 +54,17 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+extern ADC_HandleTypeDef hadc1;
+extern SPI_HandleTypeDef hspi2;
+extern SPI_HandleTypeDef hspi3;
 
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 #define IO_CS_Pin GPIO_PIN_12
 #define IO_CS_GPIO_Port GPIOG
+#define ACC_GYR_INT_Pin GPIO_PIN_7
+#define ACC_GYR_INT_GPIO_Port GPIOC
 #define VBAT_Pin GPIO_PIN_1
 #define VBAT_GPIO_Port GPIOC
 #define IO_INT_Pin GPIO_PIN_0
@@ -68,6 +73,8 @@ void Error_Handler(void);
 #define AG_CS_GPIO_Port GPIOB
 #define CS_P_Pin GPIO_PIN_3
 #define CS_P_GPIO_Port GPIOA
+#define CS_M_Pin GPIO_PIN_1
+#define CS_M_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

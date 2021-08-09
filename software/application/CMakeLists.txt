@@ -35,6 +35,7 @@ file(GLOB_RECURSE SRC_FILES
         ${CUBEMXDIR}/startup_stm32l476xx.s
         ${DRIVER_DIR}/CMSIS/Device/ST/STM32L4xx/system_stm32l4xx.c
         ${DRIVER_DIR}/STM32L4xx_HAL_Driver/Src/*.c
+        ${DRIVER_DIR}/BSP/*.c
         ${MIDDLEWARE_DIR}/ST/*.c
         ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/croutine.c
         ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/event_groups.c
@@ -58,8 +59,8 @@ endforeach()
 
 # --------------------------------------------------------- DEFINE BUILD TARGET
 set(THIS_LINK_LIBS messages)
-add_executable(${THIS_RELEASE} ${SRC_FILES})
-target_link_libraries(${THIS_RELEASE} ${THIS_LINK_LIBS})
+#add_executable(${THIS_RELEASE} ${SRC_FILES})
+#target_link_libraries(${THIS_RELEASE} ${THIS_LINK_LIBS})
 
 add_executable(${THIS_DEBUG} ${SRC_FILES})
 target_link_libraries(${THIS_DEBUG} ${THIS_LINK_LIBS})
@@ -68,23 +69,27 @@ target_link_libraries(${THIS_DEBUG} ${THIS_LINK_LIBS})
 set (INC_DIRS
     ${CMAKE_CURRENT_LIST_DIR}/inc
     ${CMAKE_CURRENT_LIST_DIR}/inc/test
+    ${CMAKE_CURRENT_LIST_DIR}/inc/lora
     ${CORE_DIR}/Inc
     ${DRIVER_DIR}/CMSIS/Include
     ${DRIVER_DIR}/CMSIS/Device/ST/STM32L4xx/Include
     ${DRIVER_DIR}/CMSIS/RTOS2/Include
     ${DRIVER_DIR}/STM32L4xx_HAL_Driver/Inc
+    ${DRIVER_DIR}/BSP/Components/lsm6dsm
     ${MIDDLEWARE_DIR}/ST/STM32_USB_Device_Library/Class/CDC/Inc
     ${MIDDLEWARE_DIR}/ST/STM32_USB_Device_Library/Core/Inc
     ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/include
     ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
     ${MIDDLEWARE_DIR}/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Utilities
+    ${MIDDLEWARE_DIR}/Third_Party/LoRaWAN/Phy
     ${USB_DIR}/App
     ${USB_DIR}/Target
 )
 
-target_include_directories(${THIS_RELEASE}
-    PRIVATE ${INC_DIRS}
-)
+# target_include_directories(${THIS_RELEASE}
+#     PRIVATE ${INC_DIRS}
+# )
 
 target_include_directories(${THIS_DEBUG}
     PRIVATE ${INC_DIRS}
@@ -92,9 +97,9 @@ target_include_directories(${THIS_DEBUG}
 
 
 # ----------------------------------------------------------- SET LINKER SCRIPT
-target_link_libraries(${THIS_RELEASE} buildinfo third_party
-    "-T ${CUBEMXDIR}/STM32L476JGYx_FLASH.ld -L${CUBEMXDIR}"
-)
+# target_link_libraries(${THIS_RELEASE} buildinfo third_party
+#     "-T ${CUBEMXDIR}/STM32L476JGYx_FLASH.ld -L${CUBEMXDIR}"
+# )
 
 target_link_libraries(${THIS_DEBUG} buildinfo third_party
     "-T ${CUBEMXDIR}/STM32L476JGYx_FLASH.ld -L${CUBEMXDIR}"
@@ -102,9 +107,9 @@ target_link_libraries(${THIS_DEBUG} buildinfo third_party
 
 
 # ---------------------------------------------------------------- SET MAP FILE
-target_link_libraries(${THIS_RELEASE}
-    "-Xlinker -Map=${CMAKE_CURRENT_BINARY_DIR}/${THIS_RELEASE}.map"
-)
+# target_link_libraries(${THIS_RELEASE}
+#     "-Xlinker -Map=${CMAKE_CURRENT_BINARY_DIR}/${THIS_RELEASE}.map"
+# )
 
 target_link_libraries(${THIS_DEBUG}
     "-Xlinker -Map=${CMAKE_CURRENT_BINARY_DIR}/${THIS_DEBUG}.map"

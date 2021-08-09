@@ -66,7 +66,7 @@ function create_build()
 
     if [ "$4" == "debug" ]; then
         printf "DEBUG build\n"
-        cmake_args="-DCMAKE_BUILD_TYPE=Debug"
+        cmake_args="${cmake_args} -DCMAKE_BUILD_TYPE=Debug"
         #exit 1
     fi
 
