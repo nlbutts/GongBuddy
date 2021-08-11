@@ -45,8 +45,8 @@ bool ApplicationHeader::isApplicationValid() const
 
     uint32_t imageCRC = 0;
 
-    imageCRC = crc_calculate(imageCRC, &(_appSpace[HEADER_CRC_START_OFFSET]), HEADER_BYTES_TO_CRC);
-    imageCRC = crc_calculate(imageCRC, &(_appSpace[APPLICATION_START_OFFSET]), appSize);
+    imageCRC = crc_calculate(&(_appSpace[HEADER_CRC_START_OFFSET]), HEADER_BYTES_TO_CRC);
+    imageCRC = crc_calculate(&(_appSpace[APPLICATION_START_OFFSET]), appSize);
 
     return imageCRC == getCrc();
 }

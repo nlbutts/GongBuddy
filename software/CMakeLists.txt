@@ -145,6 +145,7 @@ else ()
     add_subdirectory(libbuildinfo)
     add_subdirectory(third-party/tclap-1.2.1)
     add_subdirectory(imagegen)
+    add_subdirectory(ut)
 
     # Executables
 endif ()

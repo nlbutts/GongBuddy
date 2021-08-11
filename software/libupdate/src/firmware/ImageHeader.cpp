@@ -32,8 +32,8 @@ ImageHeader::ImageHeader(Type imageType, uint32_t HwCompatField,
 
     // CRC
     uint32_t crc = 0;
-    crc = crc_calculate(crc, &_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
-    crc = crc_calculate(crc, payload, payloadLength);
+    crc = crc_calculate(&_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
+    crc = crc_calculate(payload, payloadLength);
 
     _header[CRC_OFFSET    ] = static_cast<uint8_t>((crc     )  & 0xFF);
     _header[CRC_OFFSET + 1] = static_cast<uint8_t>((crc >> 8)  & 0xFF);
@@ -101,8 +101,8 @@ bool ImageHeader::isImageValid(void) const
     }
 
     uint32_t crc = 0;
-    crc = crc_calculate(crc, &_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
-    crc = crc_calculate(crc, _payload, payloadLength);
+    crc = crc_calculate(&_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
+    crc = crc_calculate(_payload, payloadLength);
 
     uint32_t storedCRC = (static_cast<uint32_t>(_header[CRC_OFFSET    ])     )
                        | (static_cast<uint32_t>(_header[CRC_OFFSET + 1]) << 8)
