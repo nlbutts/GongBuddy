@@ -14,10 +14,18 @@
 
 #include "main.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Initialize all of the application tasks
  *
  */
 void tasks_init();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TASKS_H_ */

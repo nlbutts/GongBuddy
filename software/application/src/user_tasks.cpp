@@ -1,9 +1,11 @@
+extern "C" {
 #include "user_tasks.h"
 #include "cmsis_os.h"
 #include "debug_print.h"
 #include "lsm6dsm.h"
 #include "sensor_io.h"
 #include "gong_io.h"
+
 
 osThreadId_t data_producer_handle;
 const osThreadAttr_t data_producer_attributes = {
@@ -117,9 +119,20 @@ static void sd_data_logger_task(void *arguments)
 
 void tasks_init()
 {
+    HAL_GPIO_WritePin(AG_CS_GPIO_Port, AG_CS_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(CS_P_GPIO_Port, CS_P_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(CS_M_GPIO_Port, CS_M_Pin, GPIO_PIN_SET);
+
+    gong_io_init(&hspi3);
+    gong_io_set_lora_cs(1);
+    gong_io_set_lora_reset(1);
+    gong_io_set_sd_cs(1);
+
     SEGGER_RTT_ConfigUpBuffer(0, NULL, NULL, 0, SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL);
 
     data_producer_handle = osThreadNew(data_producer_task, NULL, &data_producer_attributes);
     business_logic_handle = osThreadNew(business_logic_task, NULL, &business_logic_attributes);
     sd_data_logger_handle = osThreadNew(sd_data_logger_task, NULL, &sd_data_logger_attributes);
+}
+
 }

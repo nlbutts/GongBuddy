@@ -143,18 +143,10 @@ int main(void)
 
   /* Create the thread(s) */
   /* creation of defaultTask */
-  defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
+  //defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-  HAL_GPIO_WritePin(AG_CS_GPIO_Port, AG_CS_Pin, 1);
-  HAL_GPIO_WritePin(CS_P_GPIO_Port, CS_P_Pin, 1);
-  HAL_GPIO_WritePin(CS_M_GPIO_Port, CS_M_Pin, 1);
-
-  gong_io_init(&hspi3);
-  gong_io_set_lora_cs(1);
-  gong_io_set_lora_reset(1);
-  gong_io_set_sd_cs(1);
   tasks_init();
   /* USER CODE END RTOS_THREADS */
 
