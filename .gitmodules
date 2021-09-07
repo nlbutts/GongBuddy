@@ -1,3 +1,6 @@
 [submodule "software/nanopb"]
 	path = software/nanopb
 	url = https://github.com/nanopb/nanopb
+[submodule "software/ut/googletest"]
+	path = software/ut/googletest
+	url = git@github.com:google/googletest.git

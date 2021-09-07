@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.4)
 if (BUILD_UT)
 
     # --------------------------------------------------- INCLUDE GMOCK / GTEST
-    set(GMOCK_DIR "${CMAKE_CURRENT_LIST_DIR}/googletest-release-1.8.0")
+    set(GMOCK_DIR "${CMAKE_CURRENT_LIST_DIR}/googletest")
     add_subdirectory(${GMOCK_DIR})
 
 

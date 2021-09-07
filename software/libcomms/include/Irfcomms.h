@@ -21,7 +21,7 @@ public:
      * @brief Destroy the RFComms object
      *
      */
-    ~IRFComms();
+    ~IRFComms(){};
     /**
      * @brief Send data to the host
      *

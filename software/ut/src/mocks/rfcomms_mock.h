@@ -18,5 +18,5 @@
 class MockRFComms : public IRFComms {
  public:
   MOCK_METHOD(int, sendData, (std::vector<uint8_t> data), (override));
-  MOCK_METHOD(int, getData, (std::vector<uint8_t> &data), (override));
+  MOCK_METHOD(int, getData, (std::vector<uint8_t> &data, int timeout), (override));
 };
