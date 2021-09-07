@@ -31,9 +31,10 @@ ImageHeader::ImageHeader(Type imageType, uint32_t HwCompatField,
     _header[HW_COMPAT_OFFSET + 3] = static_cast<uint8_t>((HwCompatField >> 24) & 0xFF);
 
     // CRC
-    uint32_t crc = 0;
-    crc = crc_calculate(&_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
-    crc = crc_calculate(payload, payloadLength);
+    uint32_t crc = 0xFFFFFFFF;
+    crc = crc_partial_calculate(crc, &_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
+    crc = crc_partial_calculate(crc, payload, payloadLength);
+    crc = crc_partial_complete(crc);
 
     _header[CRC_OFFSET    ] = static_cast<uint8_t>((crc     )  & 0xFF);
     _header[CRC_OFFSET + 1] = static_cast<uint8_t>((crc >> 8)  & 0xFF);
@@ -100,9 +101,10 @@ bool ImageHeader::isImageValid(void) const
         return false;
     }
 
-    uint32_t crc = 0;
-    crc = crc_calculate(&_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
-    crc = crc_calculate(_payload, payloadLength);
+    uint32_t crc = 0xFFFFFFFF;
+    crc = crc_partial_calculate(crc, &_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
+    crc = crc_partial_calculate(crc, _payload, payloadLength);
+    crc = crc_partial_complete(crc);
 
     uint32_t storedCRC = (static_cast<uint32_t>(_header[CRC_OFFSET    ])     )
                        | (static_cast<uint32_t>(_header[CRC_OFFSET + 1]) << 8)

@@ -79,7 +79,6 @@ static void data_producer_task(void *arguments)
     LSM6DSM_GYRO_GetOutputDataRate(&sensor, &gyro_odr);
     DEBUG_PRINTF(0, "LSM6DS: %02x ACCEL ODR: %d GYRO ODR: %d\n", value, (int)accel_odr, (int)gyro_odr);
 
-    int counter = 0;
     LSM6DSM_Axes_t accel;
     LSM6DSM_Axes_t gyro;
 

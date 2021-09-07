@@ -14,7 +14,7 @@ set(APPLICATION_ELF application.elf)
 set(APPLICATION_DEBUG_ELF application_debug.elf)
 
 # Built locally
-set(APPLICATION_BIN application.bin)
+#set(APPLICATION_BIN application.bin)
 set(APPLICATION_DEBUG_HEX application_debug.hex)
 set(APPLICATION_CRC_HEX application_crc.hex)
 set(APPLICATION_CRC_BIN application_crc.bin)
@@ -28,26 +28,26 @@ set(APPLICATION_CRC_BIN application_crc.bin)
 
 add_custom_command(
     OUTPUT ${APPLICATION_DEBUG_HEX}
-    COMMAND ${OC} -O ihex $<TARGET_FILE:${APPLICATION_DEBUG_ELF}> ${APPLICATION_DEBUG_HEX}
+    COMMAND ${OC} --gap-fill=0xff -O ihex $<TARGET_FILE:${APPLICATION_DEBUG_ELF}> ${APPLICATION_DEBUG_HEX}
     DEPENDS ${APPLICATION_DEBUG_ELF}
     COMMENT "Building ${APPLICATION_DEBUG_HEX}"
 )
 
 add_custom_command(
     OUTPUT ${APPLICATION_CRC_HEX}
-    COMMAND ${SREC_CAT} ${APPLICATION_HEX} -intel
-                -exclusive-length-l-e 0x08040004
-                -fill 0xFF 0x08040008 0x08040200
-                -crc32_little_endian 0x08040000
+    COMMAND ${SREC_CAT} ${APPLICATION_DEBUG_HEX} -intel
+                -exclusive-length-l-e 0x08000004
+                -fill 0xFF 0x08000008 0x08000200
+                -crc32_little_endian 0x08000000
                 -o ${APPLICATION_CRC_HEX} -intel
-    DEPENDS ${APPLICATION_DEBUG_ELF}
+    DEPENDS ${APPLICATION_DEBUG_HEX}
     COMMENT "Building ${APPLICATION_CRC_HEX}"
 )
 
 add_custom_command(
     OUTPUT ${APPLICATION_CRC_BIN}
     COMMAND ${SREC_CAT} ${APPLICATION_CRC_HEX} -intel
-                -offset -0x08040000
+                -offset -0x08000000
                 -o ${APPLICATION_CRC_BIN} -binary
     DEPENDS ${APPLICATION_CRC_HEX}
     COMMENT "Building ${APPLICATION_CRC_BIN}"
@@ -99,11 +99,11 @@ add_custom_command(
 
 # # ------------------------------------------------- SET TARGETS TO BUILD ON ALL
 add_custom_target(fwimages ALL
-    DEPENDS ${APPLICATION_BIN}
+    DEPENDS ${APPLICATION_CRC_BIN}
 )
 
 # ------------------------------------------------------------- INSTALL TARGETS
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${APPLICATION_BIN}
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${APPLICATION_CRC_BIN}
         RENAME application-${ASSEMBLY_PN}-${BUILD_VERSION}.bin
         DESTINATION ./
 )

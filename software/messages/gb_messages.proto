@@ -1,32 +1,49 @@
-syntax = "proto2";
+syntax = "proto3";
 
 enum Status {
-    HEARTBEAT = 0;
-    IMPACT = 1;
-    ENTERING_LOW_POWER = 2;
-    REPROGRAMMING = 3;
+    HEARTBEAT               = 0;
+    IMPACT                  = 1;
+    ENTERING_LOW_POWER      = 2;
+    ENTER_REPROGRAMMING     = 3;
+    REPROGRAMMING           = 4;
 }
 
 message LoraMsg2 {
-    required Status status = 1;
-    required uint32 identifier = 2;
-    optional uint32 buildnum = 3;
-    optional bytes imu = 4;
-    optional uint32 pressure = 5;
-    optional sint32 temperature = 6;
-    optional uint32 batt_voltage = 7;
-    optional uint32 threshold = 8;
-    optional uint32 configuration = 9;
-    optional sint32 rssi = 10;
-    optional Reprogramming reprog = 11;
+    required Status status              = 1;
+    optional GongInfo                   = 2;
+    optional FWSetup fw_setup           = 3;
+    optional FWPackets reprog           = 4;
+    optional FWUpdateStatus fw_status   = 5;
 }
 
-message Reprogramming {
+message GongInfo {
+    required uint32 dev_id          = 1;
+    optional uint32 buildnum        = 2;
+    optional bytes imu              = 3;
+    optional uint32 pressure        = 4;
+    optional sint32 temperature     = 5;
+    optional uint32 batt_voltage    = 6;
+    optional uint32 threshold       = 7;
+    optional uint32 configuration   = 8;
+    optional sint32 rssi            = 9;
+}
+
+message FWSetup {
+    required uint32 start_address   = 1;
+    required uint32 total_packets   = 2;
+    required uint32 fw_crc          = 3;
+}
+
+message FWPackets {
     required uint32 address = 1;
     required bytes data = 2;
-    enum Flags {
-        LAST_PACKET = 0;
-        CONTINUE = 1;
+}
+
+message FWUpdateStatus {
+    enum FWStatus {
+        MISSING_PACKETS     = 0;
+        INVALID_CRC         = 1;
+        VALID_FW_BLOB       = 2;
     }
-    required Flags flags = 3 [default = CONTINUE];
+    required bytes valid_packets_bit_field = 1;
 }

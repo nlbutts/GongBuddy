@@ -142,6 +142,7 @@ else ()
     # Libraries
     add_subdirectory(third-party)
     add_subdirectory(libupdate)
+    add_subdirectory(libcomms)
     add_subdirectory(libbuildinfo)
     add_subdirectory(third-party/tclap-1.2.1)
     add_subdirectory(imagegen)

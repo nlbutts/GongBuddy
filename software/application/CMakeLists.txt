@@ -31,6 +31,7 @@ message(STATUS ${CUBEMXDIR})
 # -------------------------------------------------------------- FIND SRC FILES
 file(GLOB_RECURSE SRC_FILES
         ${CMAKE_CURRENT_LIST_DIR}/src/*.c
+        ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp
         ${CORE_DIR}/*.c
         ${CUBEMXDIR}/startup_stm32l476xx.s
         ${DRIVER_DIR}/CMSIS/Device/ST/STM32L4xx/system_stm32l4xx.c
@@ -59,11 +60,11 @@ endforeach()
 
 # --------------------------------------------------------- DEFINE BUILD TARGET
 set(THIS_LINK_LIBS messages)
-#add_executable(${THIS_RELEASE} ${SRC_FILES})
-#target_link_libraries(${THIS_RELEASE} ${THIS_LINK_LIBS})
+# add_executable(${THIS_RELEASE} ${SRC_FILES})
+# target_link_libraries(${THIS_RELEASE} ${THIS_LINK_LIBS})
 
 add_executable(${THIS_DEBUG} ${SRC_FILES})
-target_link_libraries(${THIS_DEBUG} ${THIS_LINK_LIBS})
+#target_link_libraries(${THIS_DEBUG} ${THIS_LINK_LIBS})
 
 # ------------------------------------------------------------- INCLUDE FOLDERS
 set (INC_DIRS
@@ -101,7 +102,7 @@ target_include_directories(${THIS_DEBUG}
 #     "-T ${CUBEMXDIR}/STM32L476JGYx_FLASH.ld -L${CUBEMXDIR}"
 # )
 
-target_link_libraries(${THIS_DEBUG} buildinfo third_party
+target_link_libraries(${THIS_DEBUG} buildinfo third_party messages
     "-T ${CUBEMXDIR}/STM32L476JGYx_FLASH.ld -L${CUBEMXDIR}"
 )
 

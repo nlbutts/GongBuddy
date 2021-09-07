@@ -24,7 +24,7 @@ uint32_t crc_calculate(const uint8_t* data, uint32_t len);
  * @details This may be called multiple times as data becomes available,
  *          the CRC does not need to be calculated in a single operation
  *
- * @param crc the existing CRC or zero to start a new CRC
+ * @param crc the existing CRC or zero to start a new CRC, should be 0xFFFFFFFF
  * @param data Pointer to the data to add in
  * @param len Length of the data to add in
  * @return uint32_t the resulting CRC
