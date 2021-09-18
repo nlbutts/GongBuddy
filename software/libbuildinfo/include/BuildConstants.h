@@ -4,6 +4,11 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /**
  * These constants are passed in at compile time. See the CMakeLists.txt file
  * to see how that is done.
@@ -48,5 +53,9 @@ const char * getBuildDateString(void);
  */
 uint32_t getHardwareCompatBitfield(void);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BUILD_CONSTANTS_H */

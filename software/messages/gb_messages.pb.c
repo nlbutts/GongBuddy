@@ -9,7 +9,19 @@
 PB_BIND(LoraMsg2, LoraMsg2, 2)
 
 
-PB_BIND(Reprogramming, Reprogramming, AUTO)
+PB_BIND(GongInfo, GongInfo, AUTO)
+
+
+PB_BIND(Configuration, Configuration, AUTO)
+
+
+PB_BIND(FWSetup, FWSetup, AUTO)
+
+
+PB_BIND(FWPackets, FWPackets, AUTO)
+
+
+PB_BIND(FWUpdateStatus, FWUpdateStatus, AUTO)
 
 
 

@@ -12,7 +12,7 @@ file(GLOB_RECURSE SRC_FILES
 # --------------------------------------------------------- DEFINE BUILD TARGET
 add_library(${LOCAL_PROJ_NAME} STATIC ${SRC_FILES})
 
-#target_link_libraries(${LOCAL_PROJ_NAME} PUBLIC third_party)
+target_link_libraries(${LOCAL_PROJ_NAME} PUBLIC buildinfo messages update utility)
 
 # -------------------------------------------------------------- FIND SRC FILES
 target_include_directories(${LOCAL_PROJ_NAME} PUBLIC

@@ -12,7 +12,6 @@
  */
 
 #include <vector>
-#include <stdint.h>
 
 class IRFComms
 {
@@ -25,18 +24,20 @@ public:
     /**
      * @brief Send data to the host
      *
-     * @param pbData serilized protobuf
+     * @param pbData pointer to a buffer of data
+     * @param length the length of data to transmit
      * @return int number of bytes Txed
      */
-    virtual int sendData(std::vector<uint8_t> pbData) = 0;
+    virtual int sendData(uint8_t * pbData, int length) = 0;
     /**
      * @brief Get data from the host
      *
-     * @param pbData serilized protobuf
+     * @param pbData pointer to a buffer to receive the data
+     * @param length the length of the buffer
      * @param timeout timeout in milliseconds
      * @return int number of bytes Received
      */
-    virtual int getData(std::vector<uint8_t> &pbData, int timeout) = 0;
+    virtual int getData(uint8_t * pbData, int length, int timeout) = 0;
 
 protected:
     /**

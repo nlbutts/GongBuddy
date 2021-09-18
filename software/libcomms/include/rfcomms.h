@@ -28,19 +28,8 @@ public:
      *
      */
     ~RFComms();
-    /**
-     * @brief Send data to the host
-     *
-     * @param pbData serilized protobuf
-     * @return int number of bytes Txed
-     */
-    int sendData(std::vector<uint8_t> pbData) override;
-    /**
-     * @brief Get data from the host
-     *
-     * @param pbData serilized protobuf
-     * @param timeout timeout in milliseconds
-     * @return int number of bytes Received
-     */
-    int getData(std::vector<uint8_t> &pbData, int timeout) override;
+
+    int sendData(uint8_t * pbData, int length) override;
+
+    int getData(uint8_t * pbData, int length, int timeout) override;
 };

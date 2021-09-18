@@ -1,2 +1,3 @@
-LoraMsg2.imu max_size:200
-Reprogramming.data max_size:200
+GongInfo.imu max_size:200
+FWPackets.data max_size:200
+FWUpdateStatus.valid_packets_bit_field max_size:200

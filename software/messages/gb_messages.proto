@@ -1,49 +1,58 @@
 syntax = "proto3";
 
 enum Status {
-    HEARTBEAT               = 0;
-    IMPACT                  = 1;
-    ENTERING_LOW_POWER      = 2;
-    ENTER_REPROGRAMMING     = 3;
-    REPROGRAMMING           = 4;
+    NOTHING                 = 0;
+    HEARTBEAT               = 1;
+    IMPACT                  = 2;
+    ENTERING_LOW_POWER      = 3;
+    ENTER_REPROGRAMMING     = 4;
+    REPROGRAMMING           = 5;
 }
 
 message LoraMsg2 {
-    required Status status              = 1;
-    optional GongInfo                   = 2;
-    optional FWSetup fw_setup           = 3;
-    optional FWPackets reprog           = 4;
-    optional FWUpdateStatus fw_status   = 5;
+    Status status               = 1;
+    GongInfo gonginfo           = 2;
+    FWSetup fw_setup            = 3;
+    FWPackets reprog            = 4;
+    FWUpdateStatus fw_status    = 5;
+    Configuration cfg           = 6;
 }
 
 message GongInfo {
-    required uint32 dev_id          = 1;
-    optional uint32 buildnum        = 2;
-    optional bytes imu              = 3;
-    optional uint32 pressure        = 4;
-    optional sint32 temperature     = 5;
-    optional uint32 batt_voltage    = 6;
-    optional uint32 threshold       = 7;
-    optional uint32 configuration   = 8;
-    optional sint32 rssi            = 9;
+    uint32 dev_id           = 1;
+    uint32 buildnum         = 2;
+    bytes imu               = 3;
+    uint32 pressure         = 4;
+    sint32 temperature      = 5;
+    uint32 batt_voltage     = 6;
+    uint32 threshold        = 7;
+    uint32 configuration    = 8;
+    sint32 rssi             = 9;
+}
+
+message Configuration {
+    uint32 threshold        = 1;
 }
 
 message FWSetup {
-    required uint32 start_address   = 1;
-    required uint32 total_packets   = 2;
-    required uint32 fw_crc          = 3;
+    uint32 start_address    = 1;
+    uint32 total_packets    = 2;
+    uint32 bytes_per_packet = 3;
+    uint32 fw_crc           = 4;
 }
 
 message FWPackets {
-    required uint32 address = 1;
-    required bytes data = 2;
+    uint32 packet           = 1;
+    bytes data              = 2;
 }
 
 message FWUpdateStatus {
     enum FWStatus {
-        MISSING_PACKETS     = 0;
-        INVALID_CRC         = 1;
-        VALID_FW_BLOB       = 2;
+        READY_FOR_PAYLOAD   = 0;
+        MISSING_PACKETS     = 1;
+        INVALID_CRC         = 2;
+        VALID_FW_BLOB       = 3;
     }
-    required bytes valid_packets_bit_field = 1;
+    FWStatus status                 = 1;
+    bytes valid_packets_bit_field   = 2;
 }

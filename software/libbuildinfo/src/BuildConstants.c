@@ -6,7 +6,7 @@
 #ifdef BUILD_VERSION
     #define FW_VERSION_STR BUILD_VERSION
 #else
-    #define FW_VERSION_STR ""
+    #define FW_VERSION_STR "1"
     #warning BUILD_VERSION is undefined
 #endif
 

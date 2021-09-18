@@ -31,7 +31,7 @@ main()
 
     # Create builds
     create_build    arm         .           "${THIS_SCRIPT_PATH}/toolchain/arm_embedded_toolchain.txt" $1 || exit 1
-    create_build    x86         .                                                           || exit 1
+    create_build    x86         .            $1 || exit 1
 
     # Build created projects, if option is set
     if [ "$1" == "make" ]; then
@@ -70,17 +70,16 @@ function create_build()
         #exit 1
     fi
 
-    # if [ ! -z "$4" ]; then
-    #     cmake_args=${4}
-    # fi
-
     # Clear and create the build path
     printf "Clearing ${build_path}\n"
     mkdir -p ${build_path}
     rm -rf ${build_path}/*
 
     # Optionally select the toolchain file
-    if [ ! -z "${3}" ]; then
+    if [ "$3" == "debug" ]; then
+        printf "DEBUG build\n"
+        cmake_args="${cmake_args} -DCMAKE_BUILD_TYPE=Debug"
+    elif [ ! -z "${3}" ]; then
         toolchain_file=$( realpath "${3}" )
         cmake_args="-DCMAKE_TOOLCHAIN_FILE:PATH=${toolchain_file} ${cmake_args}"
     fi

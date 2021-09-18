@@ -21,7 +21,7 @@ if (BUILD_UT)
 
     # ------------------------------------------------------------ BUILD TARGET
     add_executable(${THIS} ${SRC_FILES})
-    target_link_libraries(${THIS} PRIVATE update comms gmock_main)
+    target_link_libraries(${THIS} PRIVATE utility update comms buildinfo gmock_main)
 
 
     # ------------------------------------------------------- ADD INCLUDE PATHS

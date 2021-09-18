@@ -1,5 +1,5 @@
 (fp_lib_table
-  (lib (name KicadFootprint)(type KiCad)(uri C:/projects/KicadFootprint)(options "")(descr ""))
-  (lib (name mechanical)(type KiCad)(uri C:/projects/GongBuddy/hardware/mechanical)(options "")(descr ""))
-  (lib (name digikey-footprints)(type KiCad)(uri C:/projects/digikey-kicad-library/digikey-footprints.pretty)(options "")(descr ""))
+  (lib (name KicadFootprint)(type KiCad)(uri ~/projects/KicadFootprint)(options "")(descr ""))
+  (lib (name mechanical)(type KiCad)(uri ${KIPRJMOD}/mechanical)(options "")(descr ""))
+  (lib (name digikey-footprints)(type KiCad)(uri ~/projects/digikey-kicad-library/digikey-footprints.pretty)(options "")(descr ""))
 )

@@ -10,12 +10,12 @@ RFComms::~RFComms()
 
 }
 
-int RFComms::sendData(std::vector<uint8_t> pbData)
+int RFComms::sendData(uint8_t * pbData, int length)
 {
     return 0;
 }
 
-int RFComms::getData(std::vector<uint8_t> &pbData, int timeout)
+int RFComms::getData(uint8_t * pbData, int length, int timeout)
 {
     return 0;
 

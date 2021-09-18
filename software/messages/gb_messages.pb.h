@@ -11,58 +11,81 @@
 
 /* Enum definitions */
 typedef enum _Status {
-    Status_HEARTBEAT = 0,
-    Status_IMPACT = 1,
-    Status_ENTERING_LOW_POWER = 2,
-    Status_REPROGRAMMING = 3
+    Status_NOTHING = 0,
+    Status_HEARTBEAT = 1,
+    Status_IMPACT = 2,
+    Status_ENTERING_LOW_POWER = 3,
+    Status_ENTER_REPROGRAMMING = 4,
+    Status_REPROGRAMMING = 5
 } Status;
 
-typedef enum _Reprogramming_Flags {
-    Reprogramming_Flags_LAST_PACKET = 0,
-    Reprogramming_Flags_CONTINUE = 1
-} Reprogramming_Flags;
+typedef enum _FWUpdateStatus_FWStatus {
+    FWUpdateStatus_FWStatus_READY_FOR_PAYLOAD = 0,
+    FWUpdateStatus_FWStatus_MISSING_PACKETS = 1,
+    FWUpdateStatus_FWStatus_INVALID_CRC = 2,
+    FWUpdateStatus_FWStatus_VALID_FW_BLOB = 3
+} FWUpdateStatus_FWStatus;
 
 /* Struct definitions */
-typedef PB_BYTES_ARRAY_T(200) Reprogramming_data_t;
-typedef struct _Reprogramming {
-    uint32_t address;
-    Reprogramming_data_t data;
-    Reprogramming_Flags flags;
-} Reprogramming;
+typedef struct _Configuration {
+    uint32_t threshold;
+} Configuration;
 
-typedef PB_BYTES_ARRAY_T(200) LoraMsg2_imu_t;
+typedef PB_BYTES_ARRAY_T(200) FWPackets_data_t;
+typedef struct _FWPackets {
+    uint32_t packet;
+    FWPackets_data_t data;
+} FWPackets;
+
+typedef struct _FWSetup {
+    uint32_t start_address;
+    uint32_t total_packets;
+    uint32_t bytes_per_packet;
+    uint32_t fw_crc;
+} FWSetup;
+
+typedef PB_BYTES_ARRAY_T(200) FWUpdateStatus_valid_packets_bit_field_t;
+typedef struct _FWUpdateStatus {
+    FWUpdateStatus_FWStatus status;
+    FWUpdateStatus_valid_packets_bit_field_t valid_packets_bit_field;
+} FWUpdateStatus;
+
+typedef PB_BYTES_ARRAY_T(200) GongInfo_imu_t;
+typedef struct _GongInfo {
+    uint32_t dev_id;
+    uint32_t buildnum;
+    GongInfo_imu_t imu;
+    uint32_t pressure;
+    int32_t temperature;
+    uint32_t batt_voltage;
+    uint32_t threshold;
+    uint32_t configuration;
+    int32_t rssi;
+} GongInfo;
+
 typedef struct _LoraMsg2 {
     Status status;
-    uint32_t identifier;
-    bool has_buildnum;
-    uint32_t buildnum;
-    bool has_imu;
-    LoraMsg2_imu_t imu;
-    bool has_pressure;
-    uint32_t pressure;
-    bool has_temperature;
-    int32_t temperature;
-    bool has_batt_voltage;
-    uint32_t batt_voltage;
-    bool has_threshold;
-    uint32_t threshold;
-    bool has_configuration;
-    uint32_t configuration;
-    bool has_rssi;
-    int32_t rssi;
+    bool has_gonginfo;
+    GongInfo gonginfo;
+    bool has_fw_setup;
+    FWSetup fw_setup;
     bool has_reprog;
-    Reprogramming reprog;
+    FWPackets reprog;
+    bool has_fw_status;
+    FWUpdateStatus fw_status;
+    bool has_cfg;
+    Configuration cfg;
 } LoraMsg2;
 
 
 /* Helper constants for enums */
-#define _Status_MIN Status_HEARTBEAT
+#define _Status_MIN Status_NOTHING
 #define _Status_MAX Status_REPROGRAMMING
 #define _Status_ARRAYSIZE ((Status)(Status_REPROGRAMMING+1))
 
-#define _Reprogramming_Flags_MIN Reprogramming_Flags_LAST_PACKET
-#define _Reprogramming_Flags_MAX Reprogramming_Flags_CONTINUE
-#define _Reprogramming_Flags_ARRAYSIZE ((Reprogramming_Flags)(Reprogramming_Flags_CONTINUE+1))
+#define _FWUpdateStatus_FWStatus_MIN FWUpdateStatus_FWStatus_READY_FOR_PAYLOAD
+#define _FWUpdateStatus_FWStatus_MAX FWUpdateStatus_FWStatus_VALID_FW_BLOB
+#define _FWUpdateStatus_FWStatus_ARRAYSIZE ((FWUpdateStatus_FWStatus)(FWUpdateStatus_FWStatus_VALID_FW_BLOB+1))
 
 
 #ifdef __cplusplus
@@ -70,61 +93,121 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define LoraMsg2_init_default                    {_Status_MIN, 0, false, 0, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, Reprogramming_init_default}
-#define Reprogramming_init_default               {0, {0, {0}}, Reprogramming_Flags_CONTINUE}
-#define LoraMsg2_init_zero                       {_Status_MIN, 0, false, 0, false, {0, {0}}, false, 0, false, 0, false, 0, false, 0, false, 0, false, 0, false, Reprogramming_init_zero}
-#define Reprogramming_init_zero                  {0, {0, {0}}, _Reprogramming_Flags_MIN}
+#define LoraMsg2_init_default                    {_Status_MIN, false, GongInfo_init_default, false, FWSetup_init_default, false, FWPackets_init_default, false, FWUpdateStatus_init_default, false, Configuration_init_default}
+#define GongInfo_init_default                    {0, 0, {0, {0}}, 0, 0, 0, 0, 0, 0}
+#define Configuration_init_default               {0}
+#define FWSetup_init_default                     {0, 0, 0, 0}
+#define FWPackets_init_default                   {0, {0, {0}}}
+#define FWUpdateStatus_init_default              {_FWUpdateStatus_FWStatus_MIN, {0, {0}}}
+#define LoraMsg2_init_zero                       {_Status_MIN, false, GongInfo_init_zero, false, FWSetup_init_zero, false, FWPackets_init_zero, false, FWUpdateStatus_init_zero, false, Configuration_init_zero}
+#define GongInfo_init_zero                       {0, 0, {0, {0}}, 0, 0, 0, 0, 0, 0}
+#define Configuration_init_zero                  {0}
+#define FWSetup_init_zero                        {0, 0, 0, 0}
+#define FWPackets_init_zero                      {0, {0, {0}}}
+#define FWUpdateStatus_init_zero                 {_FWUpdateStatus_FWStatus_MIN, {0, {0}}}
 
 /* Field tags (for use in manual encoding/decoding) */
-#define Reprogramming_address_tag                1
-#define Reprogramming_data_tag                   2
-#define Reprogramming_flags_tag                  3
+#define Configuration_threshold_tag              1
+#define FWPackets_packet_tag                     1
+#define FWPackets_data_tag                       2
+#define FWSetup_start_address_tag                1
+#define FWSetup_total_packets_tag                2
+#define FWSetup_bytes_per_packet_tag             3
+#define FWSetup_fw_crc_tag                       4
+#define FWUpdateStatus_status_tag                1
+#define FWUpdateStatus_valid_packets_bit_field_tag 2
+#define GongInfo_dev_id_tag                      1
+#define GongInfo_buildnum_tag                    2
+#define GongInfo_imu_tag                         3
+#define GongInfo_pressure_tag                    4
+#define GongInfo_temperature_tag                 5
+#define GongInfo_batt_voltage_tag                6
+#define GongInfo_threshold_tag                   7
+#define GongInfo_configuration_tag               8
+#define GongInfo_rssi_tag                        9
 #define LoraMsg2_status_tag                      1
-#define LoraMsg2_identifier_tag                  2
-#define LoraMsg2_buildnum_tag                    3
-#define LoraMsg2_imu_tag                         4
-#define LoraMsg2_pressure_tag                    5
-#define LoraMsg2_temperature_tag                 6
-#define LoraMsg2_batt_voltage_tag                7
-#define LoraMsg2_threshold_tag                   8
-#define LoraMsg2_configuration_tag               9
-#define LoraMsg2_rssi_tag                        10
-#define LoraMsg2_reprog_tag                      11
+#define LoraMsg2_gonginfo_tag                    2
+#define LoraMsg2_fw_setup_tag                    3
+#define LoraMsg2_reprog_tag                      4
+#define LoraMsg2_fw_status_tag                   5
+#define LoraMsg2_cfg_tag                         6
 
 /* Struct field encoding specification for nanopb */
 #define LoraMsg2_FIELDLIST(X, a) \
-X(a, STATIC,   REQUIRED, UENUM,    status,            1) \
-X(a, STATIC,   REQUIRED, UINT32,   identifier,        2) \
-X(a, STATIC,   OPTIONAL, UINT32,   buildnum,          3) \
-X(a, STATIC,   OPTIONAL, BYTES,    imu,               4) \
-X(a, STATIC,   OPTIONAL, UINT32,   pressure,          5) \
-X(a, STATIC,   OPTIONAL, SINT32,   temperature,       6) \
-X(a, STATIC,   OPTIONAL, UINT32,   batt_voltage,      7) \
-X(a, STATIC,   OPTIONAL, UINT32,   threshold,         8) \
-X(a, STATIC,   OPTIONAL, UINT32,   configuration,     9) \
-X(a, STATIC,   OPTIONAL, SINT32,   rssi,             10) \
-X(a, STATIC,   OPTIONAL, MESSAGE,  reprog,           11)
+X(a, STATIC,   SINGULAR, UENUM,    status,            1) \
+X(a, STATIC,   OPTIONAL, MESSAGE,  gonginfo,          2) \
+X(a, STATIC,   OPTIONAL, MESSAGE,  fw_setup,          3) \
+X(a, STATIC,   OPTIONAL, MESSAGE,  reprog,            4) \
+X(a, STATIC,   OPTIONAL, MESSAGE,  fw_status,         5) \
+X(a, STATIC,   OPTIONAL, MESSAGE,  cfg,               6)
 #define LoraMsg2_CALLBACK NULL
 #define LoraMsg2_DEFAULT NULL
-#define LoraMsg2_reprog_MSGTYPE Reprogramming
+#define LoraMsg2_gonginfo_MSGTYPE GongInfo
+#define LoraMsg2_fw_setup_MSGTYPE FWSetup
+#define LoraMsg2_reprog_MSGTYPE FWPackets
+#define LoraMsg2_fw_status_MSGTYPE FWUpdateStatus
+#define LoraMsg2_cfg_MSGTYPE Configuration
 
-#define Reprogramming_FIELDLIST(X, a) \
-X(a, STATIC,   REQUIRED, UINT32,   address,           1) \
-X(a, STATIC,   REQUIRED, BYTES,    data,              2) \
-X(a, STATIC,   REQUIRED, UENUM,    flags,             3)
-#define Reprogramming_CALLBACK NULL
-#define Reprogramming_DEFAULT (const pb_byte_t*)"\x18\x01\x00"
+#define GongInfo_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UINT32,   dev_id,            1) \
+X(a, STATIC,   SINGULAR, UINT32,   buildnum,          2) \
+X(a, STATIC,   SINGULAR, BYTES,    imu,               3) \
+X(a, STATIC,   SINGULAR, UINT32,   pressure,          4) \
+X(a, STATIC,   SINGULAR, SINT32,   temperature,       5) \
+X(a, STATIC,   SINGULAR, UINT32,   batt_voltage,      6) \
+X(a, STATIC,   SINGULAR, UINT32,   threshold,         7) \
+X(a, STATIC,   SINGULAR, UINT32,   configuration,     8) \
+X(a, STATIC,   SINGULAR, SINT32,   rssi,              9)
+#define GongInfo_CALLBACK NULL
+#define GongInfo_DEFAULT NULL
+
+#define Configuration_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UINT32,   threshold,         1)
+#define Configuration_CALLBACK NULL
+#define Configuration_DEFAULT NULL
+
+#define FWSetup_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UINT32,   start_address,     1) \
+X(a, STATIC,   SINGULAR, UINT32,   total_packets,     2) \
+X(a, STATIC,   SINGULAR, UINT32,   bytes_per_packet,   3) \
+X(a, STATIC,   SINGULAR, UINT32,   fw_crc,            4)
+#define FWSetup_CALLBACK NULL
+#define FWSetup_DEFAULT NULL
+
+#define FWPackets_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UINT32,   packet,            1) \
+X(a, STATIC,   SINGULAR, BYTES,    data,              2)
+#define FWPackets_CALLBACK NULL
+#define FWPackets_DEFAULT NULL
+
+#define FWUpdateStatus_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UENUM,    status,            1) \
+X(a, STATIC,   SINGULAR, BYTES,    valid_packets_bit_field,   2)
+#define FWUpdateStatus_CALLBACK NULL
+#define FWUpdateStatus_DEFAULT NULL
 
 extern const pb_msgdesc_t LoraMsg2_msg;
-extern const pb_msgdesc_t Reprogramming_msg;
+extern const pb_msgdesc_t GongInfo_msg;
+extern const pb_msgdesc_t Configuration_msg;
+extern const pb_msgdesc_t FWSetup_msg;
+extern const pb_msgdesc_t FWPackets_msg;
+extern const pb_msgdesc_t FWUpdateStatus_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define LoraMsg2_fields &LoraMsg2_msg
-#define Reprogramming_fields &Reprogramming_msg
+#define GongInfo_fields &GongInfo_msg
+#define Configuration_fields &Configuration_msg
+#define FWSetup_fields &FWSetup_msg
+#define FWPackets_fields &FWPackets_msg
+#define FWUpdateStatus_fields &FWUpdateStatus_msg
 
 /* Maximum encoded size of messages (where known) */
-#define LoraMsg2_size                            467
-#define Reprogramming_size                       211
+#define LoraMsg2_size                            710
+#define GongInfo_size                            251
+#define Configuration_size                       6
+#define FWSetup_size                             24
+#define FWPackets_size                           209
+#define FWUpdateStatus_size                      205
 
 #ifdef __cplusplus
 } /* extern "C" */
