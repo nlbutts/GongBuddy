@@ -12,7 +12,7 @@
 #include <cstring>
 #include "Timer.h"
 
-Timer::Timer(const char * str)
+Timer::Timer(volatile uint32_t * cnt_reg, const char * str)
 : _timerDesc(str)
 , _expireStart(0)
 , _expireDuration(0)
@@ -21,12 +21,13 @@ Timer::Timer(const char * str)
 , _expired(true)
 , _next(NULL)
 {
+    _timerReg = cnt_reg;
     _tempStr[0] = '\0';
     start();
     registerTimer();
 }
 
-Timer::Timer()
+Timer::Timer(volatile uint32_t * cnt_reg)
 : _timerDesc("")
 , _expireStart(0)
 , _expireDuration(0)
@@ -35,6 +36,7 @@ Timer::Timer()
 , _expired(true)
 , _next(NULL)
 {
+    _timerReg = cnt_reg;
     _tempStr[0] = '\0';
     start();
     registerTimer();

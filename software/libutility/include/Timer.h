@@ -5,7 +5,7 @@
  * @version 0.1
  * @date 2021-09-15
  *
- * @copyright Copyright (c) 2021
+ * @copyright Copyright (c) 2021Q
  *
  */
 #ifndef TIMER_H_
@@ -20,10 +20,11 @@ class Timer : public ITimer
          * Timer constructor, the timer overlays a free running 1 us timer and provides
          * functionality to time events.
          *
+         * @param cnt_reg a pointer to the free running counter register
          * @param str the name of this timer
          */
-        Timer(const char * str);
-        Timer();
+        Timer(volatile uint32_t * cnt_reg, const char * str);
+        Timer(volatile uint32_t * cnt_reg);
         virtual ~Timer();
 
         /**
@@ -133,6 +134,7 @@ class Timer : public ITimer
         static uint32_t              _frequency;         // The frequency this timer is running at
         static Timer               * _root;              // Root pointer to the linked list
 
+        volatile uint32_t          * _timerReg;          // Pointer to the free running register
         const char                 * _timerDesc;         // A text description of this timer, used for timing intervals
         uint32_t                     _expireStart;       // start time of the expiration timer
         uint32_t                     _expireDuration;    // duration of the expiration timer

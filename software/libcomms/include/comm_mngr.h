@@ -116,9 +116,10 @@ private:
      * @brief Sends the FW update status message
      *
      * @param status the status to send
+     * @param fwstatus the firmware status to send back
      * @return bool follows the _comms->send return
      */
-    bool sendFWUpdateStatus(FWUpdateStatus_FWStatus status);
+    bool sendFWUpdateStatus(Status status, FWUpdateStatus_FWStatus fwstatus);
 
     void populateBaseData(LoraMsg2 &msg,
                           uint32_t pressure,
@@ -132,6 +133,10 @@ private:
                          std::vector<int16_t> &imu);
 
     int transmitPB(LoraMsg2 &msg);
+
+private:
+    // Timeout in milliseconds
+    static constexpr int ProgrammingTimeout = 1000;
 
 private:
     uint32_t    _uniqueID;  // Pointer to unique ID

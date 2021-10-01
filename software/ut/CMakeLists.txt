@@ -33,5 +33,6 @@ if (BUILD_UT)
 
     # --------------------------------------------------------- INSTALL TARGETS
     install(TARGETS ${THIS} RUNTIME DESTINATION ./)
+    install(FILES ${CMAKE_CURRENT_LIST_DIR}/data/app.image DESTINATION ./)
 
 endif()

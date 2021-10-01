@@ -61,4 +61,4 @@ else
 fi
 
 # ----------------------------------------------------- Create the update image
-${IMAGEGEN_TOOL} -a ${INPUT_FILE} ${output_file} ${hw_comp} || exit 1
+${IMAGEGEN_TOOL} -c -a ${INPUT_FILE} ${output_file} ${hw_comp} || exit 1

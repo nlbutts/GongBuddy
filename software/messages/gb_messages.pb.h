@@ -15,8 +15,7 @@ typedef enum _Status {
     Status_HEARTBEAT = 1,
     Status_IMPACT = 2,
     Status_ENTERING_LOW_POWER = 3,
-    Status_ENTER_REPROGRAMMING = 4,
-    Status_REPROGRAMMING = 5
+    Status_REPROGRAMMING = 4
 } Status;
 
 typedef enum _FWUpdateStatus_FWStatus {
@@ -31,7 +30,7 @@ typedef struct _Configuration {
     uint32_t threshold;
 } Configuration;
 
-typedef PB_BYTES_ARRAY_T(200) FWPackets_data_t;
+typedef PB_BYTES_ARRAY_T(250) FWPackets_data_t;
 typedef struct _FWPackets {
     uint32_t packet;
     FWPackets_data_t data;
@@ -44,13 +43,13 @@ typedef struct _FWSetup {
     uint32_t fw_crc;
 } FWSetup;
 
-typedef PB_BYTES_ARRAY_T(200) FWUpdateStatus_valid_packets_bit_field_t;
+typedef PB_BYTES_ARRAY_T(250) FWUpdateStatus_valid_packets_bit_field_t;
 typedef struct _FWUpdateStatus {
     FWUpdateStatus_FWStatus status;
     FWUpdateStatus_valid_packets_bit_field_t valid_packets_bit_field;
 } FWUpdateStatus;
 
-typedef PB_BYTES_ARRAY_T(200) GongInfo_imu_t;
+typedef PB_BYTES_ARRAY_T(250) GongInfo_imu_t;
 typedef struct _GongInfo {
     uint32_t dev_id;
     uint32_t buildnum;
@@ -202,12 +201,12 @@ extern const pb_msgdesc_t FWUpdateStatus_msg;
 #define FWUpdateStatus_fields &FWUpdateStatus_msg
 
 /* Maximum encoded size of messages (where known) */
-#define LoraMsg2_size                            710
-#define GongInfo_size                            251
+#define LoraMsg2_size                            860
+#define GongInfo_size                            301
 #define Configuration_size                       6
 #define FWSetup_size                             24
-#define FWPackets_size                           209
-#define FWUpdateStatus_size                      205
+#define FWPackets_size                           259
+#define FWUpdateStatus_size                      255
 
 #ifdef __cplusplus
 } /* extern "C" */

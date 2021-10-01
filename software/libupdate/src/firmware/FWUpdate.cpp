@@ -88,7 +88,7 @@ void FWUpdate::setFWProgInfo(uint32_t startAddress,
     _crc = crc;
 
     // Calculate how many pages will be required to store the data.
-    _rxPacketBitField.resize((_numPackets / _bytesPerPacket) + 1);
+    _rxPacketBitField.resize((_numPackets / 8) + 1);
 }
 
 bool FWUpdate::writePacket(uint32_t packetNum, uint8_t * data, uint32_t len)
@@ -103,11 +103,14 @@ bool FWUpdate::writePacket(uint32_t packetNum, uint8_t * data, uint32_t len)
             {
                 writeData++;
                 _currentAddress += 8; // 64 bit writes at a time
-                recordPacket(packetNum);
                 rv = true;
             }
         }
     }
+
+    if (rv)
+        recordPacket(packetNum);
+
     return rv;
 }
 

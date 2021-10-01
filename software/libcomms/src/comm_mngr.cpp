@@ -5,6 +5,7 @@
 #include <pb_decode.h>
 #include "firmware/FWUpdate.h"
 #include "Irfcomms.h"
+#include "ITimer.h"
 
 CommManager::CommManager(uint32_t uniqueID,
                          IRFComms & comms,
@@ -120,35 +121,50 @@ bool CommManager::processResponse()
 
             if (msg.has_fw_setup)
             {
+                _timer->setTimerMs(CommManager::ProgrammingTimeout);
                 _fwupdate->setFWProgInfo(msg.fw_setup.start_address,
                                          msg.fw_setup.total_packets,
                                          msg.fw_setup.bytes_per_packet,
                                          msg.fw_setup.fw_crc);
 
                 // Send a message indicating we are ready for data
-                sendFWUpdateStatus(FWUpdateStatus_FWStatus_READY_FOR_PAYLOAD);
+                sendFWUpdateStatus(Status_REPROGRAMMING, FWUpdateStatus_FWStatus_READY_FOR_PAYLOAD);
                 return true;
             }
             else if (msg.has_reprog)
             {
+                _timer->setTimerMs(CommManager::ProgrammingTimeout);
                 _fwupdate->writePacket(msg.reprog.packet, msg.reprog.data.bytes, msg.reprog.data.size);
-                if (msg.reprog.packet == _fwupdate->getPackets())
+                if (msg.reprog.packet == (_fwupdate->getPackets() - 1))
                 {
-                    _fwupdate->validateProgramming();
+                    if (_fwupdate->validateProgramming())
+                    {
+                        sendFWUpdateStatus(Status_REPROGRAMMING, FWUpdateStatus_FWStatus_VALID_FW_BLOB);
+                    }
+                    else
+                    {
+                        sendFWUpdateStatus(Status_REPROGRAMMING, FWUpdateStatus_FWStatus_INVALID_CRC);
+                    }
                 }
                 return true;
             }
         }
     }
+    else if (_timer->isTimerExpired() && (_lastStatus == Status_REPROGRAMMING))
+    {
+        // TODO: Send packets that are missing
+        sendFWUpdateStatus(Status_REPROGRAMMING, FWUpdateStatus_FWStatus_MISSING_PACKETS);
+    }
     return false;
 }
 
-bool CommManager::sendFWUpdateStatus(FWUpdateStatus_FWStatus status)
+bool CommManager::sendFWUpdateStatus(Status status, FWUpdateStatus_FWStatus fwstatus)
 {
     LoraMsg2 msg = LoraMsg2_init_default;
     uint8_t buf[10];
+    msg.status = status;
     msg.has_fw_status = true;
-    msg.fw_status.status = status;
+    msg.fw_status.status = fwstatus;
     pb_ostream_t ostream = pb_ostream_from_buffer(buf, sizeof(buf));
     if (pb_encode(&ostream, LoraMsg2_fields, &msg))
     {
