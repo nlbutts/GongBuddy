@@ -284,7 +284,113 @@ TEST_F(CommManagerTest, SendValidProgrammingPacketsWithNoErrors)
         int bytesToCopy = bytesRemaining > PacketSize ? PacketSize : bytesRemaining;
         for (int j = 0; j < bytesToCopy; j++)
         {
-            printf("i=%d j=%d size:%d\n", i, j, (int)fwblob.size());
+            msg.reprog.data.bytes[j] = fwblob[i*PacketSize + j];
+        }
+        msg.reprog.data.size = bytesToCopy;
+        pb_ostream_t temp = pb_ostream_from_buffer(pbbuf, sizeof(pbbuf));
+        stream = temp;
+        status = pb_encode(&stream, LoraMsg2_fields, &msg);
+        EXPECT_TRUE(status);
+
+        EXPECT_CALL(_comms, getData(NotNull(), Ge(150), Ge(250)))
+            .Times(AtLeast(1))
+            .WillRepeatedly(DoAll(SetArrayArgument<0>(pbbuf, pbbuf + stream.bytes_written), Return(stream.bytes_written)));
+
+        processedData = _mngr->processResponse();
+        EXPECT_EQ(1, processedData);
+        EXPECT_EQ(_mngr->getLastStatus(), Status_REPROGRAMMING);
+    }
+
+    {
+        pb_istream_t istream = pb_istream_from_buffer(_data.data(), _data.size());
+        bool status = pb_decode(&istream, LoraMsg2_fields, &msg);
+        EXPECT_TRUE(status);
+    }
+    EXPECT_EQ(msg.status, Status_REPROGRAMMING);
+    EXPECT_EQ(msg.fw_status.status, FWUpdateStatus_FWStatus_VALID_FW_BLOB);
+    dumpFlash();
+}
+
+TEST_F(CommManagerTest, SendValidProgrammingPacketsWithBadData)
+{
+    constexpr int PacketSize = 200;
+
+    // Send data back to device
+    LoraMsg2 msg = LoraMsg2_init_default;
+
+    std::vector<uint8_t> fwblob;
+    loadfw("app.image", fwblob);
+
+    fwblob[100] = 0x42;
+
+    auto packets = fwblob.size() / PacketSize;
+    if ((fwblob.size() % PacketSize) != 0)
+    {
+        packets++;
+    }
+
+    Crc32_Normal fwcrc;
+    fwcrc.update(fwblob.data(), fwblob.size());
+
+    msg.status = Status_REPROGRAMMING;
+    msg.fw_setup.bytes_per_packet = PacketSize;
+    msg.fw_setup.start_address = 0;
+    msg.fw_setup.total_packets = packets;
+    msg.fw_setup.fw_image_size = fwblob.size();
+    msg.fw_setup.fw_crc = fwcrc.getCrc();
+    msg.has_fw_setup = true;
+
+    uint8_t pbbuf[250];
+
+    pb_ostream_t stream = pb_ostream_from_buffer(pbbuf, sizeof(pbbuf));
+    bool status = pb_encode(&stream, LoraMsg2_fields, &msg);
+    EXPECT_TRUE(status);
+
+    EXPECT_CALL(_comms, sendData(_, _))
+        .Times(AtLeast(1))
+        .WillRepeatedly(Invoke(CommManagerTest::dataFromGB));
+
+    EXPECT_CALL(_comms, getData(NotNull(), Ge(150), Ge(250)))
+        .Times(AtLeast(1))
+        .WillRepeatedly(DoAll(SetArrayArgument<0>(pbbuf, pbbuf + stream.bytes_written), Return(stream.bytes_written)));
+
+    EXPECT_CALL(_flash, write(_, _))
+        .Times(AtLeast(1))
+        .WillRepeatedly(Invoke(CommManagerTest::flashWrite));
+
+    EXPECT_CALL(_flash, read(_))
+        .Times(AtLeast(1))
+        .WillRepeatedly(Invoke(CommManagerTest::flashRead));
+
+    EXPECT_CALL(_timer, setTimerMs(_))
+        .Times(AtLeast(1));
+
+    int txSize = _mngr->sendData(1000, 25, 3800, 1500, 5, -60);
+    EXPECT_GE(txSize, 10);
+
+    // comm_mngr will send data, wait a timeout value and then read data
+    int processedData = _mngr->processResponse();
+    EXPECT_EQ(1, processedData);
+    EXPECT_EQ(_mngr->getLastStatus(), Status_REPROGRAMMING);
+
+    {
+        pb_istream_t istream = pb_istream_from_buffer(_data.data(), _data.size());
+        bool status = pb_decode(&istream, LoraMsg2_fields, &msg);
+        EXPECT_TRUE(status);
+    }
+    EXPECT_EQ(msg.status, Status_REPROGRAMMING);
+    EXPECT_EQ(msg.fw_status.status, FWUpdateStatus_FWStatus_READY_FOR_PAYLOAD);
+
+    for (uint32_t i = 0; i < packets; i++)
+    {
+        msg = LoraMsg2_init_default;
+        msg.status = Status_REPROGRAMMING;
+        msg.has_reprog = true;
+        msg.reprog.packet = i;
+        int bytesRemaining = fwblob.size() - (i * PacketSize);
+        int bytesToCopy = bytesRemaining > PacketSize ? PacketSize : bytesRemaining;
+        for (int j = 0; j < bytesToCopy; j++)
+        {
             msg.reprog.data.bytes[j] = fwblob[i*PacketSize + j];
         }
         msg.reprog.data.size = bytesToCopy;

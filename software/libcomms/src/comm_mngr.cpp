@@ -136,7 +136,7 @@ bool CommManager::processResponse()
             {
                 _timer->setTimerMs(CommManager::ProgrammingTimeout);
                 _fwupdate->writePacket(msg.reprog.packet, msg.reprog.data.bytes, msg.reprog.data.size);
-                if (msg.reprog.packet == (_fwupdate->getPackets()))
+                if (msg.reprog.packet == (_fwupdate->getPackets() - 1))
                 {
                     if (_fwupdate->validateProgramming())
                     {

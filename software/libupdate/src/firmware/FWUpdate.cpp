@@ -5,6 +5,7 @@
 //#include "debug_print.h"
 #include "firmware/FWUpdate.h"
 #include "firmware/IFlash.h"
+#include <cstdio>
 
 /*
 Normally the GongBuddy sends the heartbeat or impact message. The BaseStation
@@ -96,7 +97,7 @@ void FWUpdate::setFWProgInfo(uint32_t startAddress,
 bool FWUpdate::writePacket(uint32_t packetNum, uint8_t * data, uint32_t len)
 {
     bool rv = false;
-    if ((len % WriteChunkSize) == 0)
+    //if ((len % WriteChunkSize) == 0)
     {
         uint64_t * writeData = (uint64_t*)data;
         for (uint32_t i = 0; i < len; i += 8)
@@ -160,11 +161,12 @@ bool FWUpdate::verifyAllPacketsReceived() const
 
 bool FWUpdate::verifyCRC()
 {
-    for (uint32_t offset = 0; offset < _fwImageSize; offset += 8)
+    for (uint32_t offset = 0; offset < _fwImageSize; offset++)
     {
         uint8_t data = _flash->read(_startAddress + offset);
         _calccrc.update(&data, 1);
     }
+
     if (_crc == _calccrc.getCrc())
     {
         return true;
