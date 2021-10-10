@@ -3,8 +3,6 @@
 
 #include <iostream>
 
-#include <crc/Crc32.h>
-
 #include <firmware/ImageHeader.h>
 using Firmware::ImageHeader;
 

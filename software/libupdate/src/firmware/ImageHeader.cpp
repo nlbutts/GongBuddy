@@ -1,9 +1,7 @@
 #include <stddef.h>
 #include <string.h>
 
-extern "C" {
-#include <crc/Crc32.h>
-}
+#include <Crc32.h>
 #include <firmware/ImageHeader.h>
 
 namespace Firmware {
@@ -31,15 +29,15 @@ ImageHeader::ImageHeader(Type imageType, uint32_t HwCompatField,
     _header[HW_COMPAT_OFFSET + 3] = static_cast<uint8_t>((HwCompatField >> 24) & 0xFF);
 
     // CRC
-    uint32_t crc = 0xFFFFFFFF;
-    crc = crc_partial_calculate(crc, &_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
-    crc = crc_partial_calculate(crc, payload, payloadLength);
-    crc = crc_partial_complete(crc);
+    Crc32_Normal crc;
+    crc.update(&_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
+    crc.update(payload, payloadLength);
+    uint32_t calccrc = crc.getCrc();
 
-    _header[CRC_OFFSET    ] = static_cast<uint8_t>((crc     )  & 0xFF);
-    _header[CRC_OFFSET + 1] = static_cast<uint8_t>((crc >> 8)  & 0xFF);
-    _header[CRC_OFFSET + 2] = static_cast<uint8_t>((crc >> 16) & 0xFF);
-    _header[CRC_OFFSET + 3] = static_cast<uint8_t>((crc >> 24) & 0xFF);
+    _header[CRC_OFFSET    ] = static_cast<uint8_t>((calccrc     )  & 0xFF);
+    _header[CRC_OFFSET + 1] = static_cast<uint8_t>((calccrc >> 8)  & 0xFF);
+    _header[CRC_OFFSET + 2] = static_cast<uint8_t>((calccrc >> 16) & 0xFF);
+    _header[CRC_OFFSET + 3] = static_cast<uint8_t>((calccrc >> 24) & 0xFF);
 
     // AGCO Checksum
     uint32_t checksum = 0;
@@ -101,17 +99,17 @@ bool ImageHeader::isImageValid(void) const
         return false;
     }
 
-    uint32_t crc = 0xFFFFFFFF;
-    crc = crc_partial_calculate(crc, &_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
-    crc = crc_partial_calculate(crc, _payload, payloadLength);
-    crc = crc_partial_complete(crc);
+    Crc32_Normal crc;
+    crc.update(&_header[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
+    crc.update(_payload, payloadLength);
+    uint32_t calccrc = crc.getCrc();
 
     uint32_t storedCRC = (static_cast<uint32_t>(_header[CRC_OFFSET    ])     )
                        | (static_cast<uint32_t>(_header[CRC_OFFSET + 1]) << 8)
                        | (static_cast<uint32_t>(_header[CRC_OFFSET + 2]) << 16)
                        | (static_cast<uint32_t>(_header[CRC_OFFSET + 3]) << 24);
 
-    return storedCRC == crc;
+    return storedCRC == calccrc;
 }
 
 ImageHeader::Type ImageHeader::getImageType(void) const

@@ -6,8 +6,6 @@
 #include <firmware/ApplicationHeader.h>
 using Firmware::ApplicationHeader;
 
-#include <crc/Crc32.h>
-
 class ApplicationHeaderTest : public ::testing::Test
 {
 public:

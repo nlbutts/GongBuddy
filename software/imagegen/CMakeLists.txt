@@ -21,7 +21,7 @@ file(GLOB_RECURSE SRC_FILES
 
 # ------------------------------------------------------- DEFINE THE EXECUTABLE
 add_executable(${THIS} ${SRC_FILES})
-target_link_libraries(${THIS} tclap update buildinfo)
+target_link_libraries(${THIS} tclap update buildinfo utility)
 
 
 # ------------------------------------------------------------- INCLUDE FOLDERS

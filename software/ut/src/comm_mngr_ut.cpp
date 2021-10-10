@@ -40,13 +40,20 @@ protected:
     {
         std::ifstream ifs(filename, std::ios::binary);
         ifs.seekg(0, std::ios::end);
-        auto size = ifs.tellg();
+        uint32_t size = ifs.tellg();
         ifs.seekg(0, std::ios::beg);
         std::vector<uint8_t> data;
-        data.reserve(size);
-        data.insert(data.begin(),
-                    std::istream_iterator<uint8_t>(ifs),
-                    std::istream_iterator<uint8_t>());
+        if (size == 0)
+        {
+            printf("Size can't be zero\n");
+        }
+        else
+        {
+            data.reserve(size);
+            data.insert(data.begin(),
+                        std::istream_iterator<uint8_t>(ifs),
+                        std::istream_iterator<uint8_t>());
+        }
         return data;
     }
 

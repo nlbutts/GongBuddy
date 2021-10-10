@@ -1,11 +1,50 @@
-#include <string.h>
-
-#include <crc/Crc32.h>
+/**
+ * @file Crc32.cpp
+ * @author Nick Butts (nlbutts@ieee.org)
+ * @brief CCITT32 CRC
+ * @version 0.1
+ * @date 2021-10-10
+ *
+ * @copyright Copyright (c) 2021
+ *
+ */
+#include <Crc32.h>
 
 // Stolen shamelessly from the internet
 #define UPDC32(table, octet, crc) (table[((crc) ^ (octet)) & 0xff] ^ ((crc) >> 8))
 
-const uint32_t _table[] = {
+Crc32::Crc32() :
+    _crc(0)
+{
+}
+
+Crc32::~Crc32()
+{
+}
+
+void Crc32::reset(void)
+{
+    _crc = _getInitValue();
+}
+
+void Crc32::update(const uint8_t* buf, uint32_t len)
+{
+    // Get CRC look up table from the derived class
+    const table_t& table = _getCrcTable();
+
+    for ( ; len; --len, ++buf)
+    {
+        _crc = UPDC32(table, *buf, _crc);
+    }
+}
+
+uint32_t Crc32::getCrc(void)
+{
+    return _finalizeCrc(_crc);
+}
+
+
+const Crc32::table_t Crc32_Normal::_table = {
         0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
         0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
         0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91, 0x1db71064, 0x6ab020f2,
@@ -50,26 +89,3 @@ const uint32_t _table[] = {
         0x54de5729, 0x23d967bf, 0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94,
         0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d };
 
-uint32_t crc_partial_calculate(uint32_t crc, const uint8_t* data, uint32_t len)
-{
-    for ( ; len; --len, ++data)
-    {
-        crc = UPDC32(_table, *data, crc);
-    }
-    return crc;
-}
-
-uint32_t crc_calculate(const uint8_t* data, uint32_t len)
-{
-    uint32_t crc = 0xFFFFFFFF;
-    for ( ; len; --len, ++data)
-    {
-        crc = UPDC32(_table, *data, crc);
-    }
-    return crc ^ 0xFFFFFFFF;
-}
-
-uint32_t crc_partial_complete(uint32_t crc)
-{
-    return crc ^ 0xFFFFFFFF;
-}

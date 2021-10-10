@@ -1,16 +1,18 @@
 #include <stdint.h>
 #include <gtest/gtest.h>
 
-#include <crc/Crc32.h>
+#include <Crc32.h>
 
 TEST(Crc32_NormalTest, TestInitialValue)
 {
     // Expected value generated with srec_cat
     static const uint32_t EXPECTED_CRC = 0x00000000;
 
-    uint32_t crc = crc_calculate(nullptr, 0);
+    Crc32_Normal crc;
+    crc.update(nullptr, 0);
+    uint32_t calccrc = crc.getCrc();
 
-    EXPECT_EQ(EXPECTED_CRC, crc);
+    EXPECT_EQ(EXPECTED_CRC, calccrc);
 }
 
 TEST(Crc32_NormalTest, TestBlock)
@@ -20,9 +22,11 @@ TEST(Crc32_NormalTest, TestBlock)
     static const uint32_t EXPECTED_CRC = 0xEA8C89C0;
 
     ASSERT_EQ(8, sizeof(DATA));
-    uint32_t crc = crc_calculate(DATA, 8);
+    Crc32_Normal crc;
+    crc.update(DATA, 8);
+    uint32_t calccrc = crc.getCrc();
 
-    EXPECT_EQ(EXPECTED_CRC, crc);
+    EXPECT_EQ(EXPECTED_CRC, calccrc);
 }
 
 TEST(Crc32_NormalTest, TestBlock2)
@@ -32,9 +36,11 @@ TEST(Crc32_NormalTest, TestBlock2)
     static const uint32_t EXPECTED_CRC = 0x3A458204;
 
     ASSERT_EQ(13, sizeof(DATA));
-    uint32_t crc = crc_calculate(DATA, 13);
+    Crc32_Normal crc;
+    crc.update(DATA, 13);
+    uint32_t calccrc = crc.getCrc();
 
-    EXPECT_EQ(EXPECTED_CRC, crc);
+    EXPECT_EQ(EXPECTED_CRC, calccrc);
 }
 
 TEST(Crc32_NormalTest, TestPartialBlock)
@@ -44,10 +50,10 @@ TEST(Crc32_NormalTest, TestPartialBlock)
     static const uint32_t EXPECTED_CRC = 0xEA8C89C0;
 
     ASSERT_EQ(8, sizeof(DATA));
-    uint32_t crc = 0xFFFFFFFF;
-    crc = crc_partial_calculate(crc, &DATA[0], 4);
-    crc = crc_partial_calculate(crc, &DATA[4], 4);
-    crc = crc_partial_complete(crc);
+    Crc32_Normal crc;
+    crc.update(&DATA[0], 4);
+    crc.update(&DATA[4], 4);
+    uint32_t calccrc = crc.getCrc();
 
-    EXPECT_EQ(EXPECTED_CRC, crc);
+    EXPECT_EQ(EXPECTED_CRC, calccrc);
 }

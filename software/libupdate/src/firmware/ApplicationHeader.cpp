@@ -1,6 +1,6 @@
 #include <stddef.h>
 #include <firmware/ApplicationHeader.h>
-#include <crc/Crc32.h>
+#include <Crc32.h>
 
 namespace Firmware {
 
@@ -45,11 +45,10 @@ bool ApplicationHeader::isApplicationValid() const
 
     uint32_t imageCRC = 0;
 
-    // imageCRC = crc_calculate(&(_appSpace[HEADER_CRC_START_OFFSET]), HEADER_BYTES_TO_CRC);
-    // imageCRC = crc_calculate(&(_appSpace[APPLICATION_START_OFFSET]), appSize);
-    imageCRC = crc_partial_calculate(0xFFFFFFFF, &_appSpace[HEADER_CRC_START_OFFSET], HEADER_BYTES_TO_CRC);
-    imageCRC = crc_partial_calculate(imageCRC, &_appSpace[APPLICATION_START_OFFSET], appSize);
-    imageCRC = crc_partial_complete(imageCRC);
+    Crc32_Normal crc;
+    crc.update(&(_appSpace[HEADER_CRC_START_OFFSET]), HEADER_BYTES_TO_CRC);
+    crc.update(&(_appSpace[APPLICATION_START_OFFSET]), appSize);
+    imageCRC = crc.getCrc();
 
     return imageCRC == getCrc();
 }

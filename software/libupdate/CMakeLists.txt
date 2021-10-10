@@ -27,7 +27,7 @@ endif()
 # --------------------------------------------------------- DEFINE BUILD TARGET
 add_library(${LOCAL_PROJ_NAME} STATIC ${SRC_FILES})
 
-target_link_libraries(${LOCAL_PROJ_NAME} PUBLIC third_party)
+target_link_libraries(${LOCAL_PROJ_NAME} PUBLIC third_party utility)
 
 # -------------------------------------------------------------- FIND SRC FILES
 target_include_directories(${LOCAL_PROJ_NAME} PUBLIC
