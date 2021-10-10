@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <Crc32.h>
 
 class IFlash;
 
@@ -41,11 +42,13 @@ public:
      * @param startAddress start address to program
      * @param numPackets number of expected packets
      * @param bytesPerPacket the number of bytes per packet
+     * @param fwImageSize the total size of the firmware image
      * @param crc crc of the programmed code
      */
     void setFWProgInfo(uint32_t startAddress,
                        uint32_t numPackets,
                        uint32_t bytesPerPacket,
+                       uint32_t fwImageSize,
                        uint32_t crc);
 
     /**
@@ -105,6 +108,8 @@ private:
 
 private:
     void recordPacket(uint32_t packetNum);
+    bool verifyAllPacketsReceived() const;
+    bool verifyCRC();
 
 
 private:
@@ -113,8 +118,10 @@ private:
     uint32_t                _currentAddress;
     uint32_t                _numPackets;
     uint32_t                _bytesPerPacket;
+    uint32_t                _fwImageSize;
     uint32_t                _crc;
     std::vector<uint8_t>    _rxPacketBitField;
+    Crc32_Normal            _calccrc;
 };
 
 #endif /* FW_UPDATE_H_ */

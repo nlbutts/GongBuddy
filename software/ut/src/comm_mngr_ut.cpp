@@ -10,7 +10,7 @@
 #include "gb_messages.pb.h"
 #include "firmware/FWUpdate.h"
 #include "firmware/ImageHeader.h"
-#include <fstream>
+#include <cstdio>
 
 using ::testing::AtLeast;
 using ::testing::Return;
@@ -28,6 +28,7 @@ protected:
     {
         _fwupdate = new FWUpdate(_flash);
         _mngr = new CommManager(_uniqueID, _comms, _timer, 500, *_fwupdate);
+        CommManagerTest::_baseAddress = 0xFFFFFFFF;
     }
 
     void TearDown() override
@@ -36,25 +37,23 @@ protected:
         delete _fwupdate;
     }
 
-    std::vector<uint8_t> loadfw(std::string filename)
+    uint32_t loadfw(std::string filename, std::vector<uint8_t> &data)
     {
-        std::ifstream ifs(filename, std::ios::binary);
-        ifs.seekg(0, std::ios::end);
-        uint32_t size = ifs.tellg();
-        ifs.seekg(0, std::ios::beg);
-        std::vector<uint8_t> data;
-        if (size == 0)
+        FILE * f = fopen(filename.c_str(), "rb");
+        if (f != nullptr)
         {
-            printf("Size can't be zero\n");
+            fseek(f, 0, SEEK_END);
+            uint32_t size = ftell(f);
+            fseek(f, 0, SEEK_SET);
+            uint8_t * ptr = (uint8_t*)malloc(size);
+            auto readbytes = fread(ptr, 1, size, f);
+            fclose(f);
+            std::vector<uint8_t> temp(ptr, ptr + readbytes);
+            free(ptr);
+            data = temp;
         }
-        else
-        {
-            data.reserve(size);
-            data.insert(data.begin(),
-                        std::istream_iterator<uint8_t>(ifs),
-                        std::istream_iterator<uint8_t>());
-        }
-        return data;
+
+        return data.size();
     }
 
     static int dataFromGB(uint8_t * pbData, int length)
@@ -69,13 +68,46 @@ protected:
 
     static bool flashWrite(uint32_t address, uint64_t data)
     {
-        _flashData.push_back((data      ) & 0xFF);
-        _flashData.push_back((data >>  8) & 0xFF);
-        _flashData.push_back((data >> 16) & 0xFF);
-        _flashData.push_back((data >> 24) & 0xFF);
+        if (_baseAddress == 0xFFFFFFFF)
+        {
+            _baseAddress = address;
+        }
+        uint32_t offset = address - CommManagerTest::_baseAddress;
+        // if (CommManagerTest::_flashData.capacity() < (offset + 8))
+        // {
+        //     CommManagerTest::_flashData.reserve(CommManagerTest::_flashData.size() + 256);
+        // }
+
+        CommManagerTest::_flashData[offset    ] = ((data      ) & 0xFF);
+        CommManagerTest::_flashData[offset + 1] = ((data >>  8) & 0xFF);
+        CommManagerTest::_flashData[offset + 2] = ((data >> 16) & 0xFF);
+        CommManagerTest::_flashData[offset + 3] = ((data >> 24) & 0xFF);
+        CommManagerTest::_flashData[offset + 4] = ((data >> 32) & 0xFF);
+        CommManagerTest::_flashData[offset + 5] = ((data >> 40) & 0xFF);
+        CommManagerTest::_flashData[offset + 6] = ((data >> 48) & 0xFF);
+        CommManagerTest::_flashData[offset + 7] = ((data >> 56) & 0xFF);
         return true;
     }
 
+    static uint8_t flashRead(uint32_t address)
+    {
+        uint32_t offset = address - CommManagerTest::_baseAddress;
+        if (offset < CommManagerTest::MaxBufferSize)
+        {
+            return CommManagerTest::_flashData[offset];
+        }
+        return 0;
+    }
+
+    static void dumpFlash()
+    {
+        FILE * f = fopen("dump.bin", "wb");
+        if (f != nullptr)
+        {
+            fwrite(_flashData, 1, MaxBufferSize, f);
+            fclose(f);
+        }
+    }
 
     uint32_t _uniqueID = 1234;
     MockRFComms _comms;
@@ -85,11 +117,18 @@ protected:
 
     CommManager *_mngr;
     static std::vector<uint8_t> _data;
-    static std::vector<uint8_t> _flashData;
+    //static std::vector<uint8_t> _flashData;
+    static constexpr uint32_t MaxBufferSize = 0x100000;
+    static uint8_t _flashData[CommManagerTest::MaxBufferSize];
+    static uint32_t _flashDataSize;
+    static uint32_t _baseAddress;
 };
 
 std::vector<uint8_t> CommManagerTest::_data;
-std::vector<uint8_t> CommManagerTest::_flashData;
+//std::vector<uint8_t> CommManagerTest::_flashData;
+uint8_t CommManagerTest::_flashData[0x100000] = {0xFF};
+uint32_t CommManagerTest::_flashDataSize = 0;
+uint32_t CommManagerTest::_baseAddress;
 
 TEST_F(CommManagerTest, SendHeartBeat)
 {
@@ -174,7 +213,8 @@ TEST_F(CommManagerTest, SendValidProgrammingPacketsWithNoErrors)
     // Send data back to device
     LoraMsg2 msg = LoraMsg2_init_default;
 
-    auto fwblob = loadfw("app.image");
+    std::vector<uint8_t> fwblob;
+    loadfw("app.image", fwblob);
 
     auto packets = fwblob.size() / PacketSize;
     if ((fwblob.size() % PacketSize) != 0)
@@ -182,10 +222,15 @@ TEST_F(CommManagerTest, SendValidProgrammingPacketsWithNoErrors)
         packets++;
     }
 
+    Crc32_Normal fwcrc;
+    fwcrc.update(fwblob.data(), fwblob.size());
+
     msg.status = Status_REPROGRAMMING;
     msg.fw_setup.bytes_per_packet = PacketSize;
     msg.fw_setup.start_address = 0;
     msg.fw_setup.total_packets = packets;
+    msg.fw_setup.fw_image_size = fwblob.size();
+    msg.fw_setup.fw_crc = fwcrc.getCrc();
     msg.has_fw_setup = true;
 
     uint8_t pbbuf[250];
@@ -205,6 +250,10 @@ TEST_F(CommManagerTest, SendValidProgrammingPacketsWithNoErrors)
     EXPECT_CALL(_flash, write(_, _))
         .Times(AtLeast(1))
         .WillRepeatedly(Invoke(CommManagerTest::flashWrite));
+
+    EXPECT_CALL(_flash, read(_))
+        .Times(AtLeast(1))
+        .WillRepeatedly(Invoke(CommManagerTest::flashRead));
 
     EXPECT_CALL(_timer, setTimerMs(_))
         .Times(AtLeast(1));
@@ -231,11 +280,14 @@ TEST_F(CommManagerTest, SendValidProgrammingPacketsWithNoErrors)
         msg.status = Status_REPROGRAMMING;
         msg.has_reprog = true;
         msg.reprog.packet = i;
-        for (int j = 0; j < PacketSize; j++)
+        int bytesRemaining = fwblob.size() - (i * PacketSize);
+        int bytesToCopy = bytesRemaining > PacketSize ? PacketSize : bytesRemaining;
+        for (int j = 0; j < bytesToCopy; j++)
         {
-            msg.reprog.data.bytes[j] = fwblob[j*i];
+            printf("i=%d j=%d size:%d\n", i, j, (int)fwblob.size());
+            msg.reprog.data.bytes[j] = fwblob[i*PacketSize + j];
         }
-        msg.reprog.data.size = PacketSize;
+        msg.reprog.data.size = bytesToCopy;
         pb_ostream_t temp = pb_ostream_from_buffer(pbbuf, sizeof(pbbuf));
         stream = temp;
         status = pb_encode(&stream, LoraMsg2_fields, &msg);
@@ -256,6 +308,7 @@ TEST_F(CommManagerTest, SendValidProgrammingPacketsWithNoErrors)
         EXPECT_TRUE(status);
     }
     EXPECT_EQ(msg.status, Status_REPROGRAMMING);
-    EXPECT_EQ(msg.fw_status.status, FWUpdateStatus_FWStatus_INVALID_CRC);
-
+    EXPECT_EQ(msg.fw_status.status, FWUpdateStatus_FWStatus_VALID_FW_BLOB);
+    dumpFlash();
 }
+

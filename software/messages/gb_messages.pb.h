@@ -15,7 +15,8 @@ typedef enum _Status {
     Status_HEARTBEAT = 1,
     Status_IMPACT = 2,
     Status_ENTERING_LOW_POWER = 3,
-    Status_REPROGRAMMING = 4
+    Status_ENTER_REPROGRAMMING = 4,
+    Status_REPROGRAMMING = 5
 } Status;
 
 typedef enum _FWUpdateStatus_FWStatus {
@@ -40,6 +41,7 @@ typedef struct _FWSetup {
     uint32_t start_address;
     uint32_t total_packets;
     uint32_t bytes_per_packet;
+    uint32_t fw_image_size;
     uint32_t fw_crc;
 } FWSetup;
 
@@ -95,13 +97,13 @@ extern "C" {
 #define LoraMsg2_init_default                    {_Status_MIN, false, GongInfo_init_default, false, FWSetup_init_default, false, FWPackets_init_default, false, FWUpdateStatus_init_default, false, Configuration_init_default}
 #define GongInfo_init_default                    {0, 0, {0, {0}}, 0, 0, 0, 0, 0, 0}
 #define Configuration_init_default               {0}
-#define FWSetup_init_default                     {0, 0, 0, 0}
+#define FWSetup_init_default                     {0, 0, 0, 0, 0}
 #define FWPackets_init_default                   {0, {0, {0}}}
 #define FWUpdateStatus_init_default              {_FWUpdateStatus_FWStatus_MIN, {0, {0}}}
 #define LoraMsg2_init_zero                       {_Status_MIN, false, GongInfo_init_zero, false, FWSetup_init_zero, false, FWPackets_init_zero, false, FWUpdateStatus_init_zero, false, Configuration_init_zero}
 #define GongInfo_init_zero                       {0, 0, {0, {0}}, 0, 0, 0, 0, 0, 0}
 #define Configuration_init_zero                  {0}
-#define FWSetup_init_zero                        {0, 0, 0, 0}
+#define FWSetup_init_zero                        {0, 0, 0, 0, 0}
 #define FWPackets_init_zero                      {0, {0, {0}}}
 #define FWUpdateStatus_init_zero                 {_FWUpdateStatus_FWStatus_MIN, {0, {0}}}
 
@@ -112,7 +114,8 @@ extern "C" {
 #define FWSetup_start_address_tag                1
 #define FWSetup_total_packets_tag                2
 #define FWSetup_bytes_per_packet_tag             3
-#define FWSetup_fw_crc_tag                       4
+#define FWSetup_fw_image_size_tag                4
+#define FWSetup_fw_crc_tag                       5
 #define FWUpdateStatus_status_tag                1
 #define FWUpdateStatus_valid_packets_bit_field_tag 2
 #define GongInfo_dev_id_tag                      1
@@ -169,7 +172,8 @@ X(a, STATIC,   SINGULAR, UINT32,   threshold,         1)
 X(a, STATIC,   SINGULAR, UINT32,   start_address,     1) \
 X(a, STATIC,   SINGULAR, UINT32,   total_packets,     2) \
 X(a, STATIC,   SINGULAR, UINT32,   bytes_per_packet,   3) \
-X(a, STATIC,   SINGULAR, UINT32,   fw_crc,            4)
+X(a, STATIC,   SINGULAR, UINT32,   fw_image_size,     4) \
+X(a, STATIC,   SINGULAR, UINT32,   fw_crc,            5)
 #define FWSetup_CALLBACK NULL
 #define FWSetup_DEFAULT NULL
 
@@ -201,10 +205,10 @@ extern const pb_msgdesc_t FWUpdateStatus_msg;
 #define FWUpdateStatus_fields &FWUpdateStatus_msg
 
 /* Maximum encoded size of messages (where known) */
-#define LoraMsg2_size                            860
+#define LoraMsg2_size                            866
 #define GongInfo_size                            301
 #define Configuration_size                       6
-#define FWSetup_size                             24
+#define FWSetup_size                             30
 #define FWPackets_size                           259
 #define FWUpdateStatus_size                      255
 

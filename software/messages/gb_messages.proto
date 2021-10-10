@@ -38,7 +38,8 @@ message FWSetup {
     uint32 start_address    = 1;
     uint32 total_packets    = 2;
     uint32 bytes_per_packet = 3;
-    uint32 fw_crc           = 4;
+    uint32 fw_image_size    = 4;
+    uint32 fw_crc           = 5;
 }
 
 message FWPackets {

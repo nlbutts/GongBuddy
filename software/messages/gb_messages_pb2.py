@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x11gb_messages.proto\"\xb9\x01\n\x08LoraMsg2\x12\x17\n\x06status\x18\x01 \x01(\x0e\x32\x07.Status\x12\x1b\n\x08gonginfo\x18\x02 \x01(\x0b\x32\t.GongInfo\x12\x1a\n\x08\x66w_setup\x18\x03 \x01(\x0b\x32\x08.FWSetup\x12\x1a\n\x06reprog\x18\x04 \x01(\x0b\x32\n.FWPackets\x12\"\n\tfw_status\x18\x05 \x01(\x0b\x32\x0f.FWUpdateStatus\x12\x1b\n\x03\x63\x66g\x18\x06 \x01(\x0b\x32\x0e.Configuration\"\xae\x01\n\x08GongInfo\x12\x0e\n\x06\x64\x65v_id\x18\x01 \x01(\r\x12\x10\n\x08\x62uildnum\x18\x02 \x01(\r\x12\x0b\n\x03imu\x18\x03 \x01(\x0c\x12\x10\n\x08pressure\x18\x04 \x01(\r\x12\x13\n\x0btemperature\x18\x05 \x01(\x11\x12\x14\n\x0c\x62\x61tt_voltage\x18\x06 \x01(\r\x12\x11\n\tthreshold\x18\x07 \x01(\r\x12\x15\n\rconfiguration\x18\x08 \x01(\r\x12\x0c\n\x04rssi\x18\t \x01(\x11\"\"\n\rConfiguration\x12\x11\n\tthreshold\x18\x01 \x01(\r\"a\n\x07\x46WSetup\x12\x15\n\rstart_address\x18\x01 \x01(\r\x12\x15\n\rtotal_packets\x18\x02 \x01(\r\x12\x18\n\x10\x62ytes_per_packet\x18\x03 \x01(\r\x12\x0e\n\x06\x66w_crc\x18\x04 \x01(\r\")\n\tFWPackets\x12\x0e\n\x06packet\x18\x01 \x01(\r\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\xb7\x01\n\x0e\x46WUpdateStatus\x12(\n\x06status\x18\x01 \x01(\x0e\x32\x18.FWUpdateStatus.FWStatus\x12\x1f\n\x17valid_packets_bit_field\x18\x02 \x01(\x0c\"Z\n\x08\x46WStatus\x12\x15\n\x11READY_FOR_PAYLOAD\x10\x00\x12\x13\n\x0fMISSING_PACKETS\x10\x01\x12\x0f\n\x0bINVALID_CRC\x10\x02\x12\x11\n\rVALID_FW_BLOB\x10\x03*t\n\x06Status\x12\x0b\n\x07NOTHING\x10\x00\x12\r\n\tHEARTBEAT\x10\x01\x12\n\n\x06IMPACT\x10\x02\x12\x16\n\x12\x45NTERING_LOW_POWER\x10\x03\x12\x17\n\x13\x45NTER_REPROGRAMMING\x10\x04\x12\x11\n\rREPROGRAMMING\x10\x05\x62\x06proto3')
+  serialized_pb=_b('\n\x11gb_messages.proto\"\xb9\x01\n\x08LoraMsg2\x12\x17\n\x06status\x18\x01 \x01(\x0e\x32\x07.Status\x12\x1b\n\x08gonginfo\x18\x02 \x01(\x0b\x32\t.GongInfo\x12\x1a\n\x08\x66w_setup\x18\x03 \x01(\x0b\x32\x08.FWSetup\x12\x1a\n\x06reprog\x18\x04 \x01(\x0b\x32\n.FWPackets\x12\"\n\tfw_status\x18\x05 \x01(\x0b\x32\x0f.FWUpdateStatus\x12\x1b\n\x03\x63\x66g\x18\x06 \x01(\x0b\x32\x0e.Configuration\"\xae\x01\n\x08GongInfo\x12\x0e\n\x06\x64\x65v_id\x18\x01 \x01(\r\x12\x10\n\x08\x62uildnum\x18\x02 \x01(\r\x12\x0b\n\x03imu\x18\x03 \x01(\x0c\x12\x10\n\x08pressure\x18\x04 \x01(\r\x12\x13\n\x0btemperature\x18\x05 \x01(\x11\x12\x14\n\x0c\x62\x61tt_voltage\x18\x06 \x01(\r\x12\x11\n\tthreshold\x18\x07 \x01(\r\x12\x15\n\rconfiguration\x18\x08 \x01(\r\x12\x0c\n\x04rssi\x18\t \x01(\x11\"\"\n\rConfiguration\x12\x11\n\tthreshold\x18\x01 \x01(\r\"x\n\x07\x46WSetup\x12\x15\n\rstart_address\x18\x01 \x01(\r\x12\x15\n\rtotal_packets\x18\x02 \x01(\r\x12\x18\n\x10\x62ytes_per_packet\x18\x03 \x01(\r\x12\x15\n\rfw_image_size\x18\x04 \x01(\r\x12\x0e\n\x06\x66w_crc\x18\x05 \x01(\r\")\n\tFWPackets\x12\x0e\n\x06packet\x18\x01 \x01(\r\x12\x0c\n\x04\x64\x61ta\x18\x02 \x01(\x0c\"\xb7\x01\n\x0e\x46WUpdateStatus\x12(\n\x06status\x18\x01 \x01(\x0e\x32\x18.FWUpdateStatus.FWStatus\x12\x1f\n\x17valid_packets_bit_field\x18\x02 \x01(\x0c\"Z\n\x08\x46WStatus\x12\x15\n\x11READY_FOR_PAYLOAD\x10\x00\x12\x13\n\x0fMISSING_PACKETS\x10\x01\x12\x0f\n\x0bINVALID_CRC\x10\x02\x12\x11\n\rVALID_FW_BLOB\x10\x03*t\n\x06Status\x12\x0b\n\x07NOTHING\x10\x00\x12\r\n\tHEARTBEAT\x10\x01\x12\n\n\x06IMPACT\x10\x02\x12\x16\n\x12\x45NTERING_LOW_POWER\x10\x03\x12\x17\n\x13\x45NTER_REPROGRAMMING\x10\x04\x12\x11\n\rREPROGRAMMING\x10\x05\x62\x06proto3')
 )
 
 _STATUS = _descriptor.EnumDescriptor(
@@ -56,8 +56,8 @@ _STATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=750,
-  serialized_end=866,
+  serialized_start=773,
+  serialized_end=889,
 )
 _sym_db.RegisterEnumDescriptor(_STATUS)
 
@@ -95,8 +95,8 @@ _FWUPDATESTATUS_FWSTATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=658,
-  serialized_end=748,
+  serialized_start=681,
+  serialized_end=771,
 )
 _sym_db.RegisterEnumDescriptor(_FWUPDATESTATUS_FWSTATUS)
 
@@ -314,8 +314,15 @@ _FWSETUP = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='fw_crc', full_name='FWSetup.fw_crc', index=3,
+      name='fw_image_size', full_name='FWSetup.fw_image_size', index=3,
       number=4, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='fw_crc', full_name='FWSetup.fw_crc', index=4,
+      number=5, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -333,7 +340,7 @@ _FWSETUP = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=422,
-  serialized_end=519,
+  serialized_end=542,
 )
 
 
@@ -370,8 +377,8 @@ _FWPACKETS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=521,
-  serialized_end=562,
+  serialized_start=544,
+  serialized_end=585,
 )
 
 
@@ -409,8 +416,8 @@ _FWUPDATESTATUS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=565,
-  serialized_end=748,
+  serialized_start=588,
+  serialized_end=771,
 )
 
 _LORAMSG2.fields_by_name['status'].enum_type = _STATUS

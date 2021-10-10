@@ -52,9 +52,9 @@ public:
      * @brief Reads data from the address
      *
      * @param address address to read
-     * @return uint32_t value at that address
+     * @return uint8_t value at that address
      */
-    virtual uint32_t read(uint32_t address) = 0;
+    virtual uint8_t read(uint32_t address) = 0;
 };
 
 #endif /* IFLASH */

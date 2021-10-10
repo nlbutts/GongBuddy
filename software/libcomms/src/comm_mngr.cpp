@@ -125,6 +125,7 @@ bool CommManager::processResponse()
                 _fwupdate->setFWProgInfo(msg.fw_setup.start_address,
                                          msg.fw_setup.total_packets,
                                          msg.fw_setup.bytes_per_packet,
+                                         msg.fw_setup.fw_image_size,
                                          msg.fw_setup.fw_crc);
 
                 // Send a message indicating we are ready for data
@@ -135,7 +136,7 @@ bool CommManager::processResponse()
             {
                 _timer->setTimerMs(CommManager::ProgrammingTimeout);
                 _fwupdate->writePacket(msg.reprog.packet, msg.reprog.data.bytes, msg.reprog.data.size);
-                if (msg.reprog.packet == (_fwupdate->getPackets() - 1))
+                if (msg.reprog.packet == (_fwupdate->getPackets()))
                 {
                     if (_fwupdate->validateProgramming())
                     {

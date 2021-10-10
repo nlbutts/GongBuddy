@@ -1,5 +1,4 @@
 #include <stddef.h>
-#include <Crc32.h>
 //#include <utilities_conf.h>
 #include "firmware/ImageHeader.h"
 #include <firmware/ApplicationHeader.h>
@@ -79,16 +78,19 @@ FWUpdate::~FWUpdate()
 void FWUpdate::setFWProgInfo(uint32_t startAddress,
                              uint32_t numPackets,
                              uint32_t bytesPerPacket,
+                             uint32_t fwImageSize,
                              uint32_t crc)
 {
     _startAddress = startAddress;
     _currentAddress = startAddress;
     _numPackets = numPackets;
     _bytesPerPacket = bytesPerPacket;
+    _fwImageSize = fwImageSize;
     _crc = crc;
 
     // Calculate how many pages will be required to store the data.
     _rxPacketBitField.resize((_numPackets / 8) + 1);
+    _calccrc.reset();
 }
 
 bool FWUpdate::writePacket(uint32_t packetNum, uint8_t * data, uint32_t len)
@@ -97,7 +99,7 @@ bool FWUpdate::writePacket(uint32_t packetNum, uint8_t * data, uint32_t len)
     if ((len % WriteChunkSize) == 0)
     {
         uint64_t * writeData = (uint64_t*)data;
-        for (uint32_t i = 0; i < len; i += 2)
+        for (uint32_t i = 0; i < len; i += 8)
         {
             if (_flash->write(_currentAddress, *writeData))
             {
@@ -135,5 +137,37 @@ void FWUpdate::recordPacket(uint32_t packetNum)
 
 bool FWUpdate::validateProgramming()
 {
+    // Did we receive all of the packets?
+    return verifyAllPacketsReceived() && verifyCRC();
+}
+
+bool FWUpdate::verifyAllPacketsReceived() const
+{
+    uint32_t receivedPackets = 0;
+    for (uint32_t i = 0; i < _numPackets; i++)
+    {
+        if (_rxPacketBitField[i/8] ^ (1 << (i % 8)))
+        {
+            receivedPackets++;
+        }
+    }
+    if (receivedPackets == _numPackets)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool FWUpdate::verifyCRC()
+{
+    for (uint32_t offset = 0; offset < _fwImageSize; offset += 8)
+    {
+        uint8_t data = _flash->read(_startAddress + offset);
+        _calccrc.update(&data, 1);
+    }
+    if (_crc == _calccrc.getCrc())
+    {
+        return true;
+    }
     return false;
 }

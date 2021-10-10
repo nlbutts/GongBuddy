@@ -17,5 +17,5 @@ class IFlash_mock : public IFlash {
  public:
   MOCK_METHOD(bool, erasePage, (uint32_t page), (override));
   MOCK_METHOD(bool, write, (uint32_t address, uint64_t data), (override));
-  MOCK_METHOD(uint32_t, read, (uint32_t address), (override));
+  MOCK_METHOD(uint8_t, read, (uint32_t address), (override));
 };
